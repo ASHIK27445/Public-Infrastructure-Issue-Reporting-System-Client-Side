@@ -18,6 +18,7 @@ import {
   User
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const AllIssuesPage = () => {
   const [issues, setIssues] = useState([]);
@@ -32,7 +33,15 @@ const AllIssuesPage = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [upvoting, setUpvoting] = useState({});
-
+  
+  useEffect(()=>{
+    axios.get('http://localhost:3000/allissues')
+      .then(res => {
+        setIssues(res.data)
+        console.log(issues)
+      })
+      .catch(err=> console.log(err))
+  })
   // Sample categories - in real app, fetch from API
   const categories = [
     'Road & Traffic',
@@ -187,12 +196,12 @@ const AllIssuesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-900/30 to-teal-900/30 border-b border-emerald-500/20">
+      <div className="bg-linear-to-r from-emerald-900/30 to-teal-900/30 border-b border-emerald-500/20">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-4">
-            All <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Issues</span>
+            All <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Issues</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl">
             Browse, search, and filter through community-reported infrastructure issues. 
@@ -245,7 +254,7 @@ const AllIssuesPage = () => {
             {(searchTerm || Object.values(filters).filter(v => v).length > 0) && (
               <button
                 onClick={clearFilters}
-                className="px-6 py-3 bg-gradient-to-r from-gray-700 to-slate-700 rounded-2xl text-white hover:from-gray-600 hover:to-slate-600 transition-all"
+                className="px-6 py-3 bg-linear-to-r from-gray-700 to-slate-700 rounded-2xl text-white hover:from-gray-600 hover:to-slate-600 transition-all"
               >
                 Clear All
               </button>
@@ -268,7 +277,7 @@ const AllIssuesPage = () => {
                         onClick={() => handleFilterChange('category', category)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                           filters.category === category
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white'
+                            ? 'bg-linear-to-r from-emerald-500 to-teal-500 text-white'
                             : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
                         }`}
                       >
@@ -290,7 +299,7 @@ const AllIssuesPage = () => {
                         onClick={() => handleFilterChange('status', status)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center space-x-2 ${
                           filters.status === status
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white'
+                            ? 'bg-linear-to-r from-emerald-500 to-teal-500 text-white'
                             : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
                         }`}
                       >
@@ -313,7 +322,7 @@ const AllIssuesPage = () => {
                         onClick={() => handleFilterChange('priority', priority)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                           filters.priority === priority
-                            ? `bg-gradient-to-r ${getPriorityColor(priority)} text-white`
+                            ? `bg-linear-to-r ${getPriorityColor(priority)} text-white`
                             : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
                         }`}
                       >
@@ -340,7 +349,7 @@ const AllIssuesPage = () => {
                         onClick={() => handleFilterChange('sortBy', option.value)}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           filters.sortBy === option.value
-                            ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/30'
+                            ? 'bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/30'
                             : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
                         }`}
                       >
@@ -396,7 +405,7 @@ const AllIssuesPage = () => {
               </p>
               <button
                 onClick={clearFilters}
-                className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all"
+                className="px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all"
               >
                 Clear Search & Filters
               </button>
@@ -405,62 +414,62 @@ const AllIssuesPage = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredIssues.map((issue) => (
                 <div
-                  key={issue.id}
-                  className="group relative bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl overflow-hidden border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105"
+                  key={issue._id}
+                  className="group relative bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl overflow-hidden border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105"
                 >
                   {/* Issue Image */}
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src={issue.image}
-                      alt={issue.title}
+                      src={issue?.mainPhoto}
+                      alt={issue?.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/40 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-zinc-900/40 to-transparent" />
                     
                     {/* Status Badge */}
                     <div className="absolute top-4 right-4">
-                      <div className={`px-4 py-2 bg-gradient-to-r ${getStatusColor(issue.status)} rounded-full flex items-center space-x-2 shadow-lg`}>
-                        {getStatusIcon(issue.status)}
-                        <span className="text-white font-bold text-xs">{issue.status}</span>
+                      <div className={`px-4 py-2 bg-linear-to-r ${getStatusColor(issue?.status)} rounded-full flex items-center space-x-2 shadow-lg`}>
+                        {getStatusIcon(issue?.status)}
+                        <span className="text-white font-bold text-xs">{issue?.status}</span>
                       </div>
                     </div>
 
                     {/* Priority Badge */}
                     <div className="absolute top-4 left-4">
-                      <div className={`px-4 py-2 bg-gradient-to-r ${getPriorityColor(issue.priority)} rounded-full shadow-lg`}>
-                        <span className="text-white font-bold text-xs">{issue.priority}</span>
+                      <div className={`px-4 py-2 bg-linear-to-r ${getPriorityColor(issue?.priority)} rounded-full shadow-lg`}>
+                        <span className="text-white font-bold text-xs">{issue?.priority}</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Issue Content */}
+                  {/* Issue? Content */}
                   <div className="p-6">
                     {/* Category */}
                     <div className="mb-3">
                       <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-medium">
-                        {issue.category}
+                        {issue?.category}
                       </span>
                     </div>
 
                     {/* Title */}
                     <h3 className="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-emerald-400 transition-colors">
-                      {issue.title}
+                      {issue?.title}
                     </h3>
 
                     {/* Description */}
                     <p className="text-gray-400 text-sm mb-4 line-clamp-2">
-                      {issue.description}
+                      {issue?.description}
                     </p>
 
                     {/* Location and Date */}
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                       <div className="flex items-center space-x-2">
                         <MapPin className="w-4 h-4 text-emerald-500" />
-                        <span className="line-clamp-1">{issue.location}</span>
+                        <span className="line-clamp-1">{issue?.location}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Calendar className="w-4 h-4 text-gray-500" />
-                        <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
+                        <span>{new Date(issue?.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
 
@@ -468,13 +477,13 @@ const AllIssuesPage = () => {
                     <div className="flex items-center space-x-2 mb-6">
                       <div className="w-6 h-6 rounded-full overflow-hidden">
                         <img
-                          src={issue.reporterAvatar}
-                          alt={issue.reporterName}
+                          src={issue?.reporterAvatar}
+                          alt={issue?.reporterName}
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <span className="text-xs text-gray-400">
-                        Reported by {issue.reporterName}
+                        Reported by {issue?.reporterName}
                       </span>
                     </div>
 
@@ -502,7 +511,7 @@ const AllIssuesPage = () => {
                       {/* View Details Button */}
                       <NavLink
                         to={`/issues/${issue.id}`}
-                        className="group/btn flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold text-sm hover:shadow-emerald-500/50 transition-all"
+                        className="group/btn flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold text-sm hover:shadow-emerald-500/50 transition-all"
                       >
                         <span>View Details</span>
                         <Eye className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
@@ -517,7 +526,7 @@ const AllIssuesPage = () => {
           {/* Load More Button */}
           {filteredIssues.length > 0 && (
             <div className="text-center mt-12">
-              <button className="px-8 py-3 bg-gradient-to-r from-zinc-700 to-slate-700 rounded-2xl text-white font-bold hover:from-zinc-600 hover:to-slate-600 transition-all">
+              <button className="px-8 py-3 bg-linear-to-r from-zinc-700 to-slate-700 rounded-2xl text-white font-bold hover:from-zinc-600 hover:to-slate-600 transition-all">
                 Load More Issues
               </button>
             </div>
