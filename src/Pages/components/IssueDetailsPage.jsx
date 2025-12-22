@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router';
+import { NavLink, useParams } from 'react-router';
 import { 
   ArrowLeft, 
   Edit, 
@@ -21,44 +21,24 @@ import {
   Flag,
   Loader2
 } from 'lucide-react';
+import useAxiosSecure from '../../Hooks/useAxiosSecure';
 
 const IssueDetailsPage = () => {
   const [comment, setComment] = useState('');
   const [upvoting, setUpvoting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [issue, setIssue] = useState([])
+  const axiosSecure = useAxiosSecure()
+  const {id} = useParams()
 
-  // Demo issue data
-  const issue = {
-    id: 1,
-    title: "Pothole on Main Street",
-    description: "Large pothole causing traffic issues and vehicle damage. Located near the intersection with Maple Avenue. Approximately 2 feet wide and 6 inches deep. Multiple vehicles have reported damage.",
-    image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    priority: "High",
-    status: "In Progress",
-    isBoosted: true,
-    upvotes: 42,
-    views: 128,
-    comments: 8,
-    createdAt: "2024-01-15T10:30:00Z",
-    location: "Downtown, Sector 5",
-    category: "Road Maintenance",
-    
-    reporterName: "John Doe",
-    reporterAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    reporterJoined: "2023-06-10",
-    reporterIssues: 12,
-    reporterSuccessRate: 85,
-    
-    assignedStaff: {
-      name: "Sarah Johnson",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2087&q=80",
-      department: "Public Works Department",
-      phone: "+1 (555) 123-4567",
-      email: "s.johnson@cityworks.gov",
-    },
-    assignedAt: "2024-01-16T14:20:00Z",
-    userUpvoted: false
-  };
+useEffect(()=>{
+  axiosSecure.get(`/detailIssues/${id}`)
+    .then(res =>{
+      setIssue(res.data)
+    })
+    .catch(err =>{console.log(err)})
+})
+
 
   // Demo timeline data
   const timeline = [
@@ -108,7 +88,6 @@ const IssueDetailsPage = () => {
       createdAt: '2024-01-17T08:20:00Z'
     }
   ];
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'Resolved': return 'from-emerald-500 to-teal-500';
@@ -179,7 +158,7 @@ const IssueDetailsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -195,7 +174,7 @@ const IssueDetailsPage = () => {
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleEdit}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl text-white font-bold hover:shadow-blue-500/50 transition-all"
+                className="flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-blue-500 to-cyan-500 rounded-xl text-white font-bold hover:shadow-blue-500/50 transition-all"
               >
                 <Edit className="w-4 h-4" />
                 <span>Edit</span>
@@ -203,7 +182,7 @@ const IssueDetailsPage = () => {
               
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl text-white font-bold hover:shadow-red-500/50 transition-all"
+                className="flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-red-500 to-orange-500 rounded-xl text-white font-bold hover:shadow-red-500/50 transition-all"
               >
                 <Trash2 className="w-4 h-4" />
                 <span>Delete</span>
@@ -219,17 +198,17 @@ const IssueDetailsPage = () => {
           {/* Left Column - Issue Details */}
           <div className="lg:col-span-2 space-y-8">
             {/* Issue Header */}
-            <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
               <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div className={`px-4 py-2 bg-gradient-to-r ${getPriorityColor(issue.priority)} rounded-full font-bold text-white text-sm`}>
+                <div className={`px-4 py-2 bg-linear-to-r ${getPriorityColor(issue.priority)} rounded-full font-bold text-white text-sm`}>
                   {issue.priority} Priority
                 </div>
-                <div className={`px-4 py-2 bg-gradient-to-r ${getStatusColor(issue.status)} rounded-full font-bold text-white text-sm flex items-center space-x-2`}>
+                <div className={`px-4 py-2 bg-linear-to-r ${getStatusColor(issue.status)} rounded-full font-bold text-white text-sm flex items-center space-x-2`}>
                   <CheckCircle className="w-4 h-4" />
                   <span>{issue.status}</span>
                 </div>
                 {issue.isBoosted && (
-                  <div className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full font-bold text-white text-sm flex items-center space-x-2">
+                  <div className="px-4 py-2 bg-linear-to-r from-purple-500 to-pink-500 rounded-full font-bold text-white text-sm flex items-center space-x-2">
                     <TrendingUp className="w-4 h-4" />
                     <span>Boosted</span>
                   </div>
@@ -241,7 +220,7 @@ const IssueDetailsPage = () => {
               <div className="flex items-center space-x-6 text-gray-400 mb-8">
                 <div className="flex items-center space-x-2">
                   <Calendar className="w-5 h-5" />
-                  <span>{new Date(issue.createdAt).toLocaleDateString('en-US', { 
+                  <span>{new Date(issue?.createdAt).toLocaleDateString('en-US', { 
                     weekday: 'long', 
                     year: 'numeric', 
                     month: 'long', 
@@ -250,22 +229,22 @@ const IssueDetailsPage = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <MapPin className="w-5 h-5 text-emerald-500" />
-                  <span>{issue.location}</span>
+                  <span>{issue?.location}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <User className="w-5 h-5" />
-                  <span>{issue.category}</span>
+                  <span>{issue?.category}</span>
                 </div>
               </div>
 
               {/* Issue Image */}
               <div className="relative h-96 rounded-2xl overflow-hidden mb-8">
                 <img
-                  src={issue.image}
+                  src={issue?.mainPhoto}
                   alt={issue.title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-transparent to-transparent" />
                 <div className="absolute bottom-4 right-4 bg-black/50 text-white text-sm px-3 py-1 rounded-full">
                   Demo Image
                 </div>
@@ -279,7 +258,7 @@ const IssueDetailsPage = () => {
                 </h3>
                 <div className="bg-zinc-800/50 rounded-2xl p-6">
                   <p className="text-gray-300 leading-relaxed whitespace-pre-line">
-                    {issue.description}
+                    {issue?.description}
                   </p>
                   <div className="mt-4 text-sm text-gray-500">
                     (This is demo content. All functionality is disabled.)
@@ -333,7 +312,7 @@ const IssueDetailsPage = () => {
 
                 <button
                   onClick={handleBoost}
-                  className="group flex items-center space-x-3 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl font-bold text-white hover:shadow-purple-500/50 transition-all"
+                  className="group flex items-center space-x-3 px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 rounded-2xl font-bold text-white hover:shadow-purple-500/50 transition-all"
                 >
                   <TrendingUp className="w-5 h-5" />
                   <span>Boost Priority</span>
@@ -354,7 +333,7 @@ const IssueDetailsPage = () => {
 
             {/* Staff Information */}
             {issue.assignedStaff && (
-              <div className="bg-gradient-to-br from-blue-900/20 to-cyan-900/20 rounded-3xl border border-blue-500/30 p-8">
+              <div className="bg-linear-to-br from-blue-900/20 to-cyan-900/20 rounded-3xl border border-blue-500/30 p-8">
                 <h3 className="text-2xl font-bold text-white mb-6 flex items-center space-x-3">
                   <Shield className="w-6 h-6 text-blue-500" />
                   <span>Assigned Staff</span>
@@ -398,7 +377,7 @@ const IssueDetailsPage = () => {
             )}
 
             {/* Comment Section */}
-            <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
               <h3 className="text-2xl font-bold text-white mb-6">Add Comment</h3>
               
               <form onSubmit={handleCommentSubmit}>
@@ -415,7 +394,7 @@ const IssueDetailsPage = () => {
                   </div>
                   <button
                     type="submit"
-                    className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all"
+                    className="flex items-center space-x-2 px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all"
                   >
                     <Send className="w-4 h-4" />
                     <span>Post Comment</span>
@@ -428,7 +407,7 @@ const IssueDetailsPage = () => {
           {/* Right Column - Timeline & Reporter */}
           <div className="space-y-8">
             {/* Reporter Information */}
-            <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center space-x-3">
                 <User className="w-5 h-5 text-emerald-500" />
                 <span>Reporter</span>
@@ -465,7 +444,7 @@ const IssueDetailsPage = () => {
             </div>
 
             {/* Timeline Section */}
-            <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
               <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-3">
                 <Clock className="w-5 h-5 text-amber-500" />
                 <span>Issue Timeline</span>
@@ -527,9 +506,9 @@ const IssueDetailsPage = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8 max-w-md w-full">
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8 max-w-md w-full">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-linear-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Delete Issue</h3>
@@ -547,7 +526,7 @@ const IssueDetailsPage = () => {
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl text-white font-bold hover:shadow-red-500/50 transition-all"
+                className="flex-1 px-6 py-3 bg-linear-to-r from-red-500 to-orange-500 rounded-2xl text-white font-bold hover:shadow-red-500/50 transition-all"
               >
                 Delete (Demo)
               </button>

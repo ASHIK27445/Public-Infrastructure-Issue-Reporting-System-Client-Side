@@ -510,7 +510,7 @@ const AllIssuesPage = () => {
 
                       {/* View Details Button */}
                       <NavLink
-                        to={`/issues/${issue.id}`}
+                        to={`/issues/${issue?._id}`}
                         className="group/btn flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold text-sm hover:shadow-emerald-500/50 transition-all"
                       >
                         <span>View Details</span>

@@ -27,7 +27,7 @@ export const router = createBrowserRouter([
                 path:'/allissues', Component: AllIssuesPage
             },
             {
-                path:'/is', Component: IssueDetailsPage
+                path:'/issues/:id', Component: IssueDetailsPage
             },
             {
                 path:'/cd', Component: CitizenDashboard
