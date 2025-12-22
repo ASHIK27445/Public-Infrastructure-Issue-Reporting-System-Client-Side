@@ -13,12 +13,13 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import axios from 'axios';
-import useAxios from '../../Hooks/useAxios';
+import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { AuthContext } from '../AuthProvider/AuthContext';
 
 const AddIssue = () => {
   const [imagePreview, setImagePreview] = useState(null);
-  const axiosInstance = useAxios()
+  // const axiosInstance = useAxios()
+  const axiosSecure = useAxiosSecure()
   const {user} = use(AuthContext)
 
   const categories = [
@@ -64,7 +65,7 @@ const AddIssue = () => {
         citizenEmail: user?.email
     }
     if(imgbb.data.success == true){
-        axiosInstance.post('/addissue', formData)
+        axiosSecure.post('/addissue', formData)
             .then(res=>console.log(res.data))
             .catch(err=>console.log(err))
     }

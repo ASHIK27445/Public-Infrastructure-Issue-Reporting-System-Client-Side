@@ -1,7 +1,7 @@
 import { use } from "react"
 import { RotatingTriangles } from "react-loader-spinner"
 import { Navigate, useLocation } from "react-router"
-import { AuthContext } from "../../Auth/AuthContext"
+import { AuthContext } from "../AuthProvider/AuthContext"
 
 const PrivateRouter = ({children}) => {
 const {user, loading} = use(AuthContext)
