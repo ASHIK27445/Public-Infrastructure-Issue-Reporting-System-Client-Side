@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div>
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-linear-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
                 <MapPin className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold text-white">CommunityFix</span>
@@ -66,7 +66,7 @@ const Footer = () => {
                 placeholder="Your email"
                 className="flex-1 px-6 py-4 bg-zinc-800 border border-zinc-700 rounded-l-2xl text-white placeholder-gray-500 focus:outline-none"
               />
-              <button className="px-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-r-2xl hover:shadow-emerald-500/50 transition-all duration-300">
+              <button className="px-6 bg-linear-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-r-2xl hover:shadow-emerald-500/50 transition-all duration-300">
                 Join
               </button>
             </div>
@@ -75,10 +75,10 @@ const Footer = () => {
 
         <div className="border-t border-zinc-800 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-gray-500 text-sm mb-4 md:mb-0">
-            © 2024 CommunityFix. All rights reserved.
+            © 2025 ASH. All rights reserved.
           </div>
           <div className="flex items-center space-x-6 text-sm text-gray-500">
-            <span>Built with ❤️ for better communities</span>
+            <span>Built by AI Ashik with ❤️ for better communities</span>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
               <span>All systems operational</span>

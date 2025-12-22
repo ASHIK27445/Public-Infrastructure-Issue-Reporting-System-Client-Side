@@ -67,7 +67,7 @@ const Register = () => {
                 return profileUpdate(name, mainPhoto)
                           .then(()=>{
                             setUser({...auth.currentUser})
-                            axios.post('http://localhost:3000/users', formData)
+                            axios.post('https://piirms.vercel.app/users', formData)
                               .then(res=>console.log(res.data))
                               .catch(err=>console.log(err))
                           })
