@@ -72,7 +72,7 @@ const AddIssue = () => {
 console.log(formData)
   }
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
         <div className="max-w-4xl mx-auto px-6 py-6">
@@ -84,7 +84,7 @@ console.log(formData)
             
             <div className="text-center">
               <h1 className="text-3xl font-black text-white">
-                Report <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">New Issue</span>
+                Report <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">New Issue</span>
               </h1>
               <p className="text-sm text-gray-400 mt-1">Help us improve your community</p>
             </div>
@@ -96,7 +96,7 @@ console.log(formData)
 
       {/* User Limit Banner */}
       {!userLimit.isPremium && (
-        <div className="bg-gradient-to-r from-amber-900/30 to-yellow-900/30 border-b border-amber-500/30">
+        <div className="bg-linear-to-r from-amber-900/30 to-yellow-900/30 border-b border-amber-500/30">
           <div className="max-w-4xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -110,7 +110,7 @@ console.log(formData)
               </div>
               
               {userLimit.remainingIssues === 0 && (
-                <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold hover:shadow-emerald-500/50 transition-all">
+                <button className="flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold hover:shadow-emerald-500/50 transition-all">
                   <Zap className="w-4 h-4" />
                   <span>Upgrade to Premium</span>
                 </button>
@@ -122,7 +122,7 @@ console.log(formData)
 
       {/* Premium Badge */}
       {userLimit.isPremium && (
-        <div className="bg-gradient-to-r from-emerald-900/30 to-teal-900/30 border-b border-emerald-500/30">
+        <div className="bg-linear-to-r from-emerald-900/30 to-teal-900/30 border-b border-emerald-500/30">
           <div className="max-w-4xl mx-auto px-6 py-4">
             <div className="flex items-center justify-center space-x-2">
               <CheckCircle className="w-5 h-5 text-emerald-400" />
@@ -134,7 +134,7 @@ console.log(formData)
 
       {/* Main Form */}
       <div className="max-w-4xl mx-auto px-6 py-8">
-        <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
+        <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Title Field */}
             <div className="space-y-3">
@@ -229,7 +229,7 @@ console.log(formData)
 
             {/* Submit Button */}
             <div className="pt-6 border-t border-zinc-700">
-              <button className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white hover:shadow-emerald-500/50 hover:scale-[1.02] transition-all flex items-center justify-center space-x-3">
+              <button className="w-full py-4 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white hover:shadow-emerald-500/50 hover:scale-[1.02] transition-all flex items-center justify-center space-x-3">
                 <CheckCircle className="w-5 h-5" />
                 <span>Report Issue</span>
               </button>

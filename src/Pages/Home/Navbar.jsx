@@ -17,7 +17,7 @@ import {
 
 const Navbar = () => {
   const {user, logoutUser, role} = use(AuthContext);
-  console.log(role)
+  // console.log(role)
   const handleLogout = () => {
     logoutUser()
       .then(() => toast.success("Logout Successful"))

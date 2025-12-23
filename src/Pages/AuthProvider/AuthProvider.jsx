@@ -37,14 +37,14 @@ const AuthProvider = ({children}) => {
         if(!user){return}
         axios.get(`http://localhost:3000/user/role/${user?.email}`)
             .then((res)=>{
-                console.log('Full response:', res.data)  // Check this
-            console.log('Role value:', res.data.role)
+            //     console.log('Full response:', res.data)  // Check this
+            // console.log('Role value:', res.data.role)
                 setRole(res.data.role)
             })
             .catch(err=> console.log(err))
     },[user])
 
-    console.log(role)
+    // console.log(role)
     const googleProvider = new GoogleAuthProvider()
     const signInWithGoogle = () => {
         return signInWithPopup(auth, googleProvider)
