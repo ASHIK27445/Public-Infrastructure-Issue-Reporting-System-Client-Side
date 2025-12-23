@@ -35,7 +35,7 @@ const AllIssuesPage = () => {
   const [upvoting, setUpvoting] = useState({});
   
   useEffect(()=>{
-    axios.get('https://piirms.vercel.app/allissues')
+    axios.get('http://localhost:3000/allissues')
       .then(res => {
         setIssues(res.data)
         console.log(issues)

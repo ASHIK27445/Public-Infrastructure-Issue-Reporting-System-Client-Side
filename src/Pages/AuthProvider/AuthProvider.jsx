@@ -35,7 +35,7 @@ const AuthProvider = ({children}) => {
 
     useEffect(()=>{
         if(!user){return}
-        axios.get(`https://piirms.vercel.app/user/role/${user?.email}`)
+        axios.get(`http://localhost:3000/user/role/${user?.email}`)
             .then((res)=>{
                 console.log('Full response:', res.data)  // Check this
             console.log('Role value:', res.data.role)
