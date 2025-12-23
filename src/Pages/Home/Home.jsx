@@ -21,7 +21,6 @@ const Home = () => {
       <CTASection />
       <Testimonials />
       <Contact />
-      <Footer />
     </div>
   );
 };

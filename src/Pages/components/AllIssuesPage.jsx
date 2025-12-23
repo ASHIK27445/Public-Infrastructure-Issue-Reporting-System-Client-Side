@@ -38,10 +38,10 @@ const AllIssuesPage = () => {
     axios.get('http://localhost:3000/allissues')
       .then(res => {
         setIssues(res.data)
-        console.log(issues)
       })
       .catch(err=> console.log(err))
-  })
+      toast.error('Failed to fetch issues');
+  }, [])
   // Sample categories - in real app, fetch from API
   const categories = [
     'Road & Traffic',
@@ -75,7 +75,6 @@ const AllIssuesPage = () => {
       console.error('Error fetching issues:', error);
       // Fallback to sample data
       setIssues(sampleIssues);
-      setFilteredIssues(sampleIssues);
     } finally {
       setLoading(false);
     }

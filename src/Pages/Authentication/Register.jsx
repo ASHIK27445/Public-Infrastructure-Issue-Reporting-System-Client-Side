@@ -28,12 +28,12 @@ const Register = () => {
         if(passWD.length < 6){
             newPassWordError.push('Length must be at least 6 characters')
         }
-        if(!/[0-9]/.test(passWD)){
-            newPassWordError.push('Password Must have at least one number')
-        }
-        if(!/[!@#$%^&*]/.test(passWD)){
-            newPassWordError.push('Password Must have at least one special character')
-        }
+        // if(!/[0-9]/.test(passWD)){
+        //     newPassWordError.push('Password Must have at least one number')
+        // }
+        // if(!/[!@#$%^&*]/.test(passWD)){
+        //     newPassWordError.push('Password Must have at least one special character')
+        // }
 
         setPassError(newPassWordError)
     }
@@ -105,7 +105,7 @@ const Register = () => {
     
     if(loading){
       return (
-        <div className="min-h-screen bg-gradient-to-br from-zinc-950 to-zinc-900 flex justify-center items-center">
+        <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 flex justify-center items-center">
           <div className="text-center">
             <RotatingTriangles
               visible={true}
@@ -127,16 +127,16 @@ const Register = () => {
     }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 to-zinc-900 py-12 px-4 flex items-center justify-center">
+    <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 py-12 px-4 flex items-center justify-center">
       <title>CityInfra - Register</title>
       
       <div className="w-full max-w-2xl">
         <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+          <div className="absolute -inset-1 bg-linear-to-r from-emerald-500 to-teal-500 rounded-3xl blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
           
-          <div className="relative bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-3xl p-8 border border-zinc-700">
+          <div className="relative bg-linear-to-br from-zinc-900 to-zinc-800 rounded-3xl p-8 border border-zinc-700">
             <div className="flex items-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mr-4">
+              <div className="w-16 h-16 bg-linear-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mr-4">
                 <UserPlus className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -229,7 +229,7 @@ const Register = () => {
                 </div>
                 
                 {passError.length > 0 && (
-                  <div className="mt-4 p-4 bg-gradient-to-r from-zinc-800 to-zinc-900 rounded-xl border border-zinc-700">
+                  <div className="mt-4 p-4 bg-linear-to-r from-zinc-800 to-zinc-900 rounded-xl border border-zinc-700">
                     <h4 className="text-white font-semibold mb-2 flex items-center">
                       <Shield className="w-4 h-4 mr-2 text-emerald-500" />
                       Password Requirements
@@ -246,7 +246,7 @@ const Register = () => {
                 )}
                 
                 {passError.length === 0 && password.length > 0 && (
-                  <div className="mt-4 p-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-xl border border-emerald-500/30">
+                  <div className="mt-4 p-4 bg-linear-to-r from-emerald-500/10 to-teal-500/10 rounded-xl border border-emerald-500/30">
                     <p className="text-emerald-400 font-semibold flex items-center">
                       <CheckCircle className="w-4 h-4 mr-2" />
                       All password requirements met!
@@ -269,7 +269,7 @@ const Register = () => {
 
               <button 
                 type="submit"
-                className="group w-full px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3"
+                className="group w-full px-8 py-4 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3"
               >
                 <span>Create Account</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
