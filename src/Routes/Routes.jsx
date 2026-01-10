@@ -10,6 +10,7 @@ import DashboardLayout from "../Pages/Dashboard/Dashboardlayout"
 import DashboardDesign from "../Pages/Dashboard/DashboardDesign"
 import AddIssues from "../Pages/components/AddIssues"
 import ManageIssues from "../Pages/components/ManageIssues"
+import PrivateRouter from "../Pages/Authentication/PrivateRouter"
 export const router = createBrowserRouter([
     {
         path: '/' , element:<Root></Root>,
@@ -27,7 +28,7 @@ export const router = createBrowserRouter([
                 path:'/allissues', Component: AllIssuesPage
             },
             {
-                path:'/issues/:id', Component: IssueDetailsPage
+                path:'/issues/:id', element: <PrivateRouter><IssueDetailsPage></IssueDetailsPage></PrivateRouter>
             },
             {
                 path:'/cd', Component: CitizenDashboard

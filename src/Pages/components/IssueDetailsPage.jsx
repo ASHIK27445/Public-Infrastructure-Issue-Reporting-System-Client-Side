@@ -200,14 +200,14 @@ useEffect(()=>{
             {/* Issue Header */}
             <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
               <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div className={`px-4 py-2 bg-linear-to-r ${getPriorityColor(issue.priority)} rounded-full font-bold text-white text-sm`}>
-                  {issue.priority} Priority
+                <div className={`px-4 py-2 bg-linear-to-r ${getPriorityColor(issue?.priority)} rounded-full font-bold text-white text-sm`}>
+                  {issue?.priority} Priority
                 </div>
-                <div className={`px-4 py-2 bg-linear-to-r ${getStatusColor(issue.status)} rounded-full font-bold text-white text-sm flex items-center space-x-2`}>
+                <div className={`px-4 py-2 bg-linear-to-r ${getStatusColor(issue?.status)} rounded-full font-bold text-white text-sm flex items-center space-x-2`}>
                   <CheckCircle className="w-4 h-4" />
-                  <span>{issue.status}</span>
+                  <span>{issue?.status}</span>
                 </div>
-                {issue.isBoosted && (
+                {issue?.isBoosted && (
                   <div className="px-4 py-2 bg-linear-to-r from-purple-500 to-pink-500 rounded-full font-bold text-white text-sm flex items-center space-x-2">
                     <TrendingUp className="w-4 h-4" />
                     <span>Boosted</span>
@@ -215,7 +215,7 @@ useEffect(()=>{
                 )}
               </div>
 
-              <h1 className="text-4xl font-black text-white mb-4">{issue.title}</h1>
+              <h1 className="text-4xl font-black text-white mb-4">{issue?.title}</h1>
               
               <div className="flex items-center space-x-6 text-gray-400 mb-8">
                 <div className="flex items-center space-x-2">
@@ -241,7 +241,7 @@ useEffect(()=>{
               <div className="relative h-96 rounded-2xl overflow-hidden mb-8">
                 <img
                   src={issue?.mainPhoto}
-                  alt={issue.title}
+                  alt={issue?.title}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-transparent to-transparent" />
@@ -269,15 +269,15 @@ useEffect(()=>{
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
-                  <div className="text-3xl font-black text-emerald-500 mb-2">{issue.upvotes}</div>
+                  <div className="text-3xl font-black text-emerald-500 mb-2">{issue?.upvoteCount}</div>
                   <div className="text-sm text-gray-400">Upvotes</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
-                  <div className="text-3xl font-black text-blue-500 mb-2">{issue.views}</div>
+                  <div className="text-3xl font-black text-blue-500 mb-2">{issue?.views}</div>
                   <div className="text-sm text-gray-400">Views</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
-                  <div className="text-3xl font-black text-amber-500 mb-2">{issue.comments}</div>
+                  <div className="text-3xl font-black text-amber-500 mb-2">{issue?.comments}</div>
                   <div className="text-sm text-gray-400">Comments</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
@@ -306,7 +306,7 @@ useEffect(()=>{
                   )}
                   <span>Upvote</span>
                   <span className="bg-zinc-900 px-3 py-1 rounded-full text-sm">
-                    {issue.upvotes}
+                    {issue?.upvotes}
                   </span>
                 </button>
 
@@ -412,17 +412,19 @@ useEffect(()=>{
                 <User className="w-5 h-5 text-emerald-500" />
                 <span>Reporter</span>
               </h3>
-              
               <div className="flex items-center space-x-4 mb-4">
                 <div className="w-16 h-16 rounded-full overflow-hidden">
                   <img
-                    src={issue.reporterAvatar}
+                    src={issue?.reporterPhoto}
                     alt={issue.reporterName}
                     className="w-full h-full object-cover"
                   />
                 </div>
+                {
+                  console.log(issue)
+                }
                 <div>
-                  <div className="font-bold text-white">{issue.reporterName}</div>
+                  <div className="font-bold text-white">{issue?.reporterName}</div>
                   <div className="text-sm text-emerald-400">Verified Citizen</div>
                 </div>
               </div>
