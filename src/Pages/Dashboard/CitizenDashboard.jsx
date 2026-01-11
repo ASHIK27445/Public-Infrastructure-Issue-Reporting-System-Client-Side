@@ -70,8 +70,8 @@ const CitizenDashboard = () => {
       setRecentIssues(issuesData);
     } catch (error) {
       toast.error('Failed to load dashboard data');
-      console.error('Error:', error);
-      // Fallback to sample data
+      // console.error('Error:', error);
+      // // Fallback to sample data
       setStats(sampleStats);
       setRecentIssues(sampleIssues);
     } finally {

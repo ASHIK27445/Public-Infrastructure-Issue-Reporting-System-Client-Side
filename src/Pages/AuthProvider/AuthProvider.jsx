@@ -7,6 +7,7 @@ import axios from "axios"
 const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null)
     const [role, setRole] = useState(null)
+    const [mUser, setMUser] = useState(null)
     const [loading, setLoading] = useState(true)
     const loginUser = (email, password) => {
         return signInWithEmailAndPassword(auth, email, password)
@@ -39,12 +40,17 @@ const AuthProvider = ({children}) => {
             .then((res)=>{
             //     console.log('Full response:', res.data)  // Check this
             // console.log('Role value:', res.data.role)
+                setMUser(res.data)
                 setRole(res.data.role)
             })
             .catch(err=> console.log(err))
     },[user])
 
-    // console.log(role)
+    // useEffect(()=>{
+    //     axios.get()
+    // })
+
+    // console.log(role, citizen)
     const googleProvider = new GoogleAuthProvider()
     const signInWithGoogle = () => {
         return signInWithPopup(auth, googleProvider)
@@ -56,7 +62,7 @@ const AuthProvider = ({children}) => {
         createUserEP,
         logoutUser,
         profileUpdate,
-        loading, setUser, role, setRole
+        loading, setUser, role, setRole, mUser
     }
     return(
         <AuthContext value={authInfo}>

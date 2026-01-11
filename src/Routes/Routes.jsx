@@ -12,6 +12,9 @@ import AddIssues from "../Pages/components/AddIssues"
 import ManageIssues from "../Pages/components/ManageIssues"
 import PrivateRouter from "../Pages/Authentication/PrivateRouter"
 import MyIssuePage from "../Pages/components/MyIssuePage"
+import MyProfile from "../Pages/components/MyProfile"
+import TimelinePage from "../Pages/components/TimeLinePage"
+import ManageStaff from "../Pages/Admin/ManageStaff"
 export const router = createBrowserRouter([
     {
         path: '/' , element:<Root></Root>,
@@ -37,7 +40,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        path:'dashboard', element: <DashboardLayout></DashboardLayout>,
+        path:'dashboard', element: <PrivateRouter><DashboardLayout></DashboardLayout></PrivateRouter>,
         children:[
             {
                 index: true, Component: CitizenDashboard
@@ -50,6 +53,15 @@ export const router = createBrowserRouter([
             },
             {
                 path:'dashboard/myissues', Component: MyIssuePage
+            },
+            {
+                path: 'dashboard/myProfile', Component: MyProfile
+            },
+            {
+                path:'timeline', Component: TimelinePage
+            },
+            {
+                path:'manageStaff', Component: ManageStaff
             }
 
         ]

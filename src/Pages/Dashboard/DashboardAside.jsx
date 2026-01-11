@@ -12,7 +12,8 @@ import {
   Settings,
   HelpCircle,
   Shield,
-  TrendingUp
+  TrendingUp,
+  UserRoundCog
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -20,7 +21,7 @@ import { AuthContext } from '../AuthProvider/AuthContext';
 const DashboardAside = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('dashboard');
-  const {user, logoutUser} = use(AuthContext)
+  const {user, logoutUser, mUser, role} = use(AuthContext)
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -39,47 +40,62 @@ const DashboardAside = () => {
       id: 'myissues',
       name: 'My Issues',
       icon: <AlertTriangle className="w-5 h-5" />,
-      path: 'dashboard/myissues'
+      path: 'dashboard/myissues',
+      roles: ['admin', 'citizen']
     },
     {
       id: 'addissues',
       name: 'Add Issues',
       icon: <AlertTriangle className="w-5 h-5" />,
-      path: 'dashboard/addissues'
+      path: 'dashboard/addissues',
+      roles: ['admin', 'citizen']
     },
     {
       id: 'manageIssues',
       name: 'Manage Issue',
       icon: <FileText className="w-5 h-5" />,
-      path: 'dashboard/manageissues'
+      path: 'dashboard/manageissues',
+      roles: ['admin', 'citizen']
     },
     {
       id: 'profile',
       name: 'Profile',
       icon: <User className="w-5 h-5" />,
-      path: '/profile'
+      path: 'dashboard/myProfile',
+      roles: ['admin', 'citizen']
+    },
+    {
+      id: 'manageStaff',
+      name: 'Manage Staff',
+      icon: <UserRoundCog className='w-5 h-5'></UserRoundCog>,
+      path: 'manageStaff',
+      roles: ['admin']
     },
     {
       id: 'notifications',
       name: 'Notifications',
       icon: <Bell className="w-5 h-5" />,
       path: '/notifications',
-      badge: 3
+      badge: 3,
+      roles: ['admin', 'citizen']
     },
     {
       id: 'settings',
       name: 'Settings',
       icon: <Settings className="w-5 h-5" />,
-      path: '/settings'
+      path: '/settings',
+      roles: ['admin']
     },
     {
       id: 'help',
       name: 'Help & Support',
       icon: <HelpCircle className="w-5 h-5" />,
-      path: '/help'
+      path: 'timeline',
+      roles: ['admin', 'citizen']
     }
   ];
 
+  console.log(user, mUser, role)
   return (
     <>
       {/* Mobile Menu Button */}
@@ -94,7 +110,7 @@ const DashboardAside = () => {
 
       {/* Sidebar for Desktop and Mobile */}
       <aside className={`
-        fixed top-0 left-0 h-screen bg-gradient-to-b from-zinc-900 to-zinc-950 border-r border-zinc-800
+        fixed top-0 left-0 h-screen bg-linear-to-b from-zinc-900 to-zinc-950 border-r border-zinc-800
         w-64 z-40 transform transition-transform duration-300 ease-in-out
         lg:translate-x-0 lg:relative lg:h-auto
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -102,7 +118,7 @@ const DashboardAside = () => {
         {/* Sidebar Header */}
         <div className="p-6 border-b border-zinc-800">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
               <Shield className="w-7 h-7 text-white" />
             </div>
             <div>
@@ -142,7 +158,10 @@ const DashboardAside = () => {
 
         {/* Navigation Menu */}
         <nav className="p-4 space-y-1">
-          {navItems.map((item) => (
+          {navItems.map((item) => {
+             if (item.roles && !item.roles.includes(role)) return null;
+
+             return(
             <NavLink
               key={item.id}
               to={item.path}
@@ -153,7 +172,7 @@ const DashboardAside = () => {
               className={`
                 flex items-center justify-between p-3 rounded-xl transition-all duration-200
                 ${activeMenu === item.id 
-                  ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 text-emerald-400' 
+                  ? 'bg-linear-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 text-emerald-400' 
                   : 'text-gray-400 hover:bg-zinc-800 hover:text-white'
                 }
               `}
@@ -174,8 +193,8 @@ const DashboardAside = () => {
               {activeMenu === item.id && (
                 <div className="w-1 h-4 bg-emerald-500 rounded-full ml-2"></div>
               )}
-            </NavLink>
-          ))}
+            </NavLink> )
+          })}
         </nav>
 
         {/* Quick Stats */}
@@ -210,7 +229,7 @@ const DashboardAside = () => {
         <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-zinc-800">
           <button
             onClick={handleLogout}
-            className="flex items-center justify-center w-full space-x-2 p-3 bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-500/30 rounded-xl text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all"
+            className="flex items-center justify-center w-full space-x-2 p-3 bg-linear-to-r from-red-500/10 to-red-600/10 border border-red-500/30 rounded-xl text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all"
           >
             <LogOut className="w-5 h-5" />
             <span className="font-medium">Logout</span>

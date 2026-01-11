@@ -17,9 +17,10 @@ const {user, loading} = use(AuthContext)
                     wrapperClass=""/> 
                 </div>
     }
-    if(user){
-        return children
+    console.log(user, user?.isBlocked)
+    if(!user || user?.isBlocked ){
+        return <Navigate to='/login' state={location.pathname}></Navigate>
     }
-    return <Navigate to='/login' state={location.pathname}></Navigate>
+    return children
 }
 export default PrivateRouter
