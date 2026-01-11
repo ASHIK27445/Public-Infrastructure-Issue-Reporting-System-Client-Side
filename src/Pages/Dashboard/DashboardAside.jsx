@@ -15,7 +15,9 @@ import {
   TrendingUp,
   UserRoundCog,
   UserLock,
-  Info
+  Info,
+  Slash,
+  BookAlert
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -41,7 +43,7 @@ const DashboardAside = () => {
     {
       id: 'myissues',
       name: 'My Issues',
-      icon: <AlertTriangle className="w-5 h-5" />,
+      icon: <BookAlert className="w-5 h-5" />,
       path: 'dashboard/myissues',
       roles: ['admin', 'citizen']
     },
@@ -69,8 +71,15 @@ const DashboardAside = () => {
     {
       id: 'viewIssues',
       name: 'View Issues',
-      icon: <Info className='w-5 l-5'></Info>,
+      icon: <Info className='w-5 h-5'></Info>,
       path: 'viewIssues',
+      roles: ['admin']
+    },
+    {
+      id: 'rejectedIssues',
+      name: 'Rejected Issues',
+      icon: <Slash className='w-5 h-5'></Slash>,
+      path: 'rejectedIssues',
       roles: ['admin']
     },
     {

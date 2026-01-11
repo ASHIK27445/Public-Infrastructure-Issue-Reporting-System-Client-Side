@@ -17,6 +17,7 @@ import TimelinePage from "../Pages/components/TimeLinePage"
 import ManageStaff from "../Pages/Admin/ManageStaff"
 import ManageUsers from "../Pages/Admin/ManageUser"
 import ViewIssues from "../Pages/Admin/ViewIssues"
+import RejectedIssues from "../Pages/Admin/RejectedIssues"
 export const router = createBrowserRouter([
     {
         path: '/' , element:<Root></Root>,
@@ -70,6 +71,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'viewIssues', Component: ViewIssues
+            },
+            {
+                path: 'rejectedIssues', Component: RejectedIssues
             }
 
         ]
