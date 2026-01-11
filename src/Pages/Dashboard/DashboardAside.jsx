@@ -14,7 +14,8 @@ import {
   Shield,
   TrendingUp,
   UserRoundCog,
-  UserLock
+  UserLock,
+  Info
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -64,6 +65,13 @@ const DashboardAside = () => {
       icon: <User className="w-5 h-5" />,
       path: 'dashboard/myProfile',
       roles: ['admin', 'citizen']
+    },
+    {
+      id: 'viewIssues',
+      name: 'View Issues',
+      icon: <Info className='w-5 l-5'></Info>,
+      path: 'viewIssues',
+      roles: ['admin']
     },
     {
       id: 'manageUser',

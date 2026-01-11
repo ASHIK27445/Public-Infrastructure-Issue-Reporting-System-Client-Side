@@ -16,6 +16,7 @@ import MyProfile from "../Pages/components/MyProfile"
 import TimelinePage from "../Pages/components/TimeLinePage"
 import ManageStaff from "../Pages/Admin/ManageStaff"
 import ManageUsers from "../Pages/Admin/ManageUser"
+import ViewIssues from "../Pages/Admin/ViewIssues"
 export const router = createBrowserRouter([
     {
         path: '/' , element:<Root></Root>,
@@ -66,6 +67,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'manageUser', Component: ManageUsers
+            },
+            {
+                path: 'viewIssues', Component: ViewIssues
             }
 
         ]
