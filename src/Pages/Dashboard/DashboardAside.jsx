@@ -13,7 +13,8 @@ import {
   HelpCircle,
   Shield,
   TrendingUp,
-  UserRoundCog
+  UserRoundCog,
+  UserLock
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -63,6 +64,13 @@ const DashboardAside = () => {
       icon: <User className="w-5 h-5" />,
       path: 'dashboard/myProfile',
       roles: ['admin', 'citizen']
+    },
+    {
+      id: 'manageUser',
+      name: 'Manage User',
+      icon: <UserLock className='w-5 h-5'></UserLock>,
+      path: 'manageUser',
+      roles: ['admin']
     },
     {
       id: 'manageStaff',
