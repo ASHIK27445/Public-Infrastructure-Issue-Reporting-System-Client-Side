@@ -39,7 +39,7 @@ const DashboardAside = () => {
       id: 'myissues',
       name: 'My Issues',
       icon: <AlertTriangle className="w-5 h-5" />,
-      path: '/my-issues'
+      path: 'dashboard/myissues'
     },
     {
       id: 'addissues',

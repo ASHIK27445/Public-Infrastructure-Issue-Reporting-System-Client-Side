@@ -11,6 +11,7 @@ import DashboardDesign from "../Pages/Dashboard/DashboardDesign"
 import AddIssues from "../Pages/components/AddIssues"
 import ManageIssues from "../Pages/components/ManageIssues"
 import PrivateRouter from "../Pages/Authentication/PrivateRouter"
+import MyIssuePage from "../Pages/components/MyIssuePage"
 export const router = createBrowserRouter([
     {
         path: '/' , element:<Root></Root>,
@@ -46,6 +47,9 @@ export const router = createBrowserRouter([
             },
             {
                 path:'dashboard/manageissues', Component: ManageIssues
+            },
+            {
+                path:'dashboard/myissues', Component: MyIssuePage
             }
 
         ]

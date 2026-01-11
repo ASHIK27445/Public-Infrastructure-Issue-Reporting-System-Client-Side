@@ -21,11 +21,16 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { AuthContext } from '../AuthProvider/AuthContext';
-import useAxios from '../../Hooks/useAxios';
+import useAxiosSecure from '../../Hooks/useAxiosSecure';
+import { useOutletContext, useNavigate } from 'react-router';
+import { toast } from 'react-toastify';
 
 const ManageIssues = () => {
   const { user } = use(AuthContext);
-  const axiosInstance = useAxios();
+  const axiosSecure = useAxiosSecure();
+  const {citizen} = useOutletContext();
+  const navigate = useNavigate();
+  
   const [issues, setIssues] = useState([]);
   const [filteredIssues, setFilteredIssues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,8 +43,13 @@ const ManageIssues = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [expandedRow, setExpandedRow] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Edit Modal States (from MyIssuePage)
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingIssue, setEditingIssue] = useState(null);
+  const [editLoading, setEditLoading] = useState(false);
 
-  const statuses = ['Pending', 'In Progress', 'Resolved', 'Closed'];
+  const statuses = ['Pending', 'In-Progress', 'Resolved', 'Closed'];
   const priorities = ['Critical', 'High', 'Normal', 'Low'];
   const categories = [
     'Road & Traffic',
@@ -49,31 +59,42 @@ const ManageIssues = () => {
     'Public Safety',
     'Parks & Recreation',
     'Building & Construction',
+    'Streetlight',
+    'Pothole',
+    'Water Leak',
+    'Garbage',
+    'Footpath',
     'Other'
   ];
 
   useEffect(() => {
-    if (user?.email) {
+    if (citizen?._id) {
       fetchIssues();
     }
-  }, [user]);
+  }, [citizen?._id]);
 
   useEffect(() => {
     if (issues.length > 0) {
       filterIssues();
+    } else {
+      setFilteredIssues([]);
     }
   }, [issues, searchTerm, filters]);
 
   const fetchIssues = async () => {
+    if (!citizen?._id) return;
+    
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/manageissues/${user?.email}`);
+      // Logic from MyIssuePage - fetch user's own issues
+      const response = await axiosSecure.get(`/myissues/${citizen._id}`);
       if (response.data) {
         setIssues(response.data);
         setFilteredIssues(response.data);
       }
     } catch (error) {
       console.error('Error fetching issues:', error);
+      toast.error('Failed to load issues');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -112,65 +133,84 @@ const ManageIssues = () => {
     fetchIssues();
   };
 
-  const handleStatusChange = async (issueId, newStatus) => {
+  // Edit logic from MyIssuePage
+  const handleEditClick = (issue) => {
+    // Only allow edit if status is Pending
+    if (issue.status !== 'Pending') {
+      toast.error('You can only edit pending issues');
+      return;
+    }
+    setEditingIssue(issue);
+    setShowEditModal(true);
+  };
+
+  // Edit submit logic from MyIssuePage
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingIssue) return;
+    
+    setEditLoading(true);
+    
     try {
-      const response = await axiosInstance.patch(`/issues/${issueId}/status`, {
-        status: newStatus,
-        updatedBy: user?.email
-      });
-
-      if (response.data.success) {
-        // Update local state
-        setIssues(prev => prev.map(issue => 
-          issue._id === issueId ? { ...issue, status: newStatus } : issue
-        ));
-      }
+      const formData = new FormData(e.target);
+      const updatedData = {
+        title: formData.get('title'),
+        description: formData.get('description'),
+        category: formData.get('category'),
+        location: formData.get('location'),
+      };
+      
+      // Update in database
+      const response = await axiosSecure.patch(
+        `/issue/${editingIssue._id}`,
+        updatedData
+      );
+      
+      // Update in UI instantly
+      setIssues(issues.map(issue =>
+        issue._id === editingIssue._id
+          ? { ...issue, ...updatedData }
+          : issue
+      ));
+      
+      toast.success('Issue updated successfully!');
+      setShowEditModal(false);
+      setEditingIssue(null);
+      
     } catch (error) {
-      console.error('Error updating status:', error);
+      toast.error('Failed to update issue');
+      console.error(error);
+    } finally {
+      setEditLoading(false);
     }
   };
 
+  // Delete logic from MyIssuePage
   const handleDelete = async (issueId) => {
-    if (window.confirm('Are you sure you want to delete this issue?')) {
-      try {
-        const response = await axiosInstance.delete(`/issues/${issueId}`);
-        if (response.data.success) {
-          setIssues(prev => prev.filter(issue => issue._id !== issueId));
-        }
-      } catch (error) {
-        console.error('Error deleting issue:', error);
-      }
+    if (!window.confirm('Are you sure you want to delete this issue?')) return;
+    
+    try {
+      await axiosSecure.delete(`/issue/${issueId}`);
+      
+      // Remove from UI instantly
+      setIssues(issues.filter(issue => issue._id !== issueId));
+      
+      toast.success('Issue deleted successfully!');
+    } catch (error) {
+      toast.error('Failed to delete issue');
+      console.error(error);
     }
   };
 
-  const handleBoost = async (issueId) => {
-    if (window.confirm('Boost this issue for 100 Tk?')) {
-      try {
-        const response = await axiosInstance.post(`/issues/${issueId}/boost`, {
-          userId: user?.uid,
-          amount: 100
-        });
-
-        if (response.data.success) {
-          setIssues(prev => prev.map(issue => 
-            issue._id === issueId ? { 
-              ...issue, 
-              priority: 'High',
-              isBoosted: true,
-              boostedAt: new Date().toISOString()
-            } : issue
-          ));
-        }
-      } catch (error) {
-        console.error('Error boosting issue:', error);
-      }
-    }
+  // View details logic from MyIssuePage
+  const handleViewDetails = (issueId) => {
+    navigate(`/issues/${issueId}`);
   };
 
   const getStatusColor = (status) => {
     switch(status) {
       case 'Pending': return 'bg-yellow-500/20 text-yellow-400';
-      case 'In Progress': return 'bg-blue-500/20 text-blue-400';
+      case 'In-Progress': return 'bg-blue-500/20 text-blue-400';
       case 'Resolved': return 'bg-emerald-500/20 text-emerald-400';
       case 'Closed': return 'bg-gray-500/20 text-gray-400';
       default: return 'bg-gray-500/20 text-gray-400';
@@ -190,7 +230,7 @@ const ManageIssues = () => {
   const getStatusIcon = (status) => {
     switch(status) {
       case 'Pending': return <Clock className="w-3 h-3" />;
-      case 'In Progress': return <AlertTriangle className="w-3 h-3" />;
+      case 'In-Progress': return <AlertTriangle className="w-3 h-3" />;
       case 'Resolved': return <CheckCircle className="w-3 h-3" />;
       case 'Closed': return <XCircle className="w-3 h-3" />;
       default: return <Clock className="w-3 h-3" />;
@@ -199,15 +239,15 @@ const ManageIssues = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900">
-      {/* Header */}
+      {/* Header - Same Theme */}
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-black text-white mb-2">
-                Manage <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Issues</span>
+                My <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Issues</span>
               </h1>
-              <p className="text-gray-400">View and manage all reported issues</p>
+              <p className="text-gray-400">View and manage your reported issues</p>
             </div>
             
             <div className="flex items-center space-x-4">
@@ -224,7 +264,10 @@ const ManageIssues = () => {
                 )}
               </button>
               
-              <button className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all">
+              <button 
+                onClick={() => navigate('/report-issue')}
+                className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all"
+              >
                 + New Issue
               </button>
             </div>
@@ -232,7 +275,7 @@ const ManageIssues = () => {
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search and Filters - Same Theme */}
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="flex flex-col lg:flex-row gap-4 mb-6">
           {/* Search */}
@@ -259,7 +302,7 @@ const ManageIssues = () => {
           </button>
         </div>
 
-        {/* Filter Panel */}
+        {/* Filter Panel - Same Theme */}
         {showFilters && (
           <div className="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700 rounded-2xl p-6 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -304,7 +347,7 @@ const ManageIssues = () => {
                       }))}
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                         filters.priority === priority
-                          ? `bg-gradient-to-r ${getPriorityColor(priority).replace('bg-', 'from-').replace('/20', '').replace(' text', ' to')} text-white`
+                          ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white'
                           : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
                       }`}
                     >
@@ -355,7 +398,7 @@ const ManageIssues = () => {
         )}
       </div>
 
-      {/* Table Section */}
+      {/* Table Section - Same Theme */}
       <div className="max-w-7xl mx-auto px-6 pb-8">
         {loading ? (
           <div className="text-center py-20">
@@ -417,13 +460,6 @@ const ManageIssues = () => {
                                     className="w-full h-full object-cover"
                                   />
                                 </div>
-                                {issue.isBoosted && (
-                                  <div className="absolute -top-2 -right-2">
-                                    <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                                      <TrendingUp className="w-3 h-3 text-white" />
-                                    </div>
-                                  </div>
-                                )}
                               </div>
                               <div>
                                 <div className="font-bold text-white mb-1">
@@ -432,10 +468,6 @@ const ManageIssues = () => {
                                 <div className="text-sm text-gray-400 flex items-center">
                                   <MapPin className="w-3 h-3 mr-1" />
                                   {issue.location || 'No location specified'}
-                                </div>
-                                <div className="text-xs text-gray-500 flex items-center mt-1">
-                                  <User className="w-3 h-3 mr-1" />
-                                  {user?.displayName || 'Anonymous'}
                                 </div>
                               </div>
                             </div>
@@ -470,20 +502,26 @@ const ManageIssues = () => {
                           <td className="py-4 px-6">
                             <div className="flex items-center space-x-2">
                               <button 
-                                onClick={() => setExpandedRow(expandedRow === issue._id ? null : issue._id)}
+                                onClick={() => handleViewDetails(issue._id)}
                                 className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-white hover:bg-zinc-600 transition-colors"
                                 title="View Details"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
                               
-                              <button className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-white hover:bg-zinc-600 transition-colors">
+                              <button 
+                                onClick={() => handleEditClick(issue)}
+                                disabled={issue.status !== 'Pending'}
+                                className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-white hover:bg-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title={issue.status !== 'Pending' ? 'Can only edit pending issues' : 'Edit issue'}
+                              >
                                 <Edit className="w-4 h-4" />
                               </button>
                               
                               <button 
                                 onClick={() => handleDelete(issue._id)}
                                 className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-red-400 hover:bg-zinc-600 transition-colors"
+                                title="Delete Issue"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -497,7 +535,6 @@ const ManageIssues = () => {
                             <td colSpan="6" className="px-6 py-4">
                               <div className="bg-zinc-800/50 rounded-2xl p-6">
                                 <div className="grid md:grid-cols-2 gap-6">
-                                  {/* Left Column */}
                                   <div>
                                     <h4 className="text-lg font-bold text-white mb-4">Issue Description</h4>
                                     <p className="text-gray-300 leading-relaxed">
@@ -507,73 +544,10 @@ const ManageIssues = () => {
                                       <h5 className="text-sm font-medium text-gray-400 mb-3">Quick Stats</h5>
                                       <div className="grid grid-cols-3 gap-4">
                                         <div className="text-center">
-                                          <div className="text-2xl font-black text-emerald-500">{issue.upvotes || 0}</div>
+                                          <div className="text-2xl font-black text-emerald-500">{issue.upvoteCount || 0}</div>
                                           <div className="text-xs text-gray-400">Upvotes</div>
                                         </div>
-                                        <div className="text-center">
-                                          <div className="text-2xl font-black text-blue-500">{issue.views || 0}</div>
-                                          <div className="text-xs text-gray-400">Views</div>
-                                        </div>
-                                        <div className="text-center">
-                                          <div className="text-2xl font-black text-purple-500">{issue.comments || 0}</div>
-                                          <div className="text-xs text-gray-400">Comments</div>
-                                        </div>
                                       </div>
-                                    </div>
-                                  </div>
-
-                                  {/* Right Column */}
-                                  <div>
-                                    <h4 className="text-lg font-bold text-white mb-4">Quick Actions</h4>
-                                    <div className="space-y-3">
-                                      <div className="relative">
-                                        <button className="w-full flex items-center justify-between p-3 bg-zinc-700 rounded-xl hover:bg-zinc-600 transition-colors group">
-                                          <div className="flex items-center space-x-3">
-                                            <Clock className="w-4 h-4 text-yellow-400" />
-                                            <span className="text-white">Change Status</span>
-                                          </div>
-                                          <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-emerald-400" />
-                                        </button>
-                                        
-                                        {/* Status Dropdown */}
-                                        <div className="absolute right-0 mt-2 w-48 bg-zinc-800 border border-zinc-700 rounded-xl shadow-2xl z-10 hidden group-hover:block">
-                                          <div className="p-2 space-y-1">
-                                            {statuses.map((status) => (
-                                              <button
-                                                key={status}
-                                                onClick={() => handleStatusChange(issue._id, status)}
-                                                className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-zinc-700 transition-colors text-white"
-                                              >
-                                                <span>{status}</span>
-                                                {issue.status === status && (
-                                                  <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                                                )}
-                                              </button>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      </div>
-                                      
-                                      <button 
-                                        onClick={() => handleBoost(issue._id)}
-                                        disabled={issue.isBoosted}
-                                        className="w-full flex items-center justify-between p-3 bg-zinc-700 rounded-xl hover:bg-zinc-600 transition-colors group disabled:opacity-50 disabled:cursor-not-allowed"
-                                      >
-                                        <div className="flex items-center space-x-3">
-                                          <TrendingUp className={`w-4 h-4 ${issue.isBoosted ? 'text-purple-400' : 'text-purple-400'}`} />
-                                          <span className={`${issue.isBoosted ? 'text-gray-400' : 'text-white'}`}>
-                                            {issue.isBoosted ? 'Already Boosted' : 'Boost Priority'}
-                                          </span>
-                                        </div>
-                                        <span className="text-xs text-emerald-400">100 Tk</span>
-                                      </button>
-                                      
-                                      <button className="w-full flex items-center justify-between p-3 bg-zinc-700 rounded-xl hover:bg-zinc-600 transition-colors group">
-                                        <div className="flex items-center space-x-3">
-                                          <Shield className="w-4 h-4 text-blue-400" />
-                                          <span className="text-white">Assign to Staff</span>
-                                        </div>
-                                      </button>
                                     </div>
                                   </div>
                                 </div>
@@ -590,6 +564,102 @@ const ManageIssues = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Issue Modal - From MyIssuePage with Same Theme */}
+      {showEditModal && editingIssue && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-zinc-700">
+              <h3 className="text-2xl font-bold text-white">Edit Issue</h3>
+              <p className="text-gray-400 text-sm mt-1">Update your issue details</p>
+            </div>
+            
+            <form onSubmit={handleEditSubmit} className="p-6">
+              <div className="space-y-6">
+                {/* Title */}
+                <div>
+                  <label className="block text-gray-400 text-sm font-medium mb-2">
+                    Title
+                  </label>
+                  <input 
+                    type="text" 
+                    name="title"
+                    defaultValue={editingIssue.title}
+                    className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    required
+                  />
+                </div>
+                
+                {/* Description */}
+                <div>
+                  <label className="block text-gray-400 text-sm font-medium mb-2">
+                    Description
+                  </label>
+                  <textarea 
+                    name="description"
+                    defaultValue={editingIssue.description}
+                    className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    rows="4"
+                    required
+                  />
+                </div>
+                
+                {/* Category */}
+                <div>
+                  <label className="block text-gray-400 text-sm font-medium mb-2">
+                    Category
+                  </label>
+                  <select 
+                    name="category"
+                    defaultValue={editingIssue.category}
+                    className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-xl text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                    required
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                {/* Location */}
+                <div>
+                  <label className="block text-gray-400 text-sm font-medium mb-2">
+                    Location
+                  </label>
+                  <input 
+                    type="text" 
+                    name="location"
+                    defaultValue={editingIssue.location}
+                    className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 mt-8 pt-6 border-t border-zinc-700">
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingIssue(null);
+                  }}
+                  disabled={editLoading}
+                  className="flex-1 px-6 py-3 bg-zinc-700 rounded-xl text-white font-medium hover:bg-zinc-600 transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={editLoading}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold hover:shadow-emerald-500/50 transition-all disabled:opacity-50"
+                >
+                  {editLoading ? 'Updating...' : 'Update Issue'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
