@@ -17,7 +17,8 @@ import {
   UserLock,
   Info,
   Slash,
-  BookAlert
+  BookAlert,
+  LayoutGrid
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -35,10 +36,18 @@ const DashboardAside = () => {
   };
   const navItems = [
     {
+      id:'home',
+      name: 'Home',
+      icon: <LayoutGrid className='w-5 h-5'></LayoutGrid>,
+      path: '/',
+      roles: ['admin', 'citizen']
+    },
+    {
       id: 'dashboard',
       name: 'Dashboard',
       icon: <Home className="w-5 h-5" />,
-      path: '/dashboard'
+      path: '/dashboard',
+      roles: ['admin', 'citizen']
     },
     {
       id: 'myissues',
