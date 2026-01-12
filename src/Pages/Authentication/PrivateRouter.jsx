@@ -17,7 +17,7 @@ const {user, loading} = use(AuthContext)
                     wrapperClass=""/> 
                 </div>
     }
-    console.log(user, user?.isBlocked)
+    // console.log(user, user?.isBlocked)
     if(!user || user?.isBlocked ){
         return <Navigate to='/login' state={location.pathname}></Navigate>
     }

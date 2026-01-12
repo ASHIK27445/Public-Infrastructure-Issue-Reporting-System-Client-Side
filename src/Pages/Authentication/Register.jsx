@@ -9,8 +9,7 @@ import axios from 'axios';
 import { auth } from '../../Firebase/firebase.init';
 
 const Register = () => {
-    const {user, logoutUser} = use(AuthContext)
-    const {createUserEP, profileUpdate, setUser} = use(AuthContext)
+    const {user, logoutUser, createUserEP, profileUpdate, setUser} = use(AuthContext)
     const [password, setPassword] = useState('')
     const [passError, setPassError] = useState([])
     const [loading, setLoading] = useState(false)
