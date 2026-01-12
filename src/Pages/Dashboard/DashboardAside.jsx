@@ -18,7 +18,8 @@ import {
   Info,
   Slash,
   BookAlert,
-  LayoutGrid
+  LayoutGrid,
+  ShieldUser
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -40,14 +41,14 @@ const DashboardAside = () => {
       name: 'Home',
       icon: <LayoutGrid className='w-5 h-5'></LayoutGrid>,
       path: '/',
-      roles: ['admin', 'citizen']
+      roles: ['admin', 'citizen', 'staff']
     },
     {
       id: 'dashboard',
       name: 'Dashboard',
       icon: <Home className="w-5 h-5" />,
       path: '/dashboard',
-      roles: ['admin', 'citizen']
+      roles: ['admin', 'citizen', 'staff']
     },
     {
       id: 'myissues',
@@ -75,7 +76,7 @@ const DashboardAside = () => {
       name: 'Profile',
       icon: <User className="w-5 h-5" />,
       path: 'dashboard/myProfile',
-      roles: ['admin', 'citizen']
+      roles: ['admin', 'citizen', 'staff']
     },
     {
       id: 'viewIssues',
@@ -153,11 +154,15 @@ const DashboardAside = () => {
         <div className="p-6 border-b border-zinc-800">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 rounded-xl bg-linear-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-              <Shield className="w-7 h-7 text-white" />
+              <ShieldUser className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Citizen Portal</h2>
-              <p className="text-sm text-gray-400">Public Service Dashboard</p>
+              <h2 className="text-xl font-bold text-white text-left">
+                {role === 'admin' ? 'Admin Dashboard' :
+                  role === 'staff' ? 'Staff Dashboard' :
+                  'Citizen Dashboard'
+                }
+                </h2>
             </div>
           </div>
         </div>
@@ -167,7 +172,7 @@ const DashboardAside = () => {
           <div className="flex items-center space-x-3 mb-4">
             <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-emerald-500">
               <img 
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=John"
+                src={user?.photoURL}
                 alt="User Avatar"
                 className="w-full h-full object-cover"
               />
@@ -260,7 +265,7 @@ const DashboardAside = () => {
         </div>
 
         {/* Logout Button */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-zinc-800">
+        <div className="bottom-0 left-0 right-0 p-6 border-t border-zinc-800">
           <button
             onClick={handleLogout}
             className="flex items-center justify-center w-full space-x-2 p-3 bg-linear-to-r from-red-500/10 to-red-600/10 border border-red-500/30 rounded-xl text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all"

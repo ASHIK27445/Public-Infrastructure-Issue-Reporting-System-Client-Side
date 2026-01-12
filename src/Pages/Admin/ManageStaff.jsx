@@ -3,6 +3,7 @@ import {
   UserPlus, 
   Mail, 
   Phone, 
+  X,
   User, 
   Shield, 
   Edit, 
@@ -17,38 +18,27 @@ import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { toast } from 'react-toastify';
 import { RotatingTriangles } from 'react-loader-spinner';
 import axios from 'axios';
+import { useEffect } from 'react';
 
 const ManageStaff = () => {
-  const {createUserEP, profileUpdate} = use(AuthContext)
-  const [showAddStaffModal, setShowAddStaffModal] = useState(false);
+  const [staffMembers, setStaffMembers] = useState([])
+  const [showAddStaffModal, setShowAddStaffModal] = useState(false)
+  const [showEditStaffModal, setShowEditStaffModal] = useState(false)
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  const [editDept, setEditDept] = useState('')
+  const [showEditPassword, setShowEditPassword] = useState(false)
   const [selectDept, setSelectDept] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const axiosSecure = useAxiosSecure()
-  // Mock data
-  const staffMembers = [
-    {
-      _id: '1',
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '+1234567890',
-      department: 'Road & Traffic',
-      status: 'Active',
-      photo: null,
-      createdAt: '2024-01-15'
-    },
-    {
-      _id: '2',
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      phone: '+1234567891',
-      department: 'Water Supply',
-      status: 'Active',
-      photo: null,
-      createdAt: '2024-01-10'
-    }
-  ];
 
+  useEffect(()=> {
+    axiosSecure.get('/allstaff')
+        .then(res => setStaffMembers(res.data))
+        .catch(err=> console.log(err))
+  }, [axiosSecure])
+
+//   console.log(staffMembers)
   const departments = [
     'Road & Traffic',
     'Water Supply',
@@ -84,7 +74,7 @@ const ManageStaff = () => {
         dept: selectDept
     }
 
-    console.log(formData)
+    // console.log(formData)
     if(imgbb.data.success == true){
             setLoading(true)
             axiosSecure.post('/addstaff', formData)
@@ -98,6 +88,29 @@ const ManageStaff = () => {
                 })
     }
   }
+
+  console.log(selectedStaff)
+  const handleEditStaff = (e) => {
+    e.preventDefault();
+
+    const updateData = {
+        name: e.target.editName.value,
+        tel: e.target.editTel.value,
+        dept: editDept,
+        password: e.target.editPassword.value || selectedStaff?.password,
+        uid: selectedStaff?.uid
+    }
+
+    console.log(updateData)
+
+    axiosSecure.patch('/update/staff/info', updateData)
+        .then(res => console.log(res.data))
+        .then(()=> {
+            alert('updated')
+            e.form.reset()
+        })
+        .catch(err=> console.log(err))
+    }
 
     if(loading){
       return (
@@ -173,7 +186,7 @@ const ManageStaff = () => {
                         <div className="relative">
                           <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-zinc-600">
                             <img 
-                              src={staff.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(staff.name)}&background=1f2937&color=10b981&bold=true`} 
+                              src={staff.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(staff.name)}&background=1f2937&color=10b981&bold=true`} 
                               alt={staff.name}
                               className="w-full h-full object-cover"
                             />
@@ -182,10 +195,6 @@ const ManageStaff = () => {
                         <div>
                           <div className="font-bold text-white mb-1">
                             {staff.name}
-                          </div>
-                          <div className="text-sm text-gray-400 flex items-center">
-                            <User className="w-3 h-3 mr-1" />
-                            Staff ID: {staff._id}
                           </div>
                         </div>
                       </div>
@@ -199,20 +208,20 @@ const ManageStaff = () => {
                         </div>
                         <div className="text-sm text-gray-400 flex items-center">
                           <Phone className="w-4 h-4 mr-2 text-gray-500" />
-                          {staff.phone}
+                          {staff.tel}
                         </div>
                       </div>
                     </td>
                     
                     <td className="py-4 px-6">
                       <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-medium">
-                        {staff.department}
+                        {staff.dept}
                       </span>
                     </td>
                     
                     <td className="py-4 px-6">
                       <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold">
-                        {staff.status}
+                        {staff.isBlocked ? 'blocked' : 'active'}
                       </span>
                     </td>
                     
@@ -225,7 +234,13 @@ const ManageStaff = () => {
                     
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
-                        <button className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-white hover:bg-zinc-600 transition-colors">
+                        <button 
+                          onClick={() => {
+                            setSelectedStaff(staff);
+                            setEditDept(staff.dept || '');
+                            setShowEditStaffModal(true);
+                        }}
+                        className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-white hover:bg-zinc-600 transition-colors">
                           <Edit className="w-4 h-4" />
                         </button>
                         
@@ -369,6 +384,122 @@ const ManageStaff = () => {
           </div>
         </div>
       )}
+
+        {/* Edit Staff Modal */}
+        {showEditStaffModal && selectedStaff && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl">
+            {/* Header */}
+            <div className="p-5 border-b border-zinc-800">
+                <div className="flex items-center justify-between">
+                <div>
+                    <h3 className="text-xl font-bold text-white">Edit Staff</h3>
+                    <p className="text-sm text-gray-400 mt-0.5">{selectedStaff.name}</p>
+                </div>
+                <button 
+                    onClick={() => setShowEditStaffModal(false)}
+                    className="text-gray-400 hover:text-white transition-colors p-1"
+                >
+                    <X className="w-5 h-5" />
+                </button>
+                </div>
+            </div>
+            
+            {/* Form */}
+            <form onSubmit={handleEditStaff} className="p-5">
+                <div className="space-y-4">
+                {/* Name */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                    Name
+                    </label>
+                    <input 
+                    name="editName"
+                    type="text"
+                    defaultValue={selectedStaff.name}
+                    required
+                    className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    />
+                </div>
+
+
+                {/* Phone & Department - Same Row */}
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                        Phone
+                    </label>
+                    <input 
+                        name="editTel"
+                        type="tel"
+                        defaultValue={selectedStaff.tel}
+                        required
+                        className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    />
+                    </div>
+                    
+                    <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                        Department
+                    </label>
+                    <select 
+                        value={editDept}
+                        onChange={(e) => setEditDept(e.target.value)}
+                        required
+                        className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 appearance-none"
+                    >
+                        <option value="">Select</option>
+                        {departments.map(dept => (
+                        <option key={dept} value={dept} className="bg-zinc-800">{dept}</option>
+                        ))}
+                    </select>
+                    </div>
+                </div>
+
+                {/* Password */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                    Password <span className="text-xs text-gray-500 font-normal">(optional)</span>
+                    </label>
+                    <div className="relative">
+                    <input 
+                        name="editPassword"
+                        type={showEditPassword ? "text" : "password"}
+                        placeholder="New password"
+                        className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 pr-10"
+                    />
+                    <button 
+                        type="button"
+                        onClick={() => setShowEditPassword(!showEditPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-emerald-500 transition-colors p-1"
+                    >
+                        {showEditPassword ? <GoEyeClosed className="w-4 h-4" /> : <GoEye className="w-4 h-4" />}
+                    </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1.5">Leave empty to keep current password</p>
+                </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 mt-6 pt-5 border-t border-zinc-800">
+                <button 
+                    type="button"
+                    onClick={() => setShowEditStaffModal(false)}
+                    className="flex-1 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-lg text-sm font-medium transition-colors"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="submit"
+                    className="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                    Save Changes
+                </button>
+                </div>
+            </form>
+            </div>
+        </div>
+        )}
     </div>
   );
 };

@@ -28,7 +28,6 @@ const MyProfile = () => {
   const { user } = use(AuthContext);
   const { citizen } = useOutletContext();
   const axiosSecure = useAxiosSecure();
-
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
@@ -109,13 +108,13 @@ const MyProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 p-6">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 p-6">
       <div className="max-w-5xl mx-auto">
         {/* Blocked User Warning */}
         {citizen?.isBlocked && (
-          <div className="mb-6 bg-gradient-to-r from-red-900/40 to-orange-900/40 border-2 border-red-500/50 rounded-3xl p-6 backdrop-blur-sm">
+          <div className="mb-6 bg-linear-to-r from-red-900/40 to-orange-900/40 border-2 border-red-500/50 rounded-3xl p-6 backdrop-blur-sm">
             <div className="flex items-start space-x-4">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center">
                   <AlertTriangle className="w-6 h-6 text-red-400" />
                 </div>
@@ -146,13 +145,13 @@ const MyProfile = () => {
         )}
 
         {/* Header Section */}
-        <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden mb-6">
+        <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden mb-6">
           {/* Cover Photo */}
-          <div className="h-40 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 relative">
+          <div className="h-40 bg-linear-to-r from-emerald-600 via-teal-600 to-cyan-600 relative">
             <div className="absolute inset-0 bg-black/20"></div>
             {citizen?.isPremium && (
               <div className="absolute top-4 right-4">
-                <div className="bg-gradient-to-r from-yellow-500 to-amber-500 px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg">
+                <div className="bg-linear-to-r from-yellow-500 to-amber-500 px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg">
                   <Crown className="w-5 h-5 text-white" />
                   <span className="text-white font-bold text-sm">PREMIUM</span>
                 </div>
@@ -173,7 +172,7 @@ const MyProfile = () => {
                   />
                 </div>
                 {citizen?.isPremium && (
-                  <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-yellow-500 to-amber-500 w-10 h-10 rounded-full flex items-center justify-center border-4 border-zinc-900 shadow-lg">
+                  <div className="absolute -bottom-2 -right-2 bg-linear-to-r from-yellow-500 to-amber-500 w-10 h-10 rounded-full flex items-center justify-center border-4 border-zinc-900 shadow-lg">
                     <Crown className="w-5 h-5 text-white" />
                   </div>
                 )}
@@ -188,7 +187,7 @@ const MyProfile = () => {
                         {citizen?.name || 'User Name'}
                       </h1>
                       {citizen?.isPremium && (
-                        <div className="flex items-center space-x-1 px-3 py-1 bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-full">
+                        <div className="flex items-center space-x-1 px-3 py-1 bg-linear-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-full">
                           <Sparkles className="w-4 h-4 text-yellow-400" />
                           <span className="text-xs font-bold text-yellow-400">PRO</span>
                         </div>
@@ -203,7 +202,7 @@ const MyProfile = () => {
                   {!isEditing && (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="mt-4 md:mt-0 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all flex items-center space-x-2"
+                      className="mt-4 md:mt-0 px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all flex items-center space-x-2"
                     >
                       <Edit className="w-4 h-4" />
                       <span>Edit Profile</span>
@@ -275,7 +274,7 @@ const MyProfile = () => {
         <div className="grid md:grid-cols-3 gap-6">
           {/* Left Column - Profile Details */}
           <div className="md:col-span-2">
-            <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
               <h2 className="text-2xl font-black text-white mb-6">Profile Information</h2>
 
               {isEditing ? (
@@ -344,7 +343,7 @@ const MyProfile = () => {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold hover:shadow-emerald-500/50 transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
+                      className="flex-1 px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold hover:shadow-emerald-500/50 transition-all disabled:opacity-50 flex items-center justify-center space-x-2"
                     >
                       {loading ? (
                         <>
@@ -410,12 +409,12 @@ const MyProfile = () => {
           {/* Right Column - Premium Subscription */}
           <div className="md:col-span-1">
             {!citizen?.isPremium ? (
-              <div className="bg-gradient-to-br from-yellow-900/30 to-amber-900/30 rounded-3xl border-2 border-yellow-500/30 p-6 relative overflow-hidden">
+              <div className="bg-linear-to-br from-yellow-900/30 to-amber-900/30 rounded-3xl border-2 border-yellow-500/30 p-6 relative overflow-hidden">
                 {/* Decorative Background */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-full blur-3xl"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-yellow-500/10 to-transparent rounded-full blur-3xl"></div>
                 
                 <div className="relative z-10">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-2xl mb-4 shadow-lg">
+                  <div className="flex items-center justify-center w-16 h-16 bg-linear-to-r from-yellow-500 to-amber-500 rounded-2xl mb-4 shadow-lg">
                     <Crown className="w-8 h-8 text-white" />
                   </div>
 
@@ -428,19 +427,19 @@ const MyProfile = () => {
 
                   <div className="space-y-3 mb-6">
                     <div className="flex items-start space-x-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                       <p className="text-gray-300 text-sm">Unlimited issue submissions</p>
                     </div>
                     <div className="flex items-start space-x-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                       <p className="text-gray-300 text-sm">Priority issue resolution</p>
                     </div>
                     <div className="flex items-start space-x-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                       <p className="text-gray-300 text-sm">Premium badge on profile</p>
                     </div>
                     <div className="flex items-start space-x-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                       <p className="text-gray-300 text-sm">Advanced analytics</p>
                     </div>
                   </div>
@@ -461,7 +460,7 @@ const MyProfile = () => {
                   <button
                     onClick={handleSubscribe}
                     disabled={paymentLoading || citizen?.isBlocked}
-                    className="w-full px-6 py-4 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-2xl text-white font-black text-lg hover:shadow-yellow-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                    className="w-full px-6 py-4 bg-linear-to-r from-yellow-500 to-amber-500 rounded-2xl text-white font-black text-lg hover:shadow-yellow-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                   >
                     {paymentLoading ? (
                       <>
@@ -484,8 +483,8 @@ const MyProfile = () => {
                 </div>
               </div>
             ) : (
-              <div className="bg-gradient-to-br from-yellow-900/30 to-amber-900/30 rounded-3xl border-2 border-yellow-500/30 p-6">
-                <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-2xl mb-4 shadow-lg">
+              <div className="bg-linear-to-br from-yellow-900/30 to-amber-900/30 rounded-3xl border-2 border-yellow-500/30 p-6">
+                <div className="flex items-center justify-center w-16 h-16 bg-linear-to-r from-yellow-500 to-amber-500 rounded-2xl mb-4 shadow-lg">
                   <Sparkles className="w-8 h-8 text-white" />
                 </div>
 
