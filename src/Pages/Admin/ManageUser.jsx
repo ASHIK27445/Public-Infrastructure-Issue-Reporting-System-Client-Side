@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { 
   Mail,
   Phone,
@@ -9,63 +9,74 @@ import {
   Unlock,
   Crown
 } from 'lucide-react';
-
+import { AuthContext } from '../AuthProvider/AuthContext';
+import useAxiosSecure from '../../Hooks/useAxiosSecure'
+import Swal from 'sweetalert2'
 const ManageUsers = () => {
-  // Mock data
-  const users = [
-    {
-      _id: '1',
-      name: 'John Citizen',
-      email: 'john@example.com',
-      phone: '+1234567890',
-      subscription: 'Premium',
-      subscriptionEnd: '2024-12-31',
-      status: 'Active',
-      isBlocked: false,
-      joined: '2023-01-15',
-      totalReports: 12,
-      upvotes: 45
-    },
-    {
-      _id: '2',
-      name: 'Jane Resident',
-      email: 'jane@example.com',
-      phone: '+1234567891',
-      subscription: 'Free',
-      subscriptionEnd: null,
-      status: 'Active',
-      isBlocked: false,
-      joined: '2023-02-20',
-      totalReports: 5,
-      upvotes: 23
-    },
-    {
-      _id: '3',
-      name: 'Mike User',
-      email: 'mike@example.com',
-      phone: '+1234567892',
-      subscription: 'Premium',
-      subscriptionEnd: '2024-11-15',
-      status: 'Active',
-      isBlocked: true,
-      joined: '2023-03-10',
-      totalReports: 8,
-      upvotes: 30
-    },
-    {
-      _id: '4',
-      name: 'Sarah Public',
-      email: 'sarah@example.com',
-      phone: '+1234567893',
-      subscription: 'Free',
-      subscriptionEnd: null,
-      status: 'Inactive',
-      isBlocked: false,
-      joined: '2023-04-05',
-      totalReports: 0,
-      upvotes: 0
+
+  const [users, setUsers] = useState([])
+  
+  const axiosSecure = useAxiosSecure();
+  useEffect(()=> {
+    axiosSecure.get('/allusers')
+      .then(res => setUsers(res.data))
+      .catch(err=> console.log(err))
+  }, [axiosSecure])
+
+  const handleUserStatus = async (email, isBlocked) => {
+    const confirm = await Swal.fire({
+      title: isBlocked ? "Block this user?" : "Unblock this user?",
+      text: isBlocked
+        ? "The user will not be able to access the system."
+        : "The user will regain access.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: isBlocked ? "#dc2626" : "#16a34a",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: isBlocked ? "Block User" : "Unblock User",
+      cancelButtonText: "Cancel",
+      background: "#1a1a2e",
+      color: "#e0e0e0",
+      iconColor: isBlocked ? "#dc2626" : "#16a34a"
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const res = await axiosSecure.patch("/update/user/status", {
+        email,
+        isBlocked
+      });
+
+      if (res.data.modifiedCount > 0) {
+        setUsers(prev =>
+          prev.map(user =>
+            user.email === email ? { ...user, isBlocked } : user
+          )
+        );
+
+        Swal.fire({
+          icon: "success",
+          title: isBlocked ? "User Blocked" : "User Unblocked",
+          timer: 1400,
+          showConfirmButton: false,
+          background: "#1a1a2e",
+          color: "#e0e0e0",
+          iconColor: isBlocked ? "#dc2626" : "#16a34a"
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      Swal.fire({
+        title: "Error",
+        text: "Something went wrong",
+        icon: "error",
+        background: "#1a1a2e",
+        color: "#e0e0e0",
+        iconColor: "#dc2626"
+      });
     }
-  ];
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
@@ -87,7 +98,7 @@ const ManageUsers = () => {
           {/* Table Header */}
           <div className="p-6 border-b border-zinc-700">
             <h3 className="text-xl font-bold text-white">
-              Citizen Users ({users.length})
+              Citizen Users ({users?.length})
             </h3>
           </div>
 
@@ -112,11 +123,11 @@ const ManageUsers = () => {
                         <div className="relative">
                           <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-zinc-600">
                             <img 
-                              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=1f2937&color=10b981&bold=true`} 
+                              src={user?.photoURL} 
                               alt={user.name}
                               className="w-full h-full object-cover"
                             />
-                            {user.subscription === 'Premium' && (
+                            {user?.isPremium === true && (
                               <div className="absolute -top-1 -right-1">
                                 <Crown className="w-6 h-6 text-yellow-500" fill="currentColor" />
                               </div>
@@ -125,11 +136,11 @@ const ManageUsers = () => {
                         </div>
                         <div>
                           <div className="font-bold text-white mb-1">
-                            {user.name}
+                            {user?.name}
                           </div>
                           <div className="text-sm text-gray-400 flex items-center">
                             <Calendar className="w-3 h-3 mr-1" />
-                            {new Date(user.joined).toLocaleDateString()}
+                            {new Date(user?.createdAt).toLocaleDateString()}
                           </div>
                         </div>
                       </div>
@@ -139,11 +150,11 @@ const ManageUsers = () => {
                       <div className="space-y-2">
                         <div className="text-sm text-gray-300 flex items-center">
                           <Mail className="w-4 h-4 mr-2 text-gray-500" />
-                          {user.email}
+                          {user?.email}
                         </div>
                         <div className="text-sm text-gray-400 flex items-center">
                           <Phone className="w-4 h-4 mr-2 text-gray-500" />
-                          {user.phone}
+                          {user?.role}
                         </div>
                       </div>
                     </td>
@@ -151,30 +162,23 @@ const ManageUsers = () => {
                     <td className="py-4 px-6">
                       <div className="space-y-1">
                         <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${
-                          user.subscription === 'Premium' 
+                          user?.isPremium === true 
                             ? 'bg-linear-to-r from-yellow-500/20 to-amber-500/20 text-yellow-400'
                             : 'bg-gray-500/20 text-gray-400'
                         }`}>
-                          {user.subscription === 'Premium' && <Crown className="w-3 h-3" />}
-                          <span>{user.subscription}</span>
+                          {user?.isPremium === true && <Crown className="w-3 h-3" />}
+                          <span>{user?.isPremium ? 'Premium' : 'Free'}</span>
                         </div>
-                        {user.subscription === 'Premium' && user.subscriptionEnd && (
+                        {/* {user?.isPremium === true && user.subscriptionEnd && (
                           <div className="text-xs text-gray-400">
                             Expires: {new Date(user.subscriptionEnd).toLocaleDateString()}
                           </div>
-                        )}
+                        )} */}
                       </div>
                     </td>
                     
                     <td className="py-4 px-6">
                       <div className="space-y-1">
-                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${
-                          user.status === 'Active' 
-                            ? 'bg-emerald-500/20 text-emerald-400'
-                            : 'bg-gray-500/20 text-gray-400'
-                        }`}>
-                          <span>{user.status}</span>
-                        </div>
                         <div className={`text-xs flex items-center gap-1 ${
                           user.isBlocked ? 'text-red-400' : 'text-emerald-400'
                         }`}>
@@ -210,7 +214,9 @@ const ManageUsers = () => {
                           View Details
                         </button>
                         
-                        <button className={`px-4 py-2 rounded-xl font-medium ${
+                        <button
+                        onClick={() => handleUserStatus(user.email, !user.isBlocked)}
+                        className={`px-4 py-2 rounded-xl font-medium ${
                           user.isBlocked
                             ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
                             : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
