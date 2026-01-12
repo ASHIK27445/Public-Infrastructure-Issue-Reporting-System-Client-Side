@@ -9,7 +9,9 @@ import {
   Edit, 
   Trash2, 
   Calendar,
-  Camera
+  Camera,
+  CalendarSync,
+  AlarmClock
 } from 'lucide-react';
 import { use } from 'react';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -19,7 +21,7 @@ import { toast } from 'react-toastify';
 import { RotatingTriangles } from 'react-loader-spinner';
 import axios from 'axios';
 import { useEffect } from 'react';
-
+import Swal from 'sweetalert2';
 const ManageStaff = () => {
   const [staffMembers, setStaffMembers] = useState([])
   const [showAddStaffModal, setShowAddStaffModal] = useState(false)
@@ -30,6 +32,7 @@ const ManageStaff = () => {
   const [selectDept, setSelectDept] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [photo, setPhoto] = useState('')
   const axiosSecure = useAxiosSecure()
 
   useEffect(()=> {
@@ -52,44 +55,94 @@ const ManageStaff = () => {
   const handleShowPassword = () => {
     setShowPassword(!showPassword)
   }
+
+  const handlephotoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+
+    try {
+      const res = await axios.post(
+        'https://api.imgbb.com/1/upload?key=ca33ef6ed0c09fd575db21260a8a8185',
+        formData
+      );
+      setPhoto(res.data.data.display_url);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to upload photo");
+    }
+  }
+
   const handleAddStaff = async(e) => {
     e.preventDefault()
     const name = e.target.name.value
-    const photoURL = e.target.photoURL
+    const tel = e.target.tel.value
+    // const photoURL = e.target.photoURL
     const email = e.target.email.value
     const password = e.target.password.value
-    const file = photoURL.files[0]
-    const imgbb = await axios.post(`https://api.imgbb.com/1/upload?&key=ca33ef6ed0c09fd575db21260a8a8185`, {image:file}, {
-            headers:{
-              'Content-Type': 'multipart/form-data'
-            }
-    })
-    const mainPhoto = imgbb.data.data.display_url
+    // const file = photoURL.files[0]
+    // const imgbb = await axios.post(`https://api.imgbb.com/1/upload?&key=ca33ef6ed0c09fd575db21260a8a8185`, {image:file}, {
+    //         headers:{
+    //           'Content-Type': 'multipart/form-data'
+    //         }
+    // })
+    // const mainPhoto = imgbb.data.data.display_url
+    // setPhoto(mainPhoto)
+
+    const e164Pattern = /^\+[1-9]\d{1,14}$/;
+    if(!e164Pattern.test(tel)){
+      toast.error("Invalid phone number! Must be like +1234567890")
+      return;
+    }
+    if(!password || password.length < 8){
+      toast.error("Password Must in 6 character!")
+      return;
+    }
+    const isDuplicate = staffMembers.some(
+      staff => staff.email === email || staff.tel === tel
+    );
+    if(isDuplicate){
+      toast.error("Email or Phone number already exists!");
+      return;
+    }
+
+    if(!photo){
+      toast.error("Please upload a profile photo!");
+      return;
+    }
+
     const formData = {
         name,
         email,
         password,
-        photoURL: mainPhoto,
-        tel: e.target.tel.value,
+        photoURL: photo,
+        tel: tel,
         dept: selectDept
     }
 
-    // console.log(formData)
-    if(imgbb.data.success == true){
-            setLoading(true)
-            axiosSecure.post('/addstaff', formData)
-                .then(res => {
+    console.log(formData, "photo", photo)
+
+    setLoading(true)
+    axiosSecure.post('/addstaff', formData)
+        .then(res => {
                     console.log(res.data)
+                    setStaffMembers(prev=> [...prev, res.data])
                     toast.success("Success!")
+                    e.target.reset()
                     setLoading(false)
-                }).catch(err => {
+                    setShowAddStaffModal(false)
+      }).catch(err => {
                     toast.error(err)
                     setLoading(false)
-                })
-    }
+      })
+
   }
 
   console.log(selectedStaff)
+
   const handleEditStaff = (e) => {
     e.preventDefault();
 
@@ -104,15 +157,18 @@ const ManageStaff = () => {
     console.log(updateData)
 
     axiosSecure.patch('/update/staff/info', updateData)
-        .then(res => console.log(res.data))
+        .then(res => {
+          setLoading(true)
+          console.log(res.data)
+        })
         .then(()=> {
-            alert('updated')
-            e.form.reset()
+            setLoading(false)
+            toast.success("User Updated!")
         })
         .catch(err=> console.log(err))
     }
 
-    if(loading){
+  if(loading){
       return (
         <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 flex justify-center items-center">
           <div className="text-center">
@@ -129,8 +185,108 @@ const ManageStaff = () => {
           </div>
         </div>
       )
+  }
+
+  const handleDelete = async (staff) => {
+    // Check if has assigned issues
+    if (staff.assignIssued > 0) {
+      await Swal.fire({
+        title: "Cannot Delete",
+        html: `
+          <div class="text-center">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-xl overflow-hidden border-2 border-red-500/30">
+              <img src="${staff.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(staff.name)}&background=dc2626&color=fff&bold=true`}" 
+                  alt="${staff.name}" 
+                  class="w-full h-full object-cover">
+            </div>
+
+            <div class="mt-4 p-4 bg-red-900/20 border border-red-500/30 rounded-xl">
+              <p class="text-red-300 font-medium">⚠️ ${staff.assignIssued} assigned issue(s) found</p>
+              <p class="text-red-400/80 text-sm mt-1">Unassign all issues before deleting</p>
+            </div>
+          </div>
+        `,
+        icon: "error",
+        confirmButtonColor: "#dc2626",
+        confirmButtonText: "OK",
+        background: "#1a1a2e",
+        color: "#e0e0e0",
+        iconColor: "#dc2626"
+      });
+      return;
     }
-    
+
+    // Confirmation
+    const confirm = await Swal.fire({
+      title: "Delete Staff?",
+      html: `
+        <div class="text-center">
+          <div class="w-20 h-20 mx-auto mb-4 rounded-xl overflow-hidden border-2 border-red-500/50">
+            <img src="${staff.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(staff.name)}&background=dc2626&color=fff&bold=true`}" 
+                alt="${staff.name}" 
+                class="w-full h-full object-cover">
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">${staff.name}</h3>
+          <div class="mt-4 p-4 bg-red-900/20 border border-red-500/30 rounded-xl">
+            <p class="text-red-300 font-medium">⚠️ This action cannot be undone</p>
+            <p class="text-red-400/80 text-sm mt-1">Staff will be permanently removed</p>
+          </div>
+        </div>
+      `,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+      background: "#1a1a2e",
+      color: "#e0e0e0",
+      iconColor: "#dc2626"
+    });
+
+    if (!confirm.isConfirmed) return;
+
+      // Delete API call
+    axiosSecure.delete(`/delete/staff/${staff._id}`)
+      .then(res =>{
+        setStaffMembers(prev => prev.filter(s => s._id !== staff._id));
+        // Success message
+        Swal.fire({
+          title: "Deleted!",
+          html: `
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-900/20 flex items-center justify-center border border-red-500/30">
+                <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-bold text-white">Staff Deleted</h3>
+              <p class="text-gray-300">${staff.name} has been removed</p>
+            </div>
+          `,
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+          background: "#1a1a2e",
+          color: "#e0e0e0",
+          iconColor: "#dc2626"
+        });
+      }).catch(err=>{
+        console.log(err)
+        Swal.fire({
+        title: "Error",
+        text: error.response?.data?.message || "Failed to delete staff",
+        icon: "error",
+        confirmButtonColor: "#dc2626",
+        confirmButtonText: "OK",
+        background: "#1a1a2e",
+        color: "#e0e0e0",
+        iconColor: "#dc2626"
+      });
+      })
+
+  };
+
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       {/* Header */}
@@ -175,12 +331,13 @@ const ManageStaff = () => {
                   <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Department</th>
                   <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Status</th>
                   <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Joined</th>
+                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Last Updated</th>
                   <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {staffMembers.map((staff) => (
-                  <tr key={staff._id} className="border-b border-zinc-700 hover:bg-zinc-800/50 transition-colors">
+                  <tr key={staff?._id} className="border-b border-zinc-700 hover:bg-zinc-800/50 transition-colors">
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-4">
                         <div className="relative">
@@ -220,7 +377,8 @@ const ManageStaff = () => {
                     </td>
                     
                     <td className="py-4 px-6">
-                      <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold">
+                      <span 
+                      className={`px-3 py-1 rounded-full text-xs font-bold ${staff?.isBlocked ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
                         {staff.isBlocked ? 'blocked' : 'active'}
                       </span>
                     </td>
@@ -229,6 +387,23 @@ const ManageStaff = () => {
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-2 text-gray-500" />
                         {new Date(staff.createdAt).toLocaleDateString()}
+                      </div>
+                    </td>
+
+                    <td className="py-4 px-6 text-gray-300 text-sm">
+                      <div className="flex items-center">
+                        <CalendarSync className="w-4 h-4 mr-2 text-gray-500" />
+                        {
+                          staff?.updatedAt ? new Date(staff?.updatedAt).toLocaleDateString() : 'Not updated Yet'
+                        }
+                      </div>
+                      <div className="flex items-center">
+                        <AlarmClock className="w-4 h-4 mr-2 text-gray-500" />
+                        {
+                          staff?.updatedAt ? 
+                          new Date(staff?.updatedAt).toLocaleTimeString([], {
+                          hour: '2-digit', minute: '2-digit',hour12: true}) : 'None'
+                        }
                       </div>
                     </td>
                     
@@ -244,7 +419,11 @@ const ManageStaff = () => {
                           <Edit className="w-4 h-4" />
                         </button>
                         
-                        <button className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-red-400 hover:bg-zinc-600 transition-colors">
+                        <button 
+                          onClick={() => handleDelete(staff)}
+                          className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-red-400 hover:bg-zinc-600 transition-colors"
+                          title={staff.assignIssued > 0 ? "Has assigned issues" : "Delete staff"}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -272,7 +451,7 @@ const ManageStaff = () => {
                   <div className="relative">
                     <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-zinc-600 bg-zinc-700">
                       <img 
-                        src="https://ui-avatars.com/api/?name=New+Staff&background=1f2937&color=10b981&size=128"
+                        src={photo || "https://ui-avatars.com/api/?name=New+Staff&background=1f2937&color=10b981&size=128"}
                         alt="Preview"
                         className="w-full h-full object-cover"
                       />
@@ -283,6 +462,7 @@ const ManageStaff = () => {
                         type="file" 
                         className="hidden"
                         name='photoURL'
+                        onChange={handlephotoChange}
                       />
                     </label>
                   </div>
@@ -338,8 +518,8 @@ const ManageStaff = () => {
                     onChange={(e)=> {setSelectDept(e.target.value)}}
                   >
                     <option value="">Select Department</option>
-                    {departments.map(dept => (
-                      <option key={dept} value={dept}>{dept}</option>
+                    {departments.map((dept, index )=> (
+                      <option key={index} value={dept}>{dept}</option>
                     ))}
                   </select>
                 </div>
@@ -449,8 +629,8 @@ const ManageStaff = () => {
                         className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 appearance-none"
                     >
                         <option value="">Select</option>
-                        {departments.map(dept => (
-                        <option key={dept} value={dept} className="bg-zinc-800">{dept}</option>
+                        {departments.map((dept, index) => (
+                        <option key={index} value={dept} className="bg-zinc-800">{dept}</option>
                         ))}
                     </select>
                     </div>
