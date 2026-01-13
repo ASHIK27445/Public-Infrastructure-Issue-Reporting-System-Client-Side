@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Search, 
   AlertTriangle, 
@@ -10,92 +10,103 @@ import {
   UserPlus,
   TrendingUp
 } from 'lucide-react';
+import useAxiousSecure from '../../Hooks/useAxiosSecure'
 
 const ViewAllIssues = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [issues, setIssues] = useState([])
+  const axiosSecure = useAxiousSecure()
+  const issueFetch = () => {
+    axiosSecure.get('/allissues')
+      .then(res => setIssues(res.data))
+      .catch(err => console.log(err))
+  }
 
+  useEffect(()=> {
+    issueFetch()
+  }, [issueFetch])
   // Mock data for issues
-  const issues = [
-    {
-      _id: '1',
-      title: 'Pothole on Main Street',
-      category: 'Road & Traffic',
-      status: 'Pending',
-      priority: 'High',
-      assignedStaff: null,
-      location: 'Main Street, Downtown',
-      createdAt: '2024-01-10',
-      upvoteCount: 25,
-      mainPhoto: 'https://images.unsplash.com/photo-1561144257-e32e8c5d0a8a?w=400',
-      isBoosted: true,
-      boostedUntil: '2024-02-10'
-    },
-    {
-      _id: '2',
-      title: 'Street Light Not Working',
-      category: 'Streetlight',
-      status: 'In-Progress',
-      priority: 'Normal',
-      assignedStaff: {
-        _id: 's1',
-        name: 'John Technician',
-        department: 'Electricity'
-      },
-      location: 'Maple Avenue',
-      createdAt: '2024-01-12',
-      upvoteCount: 15,
-      mainPhoto: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w-400',
-      isBoosted: false,
-      boostedUntil: null
-    },
-    {
-      _id: '3',
-      title: 'Water Pipe Leak',
-      category: 'Water Supply',
-      status: 'Pending',
-      priority: 'Critical',
-      assignedStaff: null,
-      location: 'River Road',
-      createdAt: '2024-01-14',
-      upvoteCount: 42,
-      mainPhoto: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400',
-      isBoosted: true,
-      boostedUntil: '2024-02-14'
-    },
-    {
-      _id: '4',
-      title: 'Garbage Not Collected',
-      category: 'Sanitation',
-      status: 'Resolved',
-      priority: 'Normal',
-      assignedStaff: {
-        _id: 's2',
-        name: 'Sarah Cleaner',
-        department: 'Sanitation'
-      },
-      location: 'Park Lane',
-      createdAt: '2024-01-08',
-      upvoteCount: 8,
-      mainPhoto: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400',
-      isBoosted: false,
-      boostedUntil: null
-    },
-    {
-      _id: '5',
-      title: 'Broken Playground Equipment',
-      category: 'Parks & Recreation',
-      status: 'Pending',
-      priority: 'Normal',
-      assignedStaff: null,
-      location: 'City Park',
-      createdAt: '2024-01-15',
-      upvoteCount: 12,
-      mainPhoto: 'https://images.unsplash.com/photo-1541692641319-981cc79ee10a?w=400',
-      isBoosted: true,
-      boostedUntil: '2024-02-15'
-    }
-  ];
+  // const issues = [
+  //   {
+  //     _id: '1',
+  //     title: 'Pothole on Main Street',
+  //     category: 'Road & Traffic',
+  //     status: 'Pending',
+  //     priority: 'High',
+  //     assignedStaff: null,
+  //     location: 'Main Street, Downtown',
+  //     createdAt: '2024-01-10',
+  //     upvoteCount: 25,
+  //     mainPhoto: 'https://images.unsplash.com/photo-1561144257-e32e8c5d0a8a?w=400',
+  //     isBoosted: true,
+  //     boostedUntil: '2024-02-10'
+  //   },
+  //   {
+  //     _id: '2',
+  //     title: 'Street Light Not Working',
+  //     category: 'Streetlight',
+  //     status: 'In-Progress',
+  //     priority: 'Normal',
+  //     assignedStaff: {
+  //       _id: 's1',
+  //       name: 'John Technician',
+  //       department: 'Electricity'
+  //     },
+  //     location: 'Maple Avenue',
+  //     createdAt: '2024-01-12',
+  //     upvoteCount: 15,
+  //     mainPhoto: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w-400',
+  //     isBoosted: false,
+  //     boostedUntil: null
+  //   },
+  //   {
+  //     _id: '3',
+  //     title: 'Water Pipe Leak',
+  //     category: 'Water Supply',
+  //     status: 'Pending',
+  //     priority: 'Critical',
+  //     assignedStaff: null,
+  //     location: 'River Road',
+  //     createdAt: '2024-01-14',
+  //     upvoteCount: 42,
+  //     mainPhoto: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400',
+  //     isBoosted: true,
+  //     boostedUntil: '2024-02-14'
+  //   },
+  //   {
+  //     _id: '4',
+  //     title: 'Garbage Not Collected',
+  //     category: 'Sanitation',
+  //     status: 'Resolved',
+  //     priority: 'Normal',
+  //     assignedStaff: {
+  //       _id: 's2',
+  //       name: 'Sarah Cleaner',
+  //       department: 'Sanitation'
+  //     },
+  //     location: 'Park Lane',
+  //     createdAt: '2024-01-08',
+  //     upvoteCount: 8,
+  //     mainPhoto: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400',
+  //     isBoosted: false,
+  //     boostedUntil: null
+  //   },
+  //   {
+  //     _id: '5',
+  //     title: 'Broken Playground Equipment',
+  //     category: 'Parks & Recreation',
+  //     status: 'Pending',
+  //     priority: 'Normal',
+  //     assignedStaff: null,
+  //     location: 'City Park',
+  //     createdAt: '2024-01-15',
+  //     upvoteCount: 12,
+  //     mainPhoto: 'https://images.unsplash.com/photo-1541692641319-981cc79ee10a?w=400',
+  //     isBoosted: true,
+  //     boostedUntil: '2024-02-15'
+  //   }
+  // ];
 
   const getStatusColor = (status) => {
     switch(status) {
