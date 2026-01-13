@@ -35,11 +35,14 @@ const ManageStaff = () => {
   const [photo, setPhoto] = useState('')
   const axiosSecure = useAxiosSecure()
 
-  useEffect(()=> {
-    axiosSecure.get('/allstaff')
+  const fetchDemo = () => {
+        axiosSecure.get('/allstaff')
         .then(res => setStaffMembers(res.data))
         .catch(err=> console.log(err))
-  }, [axiosSecure])
+  }
+  useEffect(()=> {
+    fetchDemo()
+  }, [fetchDemo])
 
 //   console.log(staffMembers)
   const departments = [
@@ -162,8 +165,10 @@ const ManageStaff = () => {
           console.log(res.data)
         })
         .then(()=> {
+            showEditStaffModal(false)
             setLoading(false)
             toast.success("User Updated!")
+            fetchDemo()
         })
         .catch(err=> console.log(err))
     }
