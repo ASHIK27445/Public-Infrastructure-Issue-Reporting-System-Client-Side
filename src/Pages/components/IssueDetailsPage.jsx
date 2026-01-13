@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { NavLink, useParams } from 'react-router';
 import { 
   ArrowLeft, 
@@ -22,8 +22,10 @@ import {
   Loader2
 } from 'lucide-react';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
+import { AuthContext } from '../AuthProvider/AuthContext';
 
 const IssueDetailsPage = () => {
+  const {role} = use(AuthContext)
   const [comment, setComment] = useState('');
   const [upvoting, setUpvoting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -159,14 +161,16 @@ useEffect(()=>{
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
+
       {/* Header */}
+      {role === 'admin' &&
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-4">
+
           <div className="flex items-center justify-between">
             <NavLink
               to="/all-issues"
-              className="inline-flex items-center space-x-3 text-gray-400 hover:text-white transition-colors group"
-            >
+              className="inline-flex items-center space-x-3 text-gray-400 hover:text-white transition-colors group">
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Issues</span>
             </NavLink>
@@ -189,8 +193,10 @@ useEffect(()=>{
               </button>
             </div>
           </div>
+
         </div>
       </div>
+      }
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">

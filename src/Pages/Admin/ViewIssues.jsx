@@ -8,24 +8,44 @@ import {
   RefreshCw,
   Eye,
   UserPlus,
-  TrendingUp
+  TrendingUp,
+  Check,
+  X
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import useAxiousSecure from '../../Hooks/useAxiosSecure'
+import { Link } from 'react-router';
 
 const ViewAllIssues = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [issues, setIssues] = useState([])
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [staffList, setStaffList] = useState([]);
+  const [selectedStaffId, setSelectedStaffId] = useState('');
+  const [assignLoading, setAssignLoading] = useState(false);
+  const [selectedIssueId, setSelectedIssueId] = useState('');
   const axiosSecure = useAxiousSecure()
+
   const issueFetch = () => {
     axiosSecure.get('/allissues')
       .then(res => setIssues(res.data))
       .catch(err => console.log(err))
   }
 
+  // console.log(issues)
+
+  const fetchStaffList = () => {
+    axiosSecure.get('/allstaff')
+      .then(res => {
+        const activeStaff = res.data.filter(staff => !staff.isBlocked)
+        setStaffList(activeStaff)
+      }).catch(err => console.log(err))
+  }
+
   useEffect(()=> {
     issueFetch()
-  }, [issueFetch])
+  }, [issues])
   // Mock data for issues
   // const issues = [
   //   {
@@ -143,6 +163,53 @@ const ViewAllIssues = () => {
     setTimeout(() => setRefreshing(false), 1000);
   };
 
+  const openAssignModal = (issueId) => {
+    fetchStaffList();
+    setSelectedIssueId(issueId)
+    setSelectedStaffId('');
+    setShowAssignModal(true);
+  }
+
+  const handleAssignStaff = () => {
+    if (!selectedStaffId) {
+      toast.error("Please select a staff member");
+      return;
+    }
+
+    const selectedStaff = staffList.find(staff => staff._id === selectedStaffId);
+    
+    const assignData = {
+      issueId: selectedIssueId, // issue ID
+      staffId: selectedStaffId
+    };
+
+    setAssignLoading(true);
+    
+    axiosSecure.post('/assign-staff', assignData)
+        .then(res => {
+          toast.success(`Assigned to ${selectedStaff.name}`);
+          
+          // Update specific issue in issues array
+          const updateIssue = res.data.issue
+
+          setIssues(prevIssues => {
+            console.log(prevIssues, "update:", updateIssue)
+            prevIssues.map(issue => 
+              issue?._id === updateIssue?._id ? updateIssue
+                : issue
+            )
+          }
+          )
+          setShowAssignModal(false);
+          setSelectedStaffId('');
+          setAssignLoading(false);
+        })
+        .catch(err => {
+          toast.error(err.response?.data?.message || "Failed to assign");
+          setAssignLoading(false);
+        })
+
+  }
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       {/* Header */}
@@ -194,7 +261,7 @@ const ViewAllIssues = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-bold text-white">
-                  All Issues ({issues.length})
+                  All Issues ({issues?.length})
                 </h3>
                 <p className="text-sm text-gray-400">
                   Assign staff members to unassigned issues
@@ -218,25 +285,25 @@ const ViewAllIssues = () => {
                 </tr>
               </thead>
               <tbody>
-                {issues.map((issue) => (
-                  <tr key={issue._id} className="border-b border-zinc-700 hover:bg-zinc-800/50 transition-colors">
+                {issues?.map((issue) => (
+                  <tr key={issue?._id} className="border-b border-zinc-700 hover:bg-zinc-800/50 transition-colors">
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-4">
                         <div className="relative">
                           <div className="w-14 h-14 rounded-xl overflow-hidden">
                             <img 
-                              src={issue.mainPhoto} 
-                              alt={issue.title}
+                              src={issue?.mainPhoto} 
+                              alt={issue?.title}
                               className="w-full h-full object-cover"
                             />
                           </div>
                         </div>
                         <div>
                           <div className="font-bold text-white mb-1">
-                            {issue.title}
+                            {issue?.title}
                           </div>
                           <div className="text-sm text-gray-400">
-                            Upvotes: {issue.upvoteCount}
+                            Upvotes: {issue?.upvoteCount}
                           </div>
                         </div>
                       </div>
@@ -244,25 +311,25 @@ const ViewAllIssues = () => {
                     
                     <td className="py-4 px-6">
                       <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-medium">
-                        {issue.category}
+                        {issue?.category}
                       </span>
                     </td>
                     
                     <td className="py-4 px-6">
-                      <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(issue.status)}`}>
-                        {getStatusIcon(issue.status)}
-                        <span>{issue.status}</span>
+                      <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(issue?.status)}`}>
+                        {getStatusIcon(issue?.status)}
+                        <span>{issue?.status}</span>
                       </div>
                     </td>
                     
                     <td className="py-4 px-6">
-                      <div className={`px-3 py-1 rounded-full text-xs font-bold ${getPriorityColor(issue.priority)}`}>
-                        {issue.priority}
+                      <div className={`px-3 py-1 rounded-full text-xs font-bold ${getPriorityColor(issue?.priority)}`}>
+                        {issue?.priority}
                       </div>
                     </td>
                     
                     <td className="py-4 px-6">
-                      {issue.isBoosted ? (
+                      {issue?.isBoosted ? (
                         <div className="flex items-center space-x-2">
                           <div className="p-2 bg-linear-to-r from-purple-500/20 to-pink-500/20 rounded-lg">
                             <TrendingUp className="w-4 h-4 text-purple-400" />
@@ -270,7 +337,7 @@ const ViewAllIssues = () => {
                           <div>
                             <div className="text-white text-sm font-medium">Boosted</div>
                             <div className="text-xs text-gray-400">
-                              Until: {new Date(issue.boostedUntil).toLocaleDateString()}
+                              Until: {new Date(issue?.boostedUntil).toLocaleDateString()}
                             </div>
                           </div>
                         </div>
@@ -282,21 +349,21 @@ const ViewAllIssues = () => {
                     </td>
                     
                     <td className="py-4 px-6">
-                      {issue.assignedStaff ? (
+                      {issue?.assignInto ? (
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-zinc-600">
                             <img 
-                              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(issue.assignedStaff.name)}&background=1f2937&color=10b981&bold=true`} 
-                              alt={issue.assignedStaff.name}
+                              src={issue?.assignedStaff?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(issue?.assignedStaff?.name || 'Staff')}&background=1f2937&color=10b981&bold=true`} 
+                              alt={issue?.assignedStaff?.name || 'Staff'}
                               className="w-full h-full object-cover"
                             />
                           </div>
                           <div>
                             <div className="text-white font-medium text-sm">
-                              {issue.assignedStaff.name}
+                              {issue?.assignedStaff?.name || 'Loading...'}
                             </div>
                             <div className="text-xs text-gray-400">
-                              {issue.assignedStaff.department}
+                              {issue?.assignedStaff?.department || ''}
                             </div>
                           </div>
                         </div>
@@ -309,16 +376,21 @@ const ViewAllIssues = () => {
                     
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
-                        <button className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-white hover:bg-zinc-600 transition-colors">
+                        <Link to={`/issues/${issue?._id}`} className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-white hover:bg-zinc-600 transition-colors">
                           <Eye className="w-4 h-4" />
-                        </button>
-                        
-                        {/* Only show assign button if no staff is assigned */}
-                        {!issue.assignedStaff && (
-                          <button className="p-2 bg-linear-to-r from-emerald-500/20 to-teal-500/20 rounded-lg text-emerald-400 hover:text-white hover:from-emerald-500/30 hover:to-teal-500/30 transition-colors">
+                        </Link>
+
+                        {/* Staff Assign*/}
+                        {!issue?.assignInto && issue?.status === 'Pending' &&(
+                          <button 
+                          onClick={() => {
+                            openAssignModal(issue?._id)
+                          }}
+                          className="p-2 bg-linear-to-r from-emerald-500/20 to-teal-500/20 rounded-lg text-emerald-400 hover:text-white hover:from-emerald-500/30 hover:to-teal-500/30 transition-colors">
                             <UserPlus className="w-4 h-4" />
                           </button>
                         )}
+
                       </div>
                     </td>
                   </tr>
@@ -326,6 +398,98 @@ const ViewAllIssues = () => {
               </tbody>
             </table>
           </div>
+
+          {/*Open Modals*/}
+          {showAssignModal && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl">
+                {/* Modal Header */}
+                <div className="p-5 border-b border-zinc-800">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-xl font-bold text-white">Assign Staff</h3>
+                    <button 
+                      onClick={() => setShowAssignModal(false)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-400 mt-1">Select a staff member</p>
+                </div>
+                
+                {/* Staff List */}
+                <div className="p-5 max-h-160 overflow-y-auto">
+                  <div className="space-y-3">
+                    {staffList.map(staff => (
+                      <div 
+                        key={staff._id}
+                        onClick={() => setSelectedStaffId(staff._id)}
+                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                          selectedStaffId === staff._id 
+                            ? 'border-emerald-500 bg-emerald-500/10' 
+                            : 'border-zinc-700 bg-zinc-800 hover:border-zinc-600'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {/* Profile Image */}
+                          <div className="w-12 h-12 rounded-full overflow-hidden border border-zinc-600">
+                            <img 
+                              src={staff?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(staff?.name)}&background=1f2937&color=10b981`}
+                              alt={staff?.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          
+                          {/* Staff? Info */}
+                          <div className="flex-1">
+                            <h4 className="font-bold text-white">{staff?.name}</h4>
+                            <p className="text-sm text-gray-400">{staff?.dept}</p>
+                            <div className="flex gap-3 mt-1 text-xs">
+                              <span className="text-emerald-400">{staff?.assignIssued || 0} assigned</span>
+                              <span className="text-blue-400">{staff?.resolvedIssued || 0} resolved</span>
+                            </div>
+                          </div>
+                          
+                          {/* Selection Indicator */}
+                          {selectedStaffId === staff?._id && (
+                            <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                              <Check className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {staffList.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      No active staff members found
+                    </div>
+                  )}
+                </div>
+                
+                {/* Modal Footer */}
+                <div className="p-5 border-t border-zinc-800">
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setShowAssignModal(false)}
+                      className="flex-1 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-lg"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => handleAssignStaff()}
+                      disabled={!selectedStaffId || assignLoading}
+                      className="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg disabled:opacity-50"
+                    >
+                      {assignLoading ? 'Assigning...' : 'Assign Staff'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </div>
