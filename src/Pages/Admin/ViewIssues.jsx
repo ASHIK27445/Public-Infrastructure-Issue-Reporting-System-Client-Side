@@ -19,13 +19,16 @@ import { Link } from 'react-router';
 const ViewAllIssues = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  const [issues, setIssues] = useState([])
+  const [issues, setIssues] = useState([]);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [staffList, setStaffList] = useState([]);
   const [selectedStaffId, setSelectedStaffId] = useState('');
   const [assignLoading, setAssignLoading] = useState(false);
   const [selectedIssueId, setSelectedIssueId] = useState('');
-  const axiosSecure = useAxiousSecure()
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectLoading, setRejectLoading] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const axiosSecure = useAxiousSecure();
 
   const issueFetch = () => {
     axiosSecure.get('/allissues')
@@ -134,9 +137,10 @@ const ViewAllIssues = () => {
       case 'In-Progress': return 'bg-blue-500/20 text-blue-400';
       case 'Resolved': return 'bg-emerald-500/20 text-emerald-400';
       case 'Closed': return 'bg-gray-500/20 text-gray-400';
+      case 'Rejected': return 'bg-red-500/20 text-red-400';
       default: return 'bg-gray-500/20 text-gray-400';
     }
-  };
+  }
 
   const getPriorityColor = (priority) => {
     switch(priority) {
@@ -146,7 +150,7 @@ const ViewAllIssues = () => {
       case 'Low': return 'bg-blue-500/20 text-blue-400';
       default: return 'bg-gray-500/20 text-gray-400';
     }
-  };
+  }
 
   const getStatusIcon = (status) => {
     switch(status) {
@@ -154,14 +158,16 @@ const ViewAllIssues = () => {
       case 'In-Progress': return <AlertTriangle className="w-3 h-3" />;
       case 'Resolved': return <CheckCircle className="w-3 h-3" />;
       case 'Closed': return <XCircle className="w-3 h-3" />;
+      case 'Rejected': return <X className="w-3 h-3" />;
       default: return <Clock className="w-3 h-3" />;
     }
-  };
+  }
 
   const handleRefresh = () => {
     setRefreshing(true);
+    issueFetch()
     setTimeout(() => setRefreshing(false), 1000);
-  };
+  }
 
   const openAssignModal = (issueId) => {
     fetchStaffList();
@@ -180,7 +186,7 @@ const ViewAllIssues = () => {
     
     const assignData = {
       issueId: selectedIssueId, // issue ID
-      staffId: selectedStaffId
+      staffId: selectedStaffId  // staff ID
     };
 
     setAssignLoading(true);
@@ -192,13 +198,11 @@ const ViewAllIssues = () => {
           // Update specific issue in issues array
           const updateIssue = res.data.issue
 
-          setIssues(prevIssues => {
-            console.log(prevIssues, "update:", updateIssue)
+          setIssues(prevIssues =>
             prevIssues.map(issue => 
               issue?._id === updateIssue?._id ? updateIssue
                 : issue
             )
-          }
           )
           setShowAssignModal(false);
           setSelectedStaffId('');
@@ -209,6 +213,48 @@ const ViewAllIssues = () => {
           setAssignLoading(false);
         })
 
+  }
+
+  const handleRejectIssue = () => {
+  if (!rejectReason.trim()) {
+    toast.error("Please provide a reason for rejection")
+    return
+  }
+
+  setRejectLoading(true);
+
+  const rejectData = {
+    issueId: selectedIssueId,
+    reason: rejectReason,
+    status: 'Rejected'
+  }
+
+  axiosSecure.patch('/reject-issue', rejectData)
+    .then(res => {
+      toast.success("Issue rejected successfully")
+      
+      // Update issues state
+      setIssues(prevIssues => 
+        prevIssues.map(issue => 
+          issue._id === selectedIssueId 
+            ? { 
+                ...issue, 
+                status: 'Rejected',
+                rejectedAt: new Date(),
+                rejectReason: rejectReason
+              }
+            : issue
+        )
+      );
+      
+      setShowRejectModal(false)
+      setRejectReason('')
+      setRejectLoading(false)
+    })
+    .catch(err => {
+      toast.error(err.response?.data?.message || "Failed to reject issue")
+      setRejectLoading(false)
+    })
   }
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
@@ -386,8 +432,23 @@ const ViewAllIssues = () => {
                           onClick={() => {
                             openAssignModal(issue?._id)
                           }}
-                          className="p-2 bg-linear-to-r from-emerald-500/20 to-teal-500/20 rounded-lg text-emerald-400 hover:text-white hover:from-emerald-500/30 hover:to-teal-500/30 transition-colors">
+                          disabled= {issue?.status === 'Rejected' ? true : false}
+                          className={`p-2 bg-linear-to-r ${issue?.status === 'Rejected' ? 'bg-zinc-700 rounded-lg text-gray-400' : 'from-emerald-500/20 to-teal-500/20 rounded-lg text-emerald-400 hover:text-white hover:from-emerald-500/30 hover:to-teal-500/30 transition-colors'}`}>
                             <UserPlus className="w-4 h-4" />
+                          </button>
+                        )}
+
+                        {/*Issue Rejection*/}
+                        {issue?.status === 'Pending' && !issue?.assignInto && (
+                          <button 
+                            onClick={() => {
+                              setSelectedIssueId(issue?._id);
+                              setShowRejectModal(true);
+                            }}
+                            className="p-2 bg-linear-to-r from-red-500/20 to-orange-500/20 rounded-lg text-red-400 hover:text-white hover:from-red-500/30 hover:to-orange-500/30 transition-colors"
+                            title="Reject Issue"
+                          >
+                            <X className="w-4 h-4" />
                           </button>
                         )}
 
@@ -483,6 +544,94 @@ const ViewAllIssues = () => {
                       className="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg disabled:opacity-50"
                     >
                       {assignLoading ? 'Assigning...' : 'Assign Staff'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Reject Issue Modal */}
+          {showRejectModal && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl">
+                {/* Modal Header */}
+                <div className="p-5 border-b border-zinc-800">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="text-xl font-bold text-white">Reject Issue</h3>
+                      <p className="text-sm text-gray-400 mt-1">Provide reason for rejection</p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setShowRejectModal(false);
+                        setRejectReason('');
+                      }}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Reject Form */}
+                <div className="p-5">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Rejection Reason *
+                    </label>
+                    <textarea
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                      placeholder="Explain why this issue is being rejected..."
+                      className="w-full h-32 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors resize-none"
+                      required
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      This reason will be visible to the reporter
+                    </p>
+                  </div>
+
+                  {/* Warning Message */}
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg mb-4">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-sm text-red-300 font-medium">Warning</p>
+                        <p className="text-xs text-red-400 mt-1">
+                          Once rejected, this issue cannot be reopened. The reporter will be notified.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Modal Footer */}
+                <div className="p-5 border-t border-zinc-800">
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setShowRejectModal(false);
+                        setRejectReason('');
+                      }}
+                      className="flex-1 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-lg"
+                      disabled={rejectLoading}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleRejectIssue}
+                      disabled={!rejectReason.trim() || rejectLoading}
+                      className="flex-1 px-4 py-2.5 bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-lg disabled:opacity-50 transition-all"
+                    >
+                      {rejectLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          Rejecting...
+                        </span>
+                      ) : (
+                        'Confirm Reject'
+                      )}
                     </button>
                   </div>
                 </div>
