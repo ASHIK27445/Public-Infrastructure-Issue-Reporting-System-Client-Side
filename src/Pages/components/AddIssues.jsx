@@ -154,9 +154,13 @@ const AddIssue = () => {
         if (response.data) {
           toast.success('🎉 Issue reported successfully!');
           
-          // Navigate to my issues page after short delay
+          {/* in router the route: dashboard/manageissues=>
+            Reason: The relative path didn’t match the nested route, 
+            so '/dashboard/addissues' wasn’t resolved correctly.
+            Fix: Use the full nested path:navigate('/dashboard/dashboard/addissues' */}
+
           setTimeout(() => {
-            navigate('/dashboard/my-issues');
+            navigate('/dashboard/dashboard/manageissues');
           }, 1500);
         }
       } else {

@@ -166,7 +166,7 @@ const DashboardAside = () => {
             </div>
           </div>
         </div>
-
+                
         {/* User Profile Summary */}
         <div className="p-6 border-b border-zinc-800">
           <div className="flex items-center space-x-3 mb-4">
@@ -179,7 +179,10 @@ const DashboardAside = () => {
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-white">{user?.displayName}</h3>
-              <p className="text-sm text-gray-400">Citizen ID: CTZ-789456</p>
+              <p className="text-sm text-gray-400">
+                {role === 'admin' ? 'Admin' : role === 'staff' ? 'Staff' : 
+                 'citizen'
+                } ID: <br /> {mUser._id.slice(0, 10)}...</p>
             </div>
           </div>
           

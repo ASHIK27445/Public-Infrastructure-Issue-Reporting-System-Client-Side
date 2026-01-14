@@ -265,7 +265,8 @@ const ManageIssues = () => {
               </button>
               
               <button 
-                onClick={() => navigate('/report-issue')}
+                onClick={() => navigate('/dashboard/dashboard/addissues')}
+
                 className="px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all"
               >
                 + New Issue

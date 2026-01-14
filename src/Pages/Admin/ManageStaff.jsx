@@ -159,18 +159,20 @@ const ManageStaff = () => {
 
     console.log(updateData)
 
+    setLoading(true)
     axiosSecure.patch('/update/staff/info', updateData)
         .then(res => {
-          setLoading(true)
           console.log(res.data)
         })
         .then(()=> {
-            showEditStaffModal(false)
-            setLoading(false)
-            toast.success("User Updated!")
             fetchDemo()
         })
         .catch(err=> console.log(err))
+        .finally(()=> {
+          setLoading(false)
+          toast.success("User Updated!")
+          setShowEditStaffModal(false)
+        })
     }
 
   if(loading){
