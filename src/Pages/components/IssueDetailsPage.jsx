@@ -349,7 +349,7 @@ useEffect(()=>{
                   <div className="relative">
                     <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-blue-500/50">
                       <img
-                        src={issue.assignedStaff.avatar}
+                        src={issue.assignedStaff.photoURL}
                         alt={issue.assignedStaff.name}
                         className="w-full h-full object-cover"
                       />
@@ -366,17 +366,26 @@ useEffect(()=>{
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div className="flex items-center space-x-2">
                         <Phone className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-300">{issue.assignedStaff.phone}</span>
+                        <span className="text-gray-300">{issue.assignedStaff.tel}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Mail className="w-4 h-4 text-gray-400" />
                         <span className="text-gray-300">{issue.assignedStaff.email}</span>
                       </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-gray-400 text-sm">Assign By {issue.assignedStaff.assignBy}</span>
+                      </div>
+                      <div className="text-sm text-gray-400">
+                      Assigned on{" "}
+                      {new Date(issue.assignedStaff.assignedAt).toLocaleDateString()}{" "}
+                      {new Date(issue.assignedStaff.assignedAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                      </div>
                     </div>
-                    
-                    <div className="text-sm text-gray-400">
-                      Assigned on {new Date(issue.assignedAt).toLocaleDateString()}
-                    </div>
+
                   </div>
                 </div>
               </div>
@@ -442,7 +451,7 @@ useEffect(()=>{
                 </div>
                 <div className="text-sm text-gray-400">
                   <span className="text-white">Issues reported:</span>{' '}
-                  {issue.reporterIssues}
+                  {new Date(issue.createdAt).toLocaleDateString()}
                 </div>
                 <div className="text-sm text-gray-400">
                   <span className="text-white">Success rate:</span>{' '}

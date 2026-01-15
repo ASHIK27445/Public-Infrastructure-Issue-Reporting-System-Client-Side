@@ -19,7 +19,8 @@ import {
   Slash,
   BookAlert,
   LayoutGrid,
-  ShieldUser
+  ShieldUser,
+  NotepadText
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -107,6 +108,13 @@ const DashboardAside = () => {
       roles: ['admin']
     },
     {
+      id: 'assignedIssues',
+      name: 'Assigned Issues',
+      icon: <NotepadText className='w-5 h-5'></NotepadText>,
+      path: 'assignedIssues',
+      roles: ['admin', 'staff']
+    },
+    {
       id: 'notifications',
       name: 'Notifications',
       icon: <Bell className="w-5 h-5" />,
@@ -182,7 +190,7 @@ const DashboardAside = () => {
               <p className="text-sm text-gray-400">
                 {role === 'admin' ? 'Admin' : role === 'staff' ? 'Staff' : 
                  'citizen'
-                } ID: <br /> {mUser._id.slice(0, 10)}...</p>
+                } ID: <br /> {mUser?._id.slice(0, 10)}...</p>
             </div>
           </div>
           

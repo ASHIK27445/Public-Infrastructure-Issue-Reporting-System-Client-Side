@@ -18,6 +18,7 @@ import ManageStaff from "../Pages/Admin/ManageStaff"
 import ManageUsers from "../Pages/Admin/ManageUser"
 import ViewIssues from "../Pages/Admin/ViewIssues"
 import RejectedIssues from "../Pages/Admin/RejectedIssues"
+import AssignedIssues from "../Pages/Staff/AssignedIssues"
 export const router = createBrowserRouter([
     {
         path: '/' , element:<Root></Root>,
@@ -74,6 +75,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'rejectedIssues', Component: RejectedIssues
+            },
+            {
+                path: 'assignedIssues', Component: AssignedIssues
             }
 
         ]
