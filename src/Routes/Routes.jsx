@@ -21,6 +21,15 @@ import RejectedIssues from "../Pages/Admin/RejectedIssues"
 import AssignedIssues from "../Pages/Staff/AssignedIssues"
 import MapView from "../Pages/Others/MapView"
 import PremiumMock from "../Pages/Others/PremiumMock"
+import TermsOfService from "../Pages/Others/TermsOfService"
+import PrivacyPolicy from "../Pages/Home/PrivacyPolicy"
+import CommunityGuidelines from "../Pages/Others/CommunityGuidelines"
+import Blog from "../Pages/Others/Blog"
+import HelpCenter from "../Pages/Others/HelpCenter"
+import HowItWorks from "../Pages/Home/HowItWorks"
+// import Features from "../Pages/Others/Features"
+import Features from "../Pages/Home/Features"
+// import HowItWorks from "../Pages/Others/HowItWorks"
 export const router = createBrowserRouter([
     {
         path: '/' , element:<Root></Root>,
@@ -48,6 +57,27 @@ export const router = createBrowserRouter([
             },
             {
                 path:'/premium', Component: PremiumMock
+            },
+            {
+                path:'/Terms-of-services', Component: TermsOfService
+            },
+            {
+                path:'/privacy-policy', Component: PrivacyPolicy
+            },
+            {
+                path:'/community-guidelines', Component: CommunityGuidelines
+            },
+            {
+                path:'/blog', Component: Blog
+            },
+            {
+                path:'/help-center', Component: HelpCenter
+            },
+            {
+                path:'/how-it-works', Component: HowItWorks
+            },
+            {
+                path:'/features', Component: Features
             }
         ]
     },

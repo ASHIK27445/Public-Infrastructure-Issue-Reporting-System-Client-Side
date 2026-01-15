@@ -91,6 +91,12 @@ const Login = () => {
       )
     }
 
+    const handleDemoLogin = () => {
+      setEmail('citizen.test@gmail.com');
+      setPassword('Hatake12');
+    }
+
+
   return (
     <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 py-12 px-4 flex items-center justify-center">
       <title>CityInfra - Login</title>
@@ -108,6 +114,16 @@ const Login = () => {
                 <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
                 <p className="text-gray-400">Sign in to your account</p>
               </div>
+            </div>
+
+            <div className='flex justify-center mb-5'>
+              <button
+  type="button"
+  onClick={handleDemoLogin}
+  className="mt-3 px-4 py-2 bg-zinc-700/60 hover:bg-zinc-700 text-emerald-400 text-sm font-semibold rounded-xl transition-all duration-300 border border-zinc-600"
+>
+  Demo Login
+              </button>
             </div>
 
             <form onSubmit={handleLogin}>
