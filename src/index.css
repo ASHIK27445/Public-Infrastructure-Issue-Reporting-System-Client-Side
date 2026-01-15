@@ -317,3 +317,39 @@ body {
 [data-theme="light"] .text-gray-400 {
   color: #64748b !important;
 }
+
+
+/* Footer social icons in light theme - HIGHER SPECIFICITY */
+[data-theme="light"] footer .bg-zinc-800.rounded-2xl {
+  background-color: #e4e4e7 !important;
+}
+
+[data-theme="light"] footer .bg-zinc-800.rounded-2xl:hover {
+  background-color: inherit !important;
+}
+
+/* Force hover colors to work in light theme */
+[data-theme="light"] footer a.bg-zinc-800.hover\:bg-sky-500:hover {
+  background-color: #0ea5e9 !important;
+}
+
+[data-theme="light"] footer a.bg-zinc-800.hover\:bg-blue-600:hover {
+  background-color: #2563eb !important;
+}
+
+[data-theme="light"] footer a.bg-zinc-800.hover\:bg-pink-600:hover {
+  background-color: #db2777 !important;
+}
+
+[data-theme="light"] footer a.bg-zinc-800.hover\:bg-blue-700:hover {
+  background-color: #1d4ed8 !important;
+}
+
+/* Ensure text is white on hover in light theme */
+[data-theme="light"] footer a.bg-zinc-800.hover\:text-white:hover {
+  color: white !important;
+}
+
+[data-theme="light"] footer a.bg-zinc-800.hover\:text-white:hover svg {
+  color: white !important;
+}
