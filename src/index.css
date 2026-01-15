@@ -289,3 +289,25 @@
 [data-theme="light"] .bg-zinc-900\/50 {
   background-color: rgba(244, 244, 245, 0.5) !important;
 }
+
+/* Minimal login light theme */
+[data-theme="light"] .bg-linear-to-br.from-zinc-950.to-zinc-900 {
+  background: #f8fafc !important;
+}
+
+[data-theme="light"] .bg-linear-to-br.from-zinc-900.to-zinc-800 {
+  background: white !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .border-zinc-700 {
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .text-white {
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .text-gray-400 {
+  color: #64748b !important;
+}

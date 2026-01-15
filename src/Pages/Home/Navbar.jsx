@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 import { AuthContext } from '../AuthProvider/AuthContext';
-import { use } from "react";
+import { use, useState } from "react";
 import { toast } from "react-toastify";
 import { 
   Menu, 
@@ -19,6 +19,7 @@ import { useTheme } from "../Theme/ThemeContext";
 const Navbar = () => {
   const {user, logoutUser, role} = use(AuthContext);
   const { theme, toggleTheme } = useTheme();
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleLogout = () => {
     logoutUser()
@@ -210,42 +211,51 @@ const Navbar = () => {
             )}
 
             {/* Mobile Menu Button */}
-            <button className="md:hidden p-2 rounded-2xl hover:bg-zinc-800 transition-colors">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden p-2 rounded-2xl hover:bg-zinc-800 transition-colors"
+          >
+            {isOpen ? (
+              <X className="w-6 h-6 text-gray-300" />
+            ) : (
               <Menu className="w-6 h-6 text-gray-300" />
-            </button>
+            )}
+          </button>
+
           </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <div className="md:hidden bg-zinc-800/95 backdrop-blur-xl border-t border-zinc-700">
-        <div className="px-6 py-4 space-y-2">
-          {navLinks.map((link) => (
+      {isOpen &&  
+        <div className="md:hidden bg-zinc-800/95 backdrop-blur-xl border-t border-zinc-700">
+          <div className="px-6 py-4 space-y-2">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-4 py-3 rounded-2xl font-medium transition-all duration-300 ${
+                    isActive
+                      ? 'bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400'
+                      : 'text-gray-300 hover:text-white hover:bg-zinc-700/50'
+                  }`
+                }
+              >
+                {link.icon}
+                <span>{link.label}</span>
+              </NavLink>
+            ))}
+            
             <NavLink
-              key={link.path}
-              to={link.path}
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-2xl font-medium transition-all duration-300 ${
-                  isActive
-                    ? 'bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400'
-                    : 'text-gray-300 hover:text-white hover:bg-zinc-700/50'
-                }`
-              }
+              to="/report"
+              className="flex items-center justify-center space-x-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg mt-4"
             >
-              {link.icon}
-              <span>{link.label}</span>
+              <AlertTriangle className="w-5 h-5" />
+              <span>Report Issue</span>
             </NavLink>
-          ))}
-          
-          <NavLink
-            to="/report"
-            className="flex items-center justify-center space-x-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg mt-4"
-          >
-            <AlertTriangle className="w-5 h-5" />
-            <span>Report Issue</span>
-          </NavLink>
-        </div>
-      </div>
+          </div>
+        </div>}
     </nav>
   );
 };

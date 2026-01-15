@@ -20,6 +20,7 @@ import ViewIssues from "../Pages/Admin/ViewIssues"
 import RejectedIssues from "../Pages/Admin/RejectedIssues"
 import AssignedIssues from "../Pages/Staff/AssignedIssues"
 import MapView from "../Pages/Others/MapView"
+import PremiumMock from "../Pages/Others/PremiumMock"
 export const router = createBrowserRouter([
     {
         path: '/' , element:<Root></Root>,
@@ -44,6 +45,9 @@ export const router = createBrowserRouter([
             },
             {
                 path:'/map-view', Component: MapView
+            },
+            {
+                path:'/premium', Component: PremiumMock
             }
         ]
     },
