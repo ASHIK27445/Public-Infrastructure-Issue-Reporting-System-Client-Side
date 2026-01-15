@@ -69,7 +69,7 @@ const HeroBanner = () => {
                   ))}
                 </h1>
                 
-                <p className="text-xl md:text-2xl text-gray-300 mb-10 leading-relaxed max-w-3xl">
+                <p className="debug-test text-xl md:text-2xl text-gray-300 mb-10 leading-relaxed max-w-3xl">
                   {slide.subtitle}
                 </p>
                 

@@ -1,2 +1,291 @@
 @import "tailwindcss";
 @plugin "daisyui";
+/* Hero section light theme fix */
+[data-theme="light"] .bg-gradient-to-b.from-black\/70 {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), transparent) !important;
+}
+
+[data-theme="light"] .bg-linear-to-b.from-black\/70 {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), transparent) !important;
+}
+
+/* Hero text readable in light mode */
+[data-theme="light"] .relative.z-20 h1,
+[data-theme="light"] .relative.z-20 h2,
+[data-theme="light"] .relative.z-20 p,
+[data-theme="light"] .relative.z-20 span,
+[data-theme="light"] .relative.z-20 .text-white {
+  color: #18181b !important;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Hero buttons visible in light mode */
+[data-theme="light"] .relative.z-20 button {
+  color: #18181b !important;
+  border-color: #18181b !important;
+}
+
+/* Target EXACT HeroBanner subtitle classes */
+[data-theme="light"] .text-xl.md\:text-2xl.text-gray-300.mb-10 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* StatusBar specific */
+[data-theme="light"] section.relative.-mt-24.z-30 {
+  background: linear-gradient(to bottom right, #f4f4f5, #e4e4e7) !important;
+}
+
+[data-theme="light"] .bg-linear-to-br.from-zinc-900.to-zinc-800 {
+  background: linear-gradient(to bottom right, #f4f4f5, #e4e4e7) !important;
+}
+
+[data-theme="light"] .border-zinc-700 {
+  border-color: #777780 !important;
+}
+
+/* StatusBar text colors */
+[data-theme="light"] .text-gray-400 {
+  color: #71717a !important;
+}
+
+/* ===== COMPLETE LIGHT THEME CSS ===== */
+
+/* Hero Section */
+[data-theme="light"] .bg-gradient-to-b.from-black\/70 {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), transparent) !important;
+}
+
+[data-theme="light"] .relative.z-20 h1,
+[data-theme="light"] .relative.z-20 h2,
+[data-theme="light"] .relative.z-20 p,
+[data-theme="light"] .relative.z-20 span,
+[data-theme="light"] .relative.z-20 .text-white {
+  color: #18181b !important;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* StatusBar */
+[data-theme="light"] .bg-linear-to-br.from-zinc-900.to-zinc-800 {
+  background: linear-gradient(to bottom right, #f4f4f5, #e4e4e7) !important;
+}
+
+/* Common styles for all sections */
+[data-theme="light"] .bg-gradient-to-br.from-zinc-800.to-zinc-900,
+[data-theme="light"] .bg-gradient-to-br.from-zinc-900.to-zinc-800 {
+  background: linear-gradient(to bottom right, #f4f4f5, #e4e4e7) !important;
+}
+
+[data-theme="light"] .bg-gradient-to-b.from-zinc-900.to-zinc-950,
+[data-theme="light"] .bg-gradient-to-b.from-zinc-950.to-zinc-900 {
+  background: linear-gradient(to bottom, #f4f4f5, #ffffff) !important;
+}
+
+[data-theme="light"] .border-zinc-700,
+[data-theme="light"] .border-zinc-800 {
+  border-color: #d4d4d8 !important;
+}
+
+[data-theme="light"] .text-white {
+  color: #18181b !important;
+}
+
+[data-theme="light"] .text-gray-300,
+[data-theme="light"] .text-gray-400 {
+  color: #71717a !important;
+}
+
+[data-theme="light"] .bg-zinc-800,
+[data-theme="light"] .bg-zinc-900 {
+  background-color: #f4f4f5 !important;
+}
+
+[data-theme="light"] .bg-zinc-950 {
+  background-color: #ffffff !important;
+}
+
+/* Accent colors remain same */
+[data-theme="light"] .bg-gradient-to-r.from-emerald-500.to-teal-500 {
+  background: transparent !important;
+  color: #10b981;
+}
+
+[data-theme="light"] .text-emerald-400 {
+  color: #10b981 !important;
+}
+
+/* Only Navbar background in light theme */
+[data-theme="light"] nav.bg-zinc-900\/95 {
+  background-color: #f4f4f5 !important;
+}
+
+[data-theme="light"] nav.bg-zinc-900\/95.backdrop-blur-md {
+  background-color: rgba(244, 244, 245, 0.95) !important;
+}
+
+/* Navbar complete light theme */
+[data-theme="light"] nav.bg-zinc-900\/95.backdrop-blur-md {
+  background-color: rgba(244, 244, 245, 0.95) !important;
+  border-color: #d4d4d8 !important;
+}
+
+[data-theme="light"] nav .text-white {
+  color: #18181b !important;
+}
+
+[data-theme="light"] nav .text-gray-300,
+[data-theme="light"] nav .text-gray-400 {
+  color: #71717a !important;
+}
+
+[data-theme="light"] nav .bg-zinc-800 {
+  background-color: #e4e4e7 !important;
+}
+
+[data-theme="light"] nav .border-zinc-700,
+[data-theme="light"] nav .border-zinc-800 {
+  border-color: #d4d4d8 !important;
+}
+
+[data-theme="light"] nav .bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+[data-theme="light"] nav .border-emerald-500\/30 {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+[data-theme="light"] nav .hover\:bg-zinc-800:hover {
+  background-color: #e4e4e7 !important;
+}
+
+/* Navbar dropdown menu */
+[data-theme="light"] nav .bg-zinc-800\/95 {
+  background-color: rgba(244, 244, 245, 0.95) !important;
+}
+
+/* Navbar buttons */
+[data-theme="light"] nav button.text-gray-300 {
+  color: #71717a !important;
+}
+
+/* Logo text */
+[data-theme="light"] nav .text-2xl.font-black.text-white {
+  color: #18181b !important;
+}
+
+/* Navbar dropdown stats section light theme */
+[data-theme="light"] nav .border-t.border-zinc-700 {
+  border-color: #d4d4d8 !important;
+}
+
+[data-theme="light"] nav .bg-zinc-900\/50 {
+  background-color: rgba(244, 244, 245, 0.5) !important;
+}
+
+[data-theme="light"] nav .text-xs.text-gray-400 {
+  color: #71717a !important;
+}
+
+/* DashboardAside light theme */
+[data-theme="light"] aside.bg-linear-to-b.from-zinc-900.to-zinc-950 {
+  background: linear-gradient(to bottom, #f4f4f5, #ffffff) !important;
+}
+
+[data-theme="light"] aside .border-zinc-800,
+[data-theme="light"] aside .border-r.border-zinc-800,
+[data-theme="light"] aside .border-b.border-zinc-800,
+[data-theme="light"] aside .border-t.border-zinc-800 {
+  border-color: #d4d4d8 !important;
+}
+
+[data-theme="light"] aside .text-white {
+  color: #18181b !important;
+}
+
+[data-theme="light"] aside .text-gray-400 {
+  color: #71717a !important;
+}
+
+[data-theme="light"] aside .bg-zinc-800 {
+  background-color: #e4e4e7 !important;
+}
+
+[data-theme="light"] aside .hover\:bg-zinc-800:hover {
+  background-color: #e4e4e7 !important;
+}
+
+[data-theme="light"] aside .bg-zinc-900 {
+  background-color: #f4f4f5 !important;
+}
+
+/* ManageUsers page light theme */
+[data-theme="light"] .bg-linear-to-b.from-zinc-950.to-zinc-900 {
+  background: linear-gradient(to bottom, #ffffff, #f4f4f5) !important;
+}
+
+[data-theme="light"] .bg-zinc-900\/95.backdrop-blur-md {
+  background-color: rgba(244, 244, 245, 0.95) !important;
+}
+
+[data-theme="light"] .border-zinc-800,
+[data-theme="light"] .border-zinc-700 {
+  border-color: #d4d4d8 !important;
+}
+
+[data-theme="light"] .text-white {
+  color: #18181b !important;
+}
+
+[data-theme="light"] .text-gray-400 {
+  color: #71717a !important;
+}
+
+[data-theme="light"] .bg-linear-to-br.from-zinc-800.to-zinc-900 {
+  background: linear-gradient(to bottom right, #f4f4f5, #e4e4e7) !important;
+}
+
+[data-theme="light"] .hover\:bg-zinc-800\/50:hover {
+  background-color: rgba(228, 228, 231, 0.5) !important;
+}
+
+[data-theme="light"] .bg-zinc-700 {
+  background-color: #d4d4d8 !important;
+}
+
+[data-theme="light"] .hover\:bg-zinc-600:hover {
+  background-color: #c1c1c4 !important;
+}
+
+/* MyProfile page light theme */
+[data-theme="light"] .bg-linear-to-b.from-zinc-950.to-zinc-900 {
+  background: linear-gradient(to bottom, #ffffff, #f4f4f5) !important;
+}
+
+[data-theme="light"] .bg-linear-to-br.from-zinc-800.to-zinc-900 {
+  background: linear-gradient(to bottom right, #f4f4f5, #e4e4e7) !important;
+}
+
+[data-theme="light"] .border-zinc-700 {
+  border-color: #d4d4d8 !important;
+}
+
+[data-theme="light"] .text-white {
+  color: #18181b !important;
+}
+
+[data-theme="light"] .text-gray-400 {
+  color: #71717a !important;
+}
+
+[data-theme="light"] .bg-zinc-800\/50 {
+  background-color: rgba(228, 228, 231, 0.5) !important;
+}
+
+[data-theme="light"] .bg-zinc-700 {
+  background-color: #d4d4d8 !important;
+}
+
+[data-theme="light"] .bg-zinc-900\/50 {
+  background-color: rgba(244, 244, 245, 0.5) !important;
+}

@@ -12,12 +12,14 @@ import {
   LogOut, 
   LayoutDashboard,
   ChevronDown,
-  Zap
+  Zap, Moon, Sun
 } from "lucide-react";
+import { useTheme } from "../Theme/ThemeContext";
 
 const Navbar = () => {
   const {user, logoutUser, role} = use(AuthContext);
-  // console.log(role)
+  const { theme, toggleTheme } = useTheme();
+
   const handleLogout = () => {
     logoutUser()
       .then(() => toast.success("Logout Successful"))
@@ -45,11 +47,11 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-20">
           
-          {/* Logo Section */}
-          <div className="flex items-center space-x-4">
+          {/* Logo Section - Fixed width */}
+          <div className="shrink-0 min-w-50">
             <NavLink 
               to="/" 
               className="flex items-center space-x-3 group"
@@ -58,22 +60,22 @@ const Navbar = () => {
                 <MapPin className="w-7 h-7 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-black text-white">
+                <span className="text-xl sm:text-2xl font-black text-white">
                   Community<span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Fix</span>
                 </span>
-                <span className="text-xs text-gray-400">Building Better Communities</span>
+                <span className="text-xs text-gray-400 hidden sm:block">Building Better Communities</span>
               </div>
             </NavLink>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center space-x-1">
+          {/* Desktop Navigation Links - Centered */}
+          <div className="hidden md:flex items-center space-x-1 flex-1 justify-center mx-4">
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) => 
-                  `group flex items-center space-x-2 px-6 py-3 rounded-2xl font-medium transition-all duration-300 ${
+                  `group flex items-center space-x-2 px-4 py-2 rounded-2xl font-medium transition-all duration-300 ${
                     isActive 
                       ? 'bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/30' 
                       : 'text-gray-300 hover:text-white hover:bg-zinc-800'
@@ -81,41 +83,46 @@ const Navbar = () => {
                 }
               >
                 {link.icon}
-                <span>{link.label}</span>
-                <div className={`absolute bottom-0 left-0 right-0 h-0.5 rounded-full transition-all duration-300 ${
-                  ({ isActive }) => isActive 
-                    ? 'bg-linear-to-r from-emerald-500 to-teal-500' 
-                    : 'bg-transparent group-hover:bg-emerald-500/50'
-                }`} />
+                <span className="whitespace-nowrap">{link.label}</span>
               </NavLink>
             ))}
           </div>
 
           {/* Right Section - User Menu */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <button 
+              onClick={toggleTheme}
+              className="p-2 sm:p-3 rounded-2xl hover:bg-zinc-800 transition-colors"
+              aria-label="Toggle theme">
+              {theme === 'light' ? (
+                <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+              ) : (
+                <Sun className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300" />
+              )}
+            </button>
             
             {/* Report Button */}
             <NavLink
               to="/report"
-              className="hidden md:flex items-center space-x-2 px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300"
+              className="hidden md:flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300"
             >
-              <AlertTriangle className="w-5 h-5" />
-              <span>Report Issue</span>
+              <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="whitespace-nowrap">Report Issue</span>
             </NavLink>
 
             {/* User Menu */}
             {user ? (
               <div className="relative group">
-                <button className="flex items-center space-x-3 p-2 rounded-2xl hover:bg-zinc-800 transition-all duration-300">
+                <button className="flex items-center space-x-2 sm:space-x-3 p-1 sm:p-2 rounded-2xl hover:bg-zinc-800 transition-all duration-300">
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-emerald-500/50">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-emerald-500/50">
                       <img
                         src={user?.photoURL || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + user?.displayName}
                         alt={user?.displayName}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-zinc-900" />
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-emerald-500 rounded-full border-2 border-zinc-900" />
                   </div>
                   
                   <div className="hidden lg:flex flex-col items-start">
@@ -125,11 +132,11 @@ const Navbar = () => {
                     <span className="text-emerald-400 text-xs font-medium">{role}</span>
                   </div>
                   
-                  <ChevronDown className="w-5 h-5 text-gray-400 group-hover:text-emerald-400 transition-colors" />
+                  <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-emerald-400 transition-colors" />
                 </button>
 
                 {/* Dropdown Menu */}
-                <div className="absolute right-0 top-full mt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                <div className="absolute right-0 top-full mt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                   <div className="bg-zinc-800/95 backdrop-blur-xl rounded-2xl border border-zinc-700 shadow-2xl p-4 mt-4">
                     
                     {/* User Info */}
@@ -186,16 +193,16 @@ const Navbar = () => {
               </div>
             ) : (
               // Login Button for non-authenticated users
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 <NavLink
                   to="/login"
-                  className="px-6 py-3 border-2 border-emerald-500/50 rounded-2xl font-bold text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500 transition-all duration-300"
+                  className="px-4 py-2 sm:px-6 sm:py-3 border-2 border-emerald-500/50 rounded-2xl font-bold text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500 transition-all duration-300 whitespace-nowrap"
                 >
                   Login
                 </NavLink>
                 <NavLink
                   to="/register"
-                  className="px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300"
+                  className="px-4 py-2 sm:px-6 sm:py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300 whitespace-nowrap"
                 >
                   Register
                 </NavLink>
@@ -203,7 +210,7 @@ const Navbar = () => {
             )}
 
             {/* Mobile Menu Button */}
-            <button className="md:hidden p-3 rounded-2xl hover:bg-zinc-800 transition-colors">
+            <button className="md:hidden p-2 rounded-2xl hover:bg-zinc-800 transition-colors">
               <Menu className="w-6 h-6 text-gray-300" />
             </button>
           </div>
