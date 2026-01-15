@@ -69,7 +69,7 @@ const AssignedIssues = () => {
   }, [mUser?._id, role]);
 
   // Handle status update
-  const handleStatusUpdate = async (issueId, currentStatus, newStatus) => {
+  const handleStatusUpdate = async (issueId, currentStatus, newStatus, closeReason = '') => {
     const allowedTransitions = statusFlow[currentStatus] || [];
     if (!allowedTransitions.includes(newStatus)) {
       showNotification(`Invalid status transition: ${currentStatus} → ${newStatus}`, 'error');
@@ -79,9 +79,15 @@ const AssignedIssues = () => {
     setUpdatingStatus(issueId);
     
     try {
-      const response = await axiosSecure.patch(`/update-issue-status/${issueId}`, {
+      const requestData = {
         newStatus: newStatus
-      });
+      }
+
+      if (currentStatus === 'Working' && newStatus === 'Closed' && closeReason) {
+      requestData.closeReason = closeReason;
+     }
+
+      const response = await axiosSecure.patch(`/update-issue-status/${issueId}`, requestData);
 
       if (response.data.modifiedCount > 0) {
         // Update local state with new status and updatedAt
@@ -197,7 +203,6 @@ const AssignedIssues = () => {
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       {/* Notification */}
-      {/* Replace the notification div with this centered version: */}
       {notification && (
         <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl border shadow-2xl ${
           notification.type === 'success' 
@@ -214,62 +219,58 @@ const AssignedIssues = () => {
         </div>
       )}
 
-      {/* Add this modal near the notification */}
-{showCloseReasonModal && selectedIssue && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-    <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-700 p-6 max-w-md w-full mx-4">
-      <h3 className="text-xl font-bold text-white mb-2">Reason for Closing</h3>
-      <p className="text-gray-400 mb-4">
-        Why are you closing issue "{selectedIssue.title}" without resolving it?
-      </p>
-      
-      <textarea
-        value={closeReason}
-        onChange={(e) => setCloseReason(e.target.value)}
-        placeholder="Please provide a reason (e.g., Duplicate issue, Cannot be fixed, Not valid, etc.)"
-        className="w-full h-32 p-3 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 mb-4"
-        required
-      />
-      
-      <div className="flex space-x-3">
-        <button
-          onClick={() => {
-            setShowCloseReasonModal(false);
-            setSelectedIssue(null);
-            setCloseReason('');
-          }}
-          className="flex-1 px-4 py-2 bg-zinc-700 text-gray-300 rounded-lg hover:bg-zinc-600 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={() => {
-            if (!closeReason.trim()) {
-              showNotification('Please provide a reason for closing', 'error');
-              return;
-            }
+      {/* Close Reson Modal */}
+      {showCloseReasonModal && selectedIssue && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-700 p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold text-white mb-2">Reason for Closing</h3>
+            <p className="text-gray-400 mb-4">
+              Why are you closing issue "{selectedIssue.title}" without resolving it?
+            </p>
             
-            // First update status to Closed
-            handleStatusUpdate(selectedIssue._id, selectedIssue.status, 'Closed');
+            <textarea
+              value={closeReason}
+              onChange={(e) => setCloseReason(e.target.value)}
+              placeholder="Please provide a reason (e.g., Duplicate issue, Cannot be fixed, Not valid, etc.)"
+              className="w-full h-32 p-3 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 mb-4"
+              required
+            />
             
-            // Then you might want to save the close reason to backend
-            // You can add another API call here if needed
-            
-            setShowCloseReasonModal(false);
-            setSelectedIssue(null);
-            setCloseReason('');
-            
-            // Show additional notification
-            showNotification(`Issue closed. Reason: ${closeReason}`, 'info');
-          }}
-          className="flex-1 px-4 py-2 bg-linear-to-r from-red-500 to-orange-500 text-white rounded-lg hover:opacity-90 transition-opacity"
-        >
-          Confirm Close
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            <div className="flex space-x-3">
+              <button
+                onClick={() => {
+                  setShowCloseReasonModal(false);
+                  setSelectedIssue(null);
+                  setCloseReason('');
+                }}
+                className="flex-1 px-4 py-2 bg-zinc-700 text-gray-300 rounded-lg hover:bg-zinc-600 transition-colors"
+              >
+                Cancel
+              </button>
+
+      <button
+        onClick={() => {
+          if (!closeReason.trim()) {
+            showNotification('Please provide a reason for closing', 'error');
+            return;
+          }
+          
+          // শুধুমাত্র closeReason সহ handleStatusUpdate কল করুন
+          handleStatusUpdate(selectedIssue._id, selectedIssue.status, 'Closed', closeReason);
+          
+          setShowCloseReasonModal(false);
+          setSelectedIssue(null);
+          setCloseReason('');
+        }}
+        className="flex-1 px-4 py-2 bg-linear-to-r from-red-500 to-orange-500 text-white rounded-lg hover:opacity-90 transition-opacity"
+      >
+        Confirm Close
+      </button>
+
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
@@ -346,7 +347,7 @@ const AssignedIssues = () => {
 
           {/* Table */}
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1200px] lg:min-w-0">
+            <table className="w-full min-w-300 lg:min-w-0">
               <thead>
                 <tr className="border-b border-zinc-700">
                   <th className="text-left py-3 px-4 sm:py-4 sm:px-6 text-gray-400 font-medium text-xs sm:text-sm whitespace-nowrap">Issue Details</th>
@@ -382,7 +383,7 @@ const AssignedIssues = () => {
                         {/* Issue Details */}
                         <td className="py-3 px-4 sm:py-4 sm:px-6">
                           <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl overflow-hidden flex-shrink-0">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl overflow-hidden shrink-0">
                               <img 
                                 src={issue.mainPhoto || 'https://images.unsplash.com/photo-1561144257-e32e8c5d0a8a?w=400'} 
                                 alt={issue.title}
@@ -441,7 +442,7 @@ const AssignedIssues = () => {
                         {/* Reporter */}
                         <td className="py-3 px-4 sm:py-4 sm:px-6">
                           <div className="flex items-center space-x-2 sm:space-x-3">
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-zinc-600 flex-shrink-0">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-zinc-600 shrink-0">
                               <img 
                                 src={issue.reporter?.photoURL || `https://ui-avatars.com/api/?name=${issue.reporter?.name || 'User'}&background=1f2937&color=10b981`} 
                                 alt={issue.reporter?.name}
@@ -511,7 +512,7 @@ const AssignedIssues = () => {
                                   </>
                                 ) : (
                                   <>
-                                    <MoreVertical className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                    <MoreVertical className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
                                     <span className="truncate">{getStatusButtonText(issue.status)}</span>
                                   </>
                                 )}
@@ -536,7 +537,7 @@ const AssignedIssues = () => {
                                           onClick={() => handleStatusUpdate(issue._id, issue.status, 'In-Progress')}
                                           className="w-full text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-300 hover:bg-zinc-700 hover:text-white transition-colors flex items-center space-x-2 sm:space-x-3"
                                         >
-                                          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0" />
+                                          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 shrink-0" />
                                           <span>In-Progress</span>
                                         </button>
                                       )}
@@ -546,7 +547,7 @@ const AssignedIssues = () => {
                                           onClick={() => handleStatusUpdate(issue._id, issue.status, 'Working')}
                                           className="w-full text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-300 hover:bg-zinc-700 hover:text-white transition-colors flex items-center space-x-2 sm:space-x-3"
                                         >
-                                          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-purple-500 flex-shrink-0" />
+                                          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-purple-500 shrink-0" />
                                           <span>Working</span>
                                         </button>
                                       )}
@@ -556,30 +557,30 @@ const AssignedIssues = () => {
                                           onClick={() => handleStatusUpdate(issue._id, issue.status, 'Resolved')}
                                           className="w-full text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-300 hover:bg-zinc-700 hover:text-white transition-colors flex items-center space-x-2 sm:space-x-3"
                                         >
-                                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-500 flex-shrink-0" />
+                                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-500 shrink-0" />
                                           <span>Resolved</span>
                                         </button>
                                       )}
                                       
-{nextStatusOptions.includes('Closed') && (
-  <button
-    onClick={() => {
-      if (issue.status === 'Working') {
-        // If going from Working → Closed, show reason modal
-        setSelectedIssue(issue);
-        setShowCloseReasonModal(true);
-        setStatusDropdownOpen(null);
-      } else {
-        // If going from Resolved → Closed, no need for reason
-        handleStatusUpdate(issue._id, issue.status, 'Closed');
-      }
-    }}
-    className="w-full text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-300 hover:bg-zinc-700 hover:text-white transition-colors flex items-center space-x-2 sm:space-x-3"
-  >
-    <XCircle className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
-    <span>Close Issue</span>
-  </button>
-)}
+                                      {nextStatusOptions.includes('Closed') && (
+                                        <button
+                                          onClick={() => {
+                                            if (issue.status === 'Working') {
+                                              // Require a reason only when changing status from Working to Closed
+                                              setSelectedIssue(issue);
+                                              setShowCloseReasonModal(true);
+                                              setStatusDropdownOpen(null);
+                                            } else {
+                                              // Skip close reason if status changes from Resolved to Closed
+                                              handleStatusUpdate(issue._id, issue.status, 'Closed');
+                                            }
+                                          }}
+                                          className="w-full text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-300 hover:bg-zinc-700 hover:text-white transition-colors flex items-center space-x-2 sm:space-x-3"
+                                        >
+                                          <XCircle className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 shrink-0" />
+                                          <span>Close Issue</span>
+                                        </button>
+                                      )}
                                     </div>
                                   </div>
                                 </>
@@ -591,7 +592,7 @@ const AssignedIssues = () => {
                               to={`/issues/${issue._id}`}
                               className="w-full flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-zinc-700 rounded-xl text-xs sm:text-sm text-gray-300 hover:text-white hover:bg-zinc-600 transition-colors"
                             >
-                              <Eye className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                              <Eye className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
                               <span className="truncate">View Details</span>
                             </Link>
                           </div>
