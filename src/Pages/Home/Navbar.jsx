@@ -36,7 +36,7 @@ const Navbar = () => {
 
   const userMenuItems = [
     { label: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
-    { label: "Profile", path: "/profile", icon: <User className="w-4 h-4" /> },
+    { label: "Profile", path: "dashboard/dashboard/myProfile", icon: <User className="w-4 h-4" /> },
     { type: "divider" },
     { 
       label: "Logout", 
@@ -104,7 +104,7 @@ const Navbar = () => {
             
             {/* Report Button */}
             <NavLink
-              to="/report"
+              to="dashboard/dashboard/addissues"
               className="hidden md:flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300"
             >
               <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />

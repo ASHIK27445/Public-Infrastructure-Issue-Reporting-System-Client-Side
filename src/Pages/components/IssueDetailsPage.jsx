@@ -23,23 +23,38 @@ import {
 } from 'lucide-react';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { AuthContext } from '../AuthProvider/AuthContext';
+import { toast} from "react-toastify"
 
 const IssueDetailsPage = () => {
-  const {role} = use(AuthContext)
+  const {role, user, mUser} = use(AuthContext)
   const [comment, setComment] = useState('');
   const [upvoting, setUpvoting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [issue, setIssue] = useState([])
   const axiosSecure = useAxiosSecure()
   const {id} = useParams()
+  const [count, setCount] = useState(0)
+  const [hasUpvoted, setHasUpvoted] = useState(false)
+  const isOwnIssue = issue?.reportBy === mUser?._id
 
-useEffect(()=>{
-  axiosSecure.get(`/detailIssues/${id}`)
-    .then(res =>{
-      setIssue(res.data)
-    })
-    .catch(err =>{console.log(err)})
-})
+  const fetchIssues = () =>{
+      axiosSecure.get(`/detailIssues/${id}`)
+      .then(res =>{
+        setIssue(res.data)
+      })
+      .catch(err =>{console.log(err)})
+  }
+  const fetchUpvote = () => {
+    axiosSecure.get(`/upvote-info/${id}`)
+      .then((res)=> {
+        setCount(res.data.count || 0)
+        setHasUpvoted(res.data.hasUpvoted || false)
+      }).catch(err=> console.log(err))
+  }
+  useEffect(()=>{
+    fetchIssues();
+    fetchUpvote();
+  },[axiosSecure, id])
 
 
   // Demo timeline data
@@ -119,15 +134,26 @@ useEffect(()=>{
       case 'comment': return <Send className="w-5 h-5 text-gray-400" />;
       default: return <Clock className="w-5 h-5 text-gray-400" />;
     }
-  };
+  }
 
-  // Demo functions
   const handleUpvote = () => {
-    setUpvoting(true);
-    setTimeout(() => {
-      setUpvoting(false);
-      alert('Demo: Issue upvoted! (Functionality disabled in demo)');
-    }, 1000);
+    if(!user){
+      toast("login first")
+      return;
+    }
+    if(role === 'staff'){
+      toast("Staff can't give vote")
+      return;
+    }
+    setUpvoting(true)
+    axiosSecure.post(`/upvote/${issue._id}`)
+      .then((res)=> {
+        if(res.data.success){
+          setHasUpvoted(res.data.hasUpvoted)
+          setCount(res.data.upvoteCount || 0)
+          setUpvoting(false)
+        }
+      }).catch(err => console.log(err))
   };
 
   const handleBoost = () => {
@@ -275,7 +301,7 @@ useEffect(()=>{
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
-                  <div className="text-3xl font-black text-emerald-500 mb-2">{issue?.upvoteCount}</div>
+                  <div className="text-3xl font-black text-emerald-500 mb-2">{count}</div>
                   <div className="text-sm text-gray-400">Upvotes</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
@@ -298,12 +324,13 @@ useEffect(()=>{
               <div className="flex flex-wrap gap-4">
                 <button
                   onClick={handleUpvote}
-                  disabled={upvoting}
+                  disabled={upvoting || isOwnIssue}
                   className={`flex items-center space-x-3 px-6 py-3 rounded-2xl font-bold transition-all ${
-                    issue.userUpvoted
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    hasUpvoted || isOwnIssue
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-not-allowed'
                       : 'bg-zinc-800 text-white hover:bg-zinc-700'
-                  } ${upvoting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  }`}
+                  title={isOwnIssue ? "You cannot upvote your own issue" : ""}
                 >
                   {upvoting ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -311,9 +338,7 @@ useEffect(()=>{
                     <ThumbsUp className="w-5 h-5" />
                   )}
                   <span>Upvote</span>
-                  <span className="bg-zinc-900 px-3 py-1 rounded-full text-sm">
-                    {issue?.upvotes}
-                  </span>
+                  <span className="bg-zinc-900 px-3 py-1 rounded-full text-sm">{count}</span>
                 </button>
 
                 <button
@@ -435,9 +460,9 @@ useEffect(()=>{
                     className="w-full h-full object-cover"
                   />
                 </div>
-                {
+                {/* {
                   console.log(issue)
-                }
+                } */}
                 <div>
                   <div className="font-bold text-white">{issue?.reporterName}</div>
                   <div className="text-sm text-emerald-400">Verified Citizen</div>
