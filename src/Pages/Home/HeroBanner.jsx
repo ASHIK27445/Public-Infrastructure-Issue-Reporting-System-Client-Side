@@ -33,7 +33,8 @@ const HeroBanner = () => {
   }, []);
 
   return (
-    <section className="relative h-screen overflow-hidden">
+    //relative h-screen overflow-hidden
+    <section className="relative min-h-[120vh] overflow-hidden"> 
       {bannerSlides.map((slide, index) => (
         <div
           key={index}

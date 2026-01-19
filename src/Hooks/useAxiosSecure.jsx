@@ -4,7 +4,7 @@ import { use, useEffect } from "react";
 const axiosSecure = axios.create({
     baseURL: 'http://localhost:3000'
 })
-
+//http://localhost:3000 http://localhost:3000
 const useAxiosSecure = () => {
     const {user} = use(AuthContext)
 

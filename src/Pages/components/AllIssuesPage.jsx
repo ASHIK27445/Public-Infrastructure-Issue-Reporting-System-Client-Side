@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-
+import useAxiosSecure from '../../Hooks/useAxiosSecure'
 const AllIssuesPage = () => {
   const [issues, setIssues] = useState([]);
   const [filteredIssues, setFilteredIssues] = useState([]);
@@ -31,6 +31,7 @@ const AllIssuesPage = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [upvoting, setUpvoting] = useState({});
+  const axiosSecure = useAxiosSecure()
 
   // Fetch issues from backend
   useEffect(() => {
@@ -105,18 +106,25 @@ const AllIssuesPage = () => {
 
   const handleUpvote = async (issueId) => {
     if (upvoting[issueId]) return;
-    
+
     setUpvoting(prev => ({ ...prev, [issueId]: true }));
+
     try {
-      const response = await axios.post(`http://localhost:3000/issues/${issueId}/upvote`);
-      const updatedIssue = response.data;
-      setIssues(prev => prev.map(issue =>
-        issue._id === issueId ? { ...issue, upvoteCount: updatedIssue.upvoteCount, userUpvoted: true } : issue
-      ));
-      toast.success('Issue upvoted!');
+      const res = await axiosSecure.post(`/upvote/${issueId}`);
+      const { upvoteCount, hasUpvoted } = res.data;
+
+      setIssues(prev =>
+        prev.map(issue =>
+          issue._id === issueId
+            ? { ...issue, upvoteCount, userUpvoted: hasUpvoted }
+            : issue
+        )
+      );
+
+      toast.success(hasUpvoted ? "Upvoted successfully" : "Upvote removed");
     } catch (err) {
       console.error(err);
-      toast.error('Failed to upvote');
+      toast.error("Failed to upvote");
     } finally {
       setUpvoting(prev => ({ ...prev, [issueId]: false }));
     }

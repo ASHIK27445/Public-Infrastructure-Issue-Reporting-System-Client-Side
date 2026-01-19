@@ -35,6 +35,7 @@ const IssueDetailsPage = () => {
   const {id} = useParams()
   const [count, setCount] = useState(0)
   const [hasUpvoted, setHasUpvoted] = useState(false)
+  const [timelines, setTimeline] = useState({})
   const isOwnIssue = issue?.reportBy === mUser?._id
 
   const fetchIssues = () =>{
@@ -51,11 +52,18 @@ const IssueDetailsPage = () => {
         setHasUpvoted(res.data.hasUpvoted || false)
       }).catch(err=> console.log(err))
   }
+  const fetchTime = () => {
+    axiosSecure.get(`/timeline/${id}`)
+      .then(res=> setTimeline(res.data))
+      .catch(err=> console.log(err))
+  }
   useEffect(()=>{
     fetchIssues();
     fetchUpvote();
+    fetchTime();
   },[axiosSecure, id])
 
+  // console.log(id, timelines)
 
   // Demo timeline data
   const timeline = [
@@ -541,7 +549,63 @@ const IssueDetailsPage = () => {
                 </div>
               </div>
             </div>
+
+
+            {/*realtimeline for test*/}
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+              <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-3">
+                <Clock className="w-5 h-5 text-amber-500" />
+                <span>Issue Timeline</span>
+              </h3>
+              
+              <div className="space-y-6">
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-emerald-500/20" />
+                  
+                    <div className="relative pl-16 pb-6">
+                      {/* Icon */}
+                      <div className="absolute left-4 top-0 w-10 h-10 bg-zinc-900 border-2 border-emerald-500/30 rounded-full flex items-center justify-center">
+                        {getTimelineIcon('created')}
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="bg-zinc-800/50 rounded-2xl p-4 border border-zinc-700">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="font-bold text-white">Issue Reported</div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(timelines.issueCreatedAt).toLocaleTimeString([], { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </div>
+                        </div>
+                        
+  
+                          <p className="text-sm text-gray-400 mb-3">Issue was initially reported by {timelines.issueCreatorRole}</p>
+                        
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center space-x-2">
+                            <div className={`px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400
+                            }`}>
+                              {timelines.issueCreatorRole}
+                            </div>
+                            <span className="text-gray-500">by {timelines.issueCreatedBy}</span>
+                          </div>
+                          <div className="text-gray-500">
+                            {new Date(timelines.issueCreatedAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+              </div>
+            </div>
+
+
           </div>
+      
         </div>
       </div>
 
