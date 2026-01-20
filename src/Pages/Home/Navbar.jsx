@@ -20,10 +20,15 @@ const Navbar = () => {
   const {user, logoutUser, role} = use(AuthContext);
   const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false)
+  const [logoutLoading, setLogoutLoading] = useState(false)
 
   const handleLogout = () => {
+    setLogoutLoading(true)
     logoutUser()
-      .then(() => toast.success("Logout Successful"))
+      .then(() => {
+        setLogoutLoading(false)
+        toast.success("Logout Successful!")
+      })
       .catch((error) => toast.error(error.message));
   };
 
@@ -46,6 +51,30 @@ const Navbar = () => {
     },
   ];
 
+  if (logoutLoading) {
+  return (
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+      <div className="text-center space-y-4">
+        {/* Power button animation */}
+        <div className="relative w-16 h-16 mx-auto">
+          {/* Outer circle */}
+          <div className="absolute inset-0 border-2 border-red-500/30 rounded-full" />
+          
+          {/* Inner circle fading */}
+          <div className="absolute inset-4 bg-red-500/20 rounded-full animate-pulse" />
+          
+          {/* Power symbol */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="w-0.5 h-6 bg-red-500" />
+            <div className="w-4 h-4 border-2 border-red-500 rounded-full -top-5 -translate-x-1/2 left-1/2 absolute" />
+          </div>
+        </div>
+        
+        <p className="text-gray-400 text-sm">Closing session</p>
+      </div>
+    </div>
+  );
+  }
   return (
     <nav className="sticky top-0 z-50 w-full bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, use } from 'react';
-import { NavLink, useParams } from 'react-router';
+import { NavLink, useNavigate, useParams } from 'react-router';
 import { 
   ArrowLeft, 
   Edit, 
@@ -24,7 +24,8 @@ import {
   Loader,
   Pickaxe,
   CircleCheckBig,
-  BookmarkCheck
+  BookmarkCheck,
+  SquarePen
 } from 'lucide-react';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -41,32 +42,58 @@ const IssueDetailsPage = () => {
   const [count, setCount] = useState(0)
   const [hasUpvoted, setHasUpvoted] = useState(false)
   const [timelines, setTimeline] = useState({})
+  const [loading, setLoading] = useState(true)
   const isOwnIssue = issue?.reportBy === mUser?._id
 
-  const fetchIssues = () =>{
-      axiosSecure.get(`/detailIssues/${id}`)
-      .then(res =>{
-        setIssue(res.data)
-      })
-      .catch(err =>{console.log(err)})
+  const fetchAllData = async() =>{
+    setLoading(true)
+    try{
+      const [issueResponse, upvotesRes, timelineResponse] = await Promise.all([
+        axiosSecure.get(`/detailIssues/${id}`),
+        axiosSecure.get(`/upvote-info/${id}`),
+        axiosSecure.get(`/timeline/${id}`) ])
+        
+        setIssue(issueResponse.data)
+        setCount(upvotesRes.data.count || 0);
+        setHasUpvoted(upvotesRes.data.hasUpvoted || false)
+        setTimeline(timelineResponse.data)
+    }catch (err){
+      console.log(err)
+      toast('Failed to load the data.')
+    }finally{
+      setLoading(false)
+    }
   }
-  const fetchUpvote = () => {
-    axiosSecure.get(`/upvote-info/${id}`)
-      .then((res)=> {
-        setCount(res.data.count || 0)
-        setHasUpvoted(res.data.hasUpvoted || false)
-      }).catch(err=> console.log(err))
-  }
-  const fetchTime = () => {
-    axiosSecure.get(`/timeline/${id}`)
-      .then(res=> setTimeline(res.data))
-      .catch(err=> console.log(err))
-  }
-  useEffect(()=>{
-    fetchIssues();
-    fetchUpvote();
-    fetchTime();
-  },[axiosSecure, id])
+
+  useEffect(()=> {
+    fetchAllData()
+  }, [axiosSecure, id])
+
+  // const fetchIssues = () =>{
+  //     axiosSecure.get(`/detailIssues/${id}`)
+  //     .then(res =>{
+  //       setIssue(res.data)
+  //     })
+  //     .catch(err =>{console.log(err)})
+  // }
+  // const fetchUpvote = () => {
+  //   axiosSecure.get(`/upvote-info/${id}`)
+  //     .then((res)=> {
+  //       setCount(res.data.count || 0)
+  //       setHasUpvoted(res.data.hasUpvoted || false)
+  //     }).catch(err=> console.log(err))
+  // }
+  // const fetchTime = () => {
+  //   axiosSecure.get(`/timeline/${id}`)
+  //     .then(res=> setTimeline(res.data))
+  //     .catch(err=> console.log(err))
+  // }
+  // useEffect(()=>{
+  //   fetchIssues();
+  //   fetchUpvote();
+  //   fetchTime();
+  // },[axiosSecure, id])
+
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -78,7 +105,7 @@ const IssueDetailsPage = () => {
       case 'Rejected': return 'from-red-500 to-rose-500'
       default: return 'from-gray-500 to-slate-500';
     }
-  };
+  }
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -88,7 +115,7 @@ const IssueDetailsPage = () => {
       case 'Low': return 'from-blue-500 to-cyan-500';
       default: return 'from-gray-500 to-slate-500';
     }
-  };
+  }
 
   const getTimelineIcon = (type) => {
     switch (type) {
@@ -100,7 +127,8 @@ const IssueDetailsPage = () => {
       case 'Closed': return <BookmarkCheck className={`w-5 h-5 ${issue?.closeNote ? 'text-red-500' : 'text-white'}`} />;
       case 'boost': return <TrendingUp className="w-5 h-5 text-pink-500" />;
       case 'comment': return <Send className="w-5 h-5 text-gray-400" />;
-      case 'rejected': return <CircleX className="w-5 h-5 text-red-600"></CircleX>;
+      case 'rejected': return <CircleX className="w-5 h-5 text-red-600"/>;
+      case 'issue-updated': return <SquarePen className='w-5 h-5 text-cyan-600'/>;
       default: return <Clock className="w-5 h-5 text-gray-400" />;
     }
   }
@@ -131,7 +159,7 @@ const IssueDetailsPage = () => {
           setUpvoting(false)
         }
       }).catch(err => console.log(err))
-  };
+  }
 
   const handleBoost = () => {
     const confirmed = window.confirm(
@@ -143,16 +171,16 @@ const IssueDetailsPage = () => {
     if (confirmed) {
       alert('Demo: Issue boosted to High Priority! (Functionality disabled in demo)');
     }
-  };
+  }
 
   const handleDelete = () => {
     setShowDeleteConfirm(false);
     alert('Demo: Issue deleted! (Functionality disabled in demo)');
-  };
+  }
 
   const handleEdit = () => {
     alert('Demo: Edit functionality (Disabled in demo)');
-  };
+  }
 
   const handleCommentSubmit = (e) => {
     e.preventDefault();
@@ -160,7 +188,7 @@ const IssueDetailsPage = () => {
     
     alert(`Demo: Comment posted: "${comment}"\n(Functionality disabled in demo)`);
     setComment('');
-  };
+  }
 
   const successRate = () =>{
     const issueCount = issue?.reporterIssueCount
@@ -170,7 +198,26 @@ const IssueDetailsPage = () => {
 
     return successRate
   }
-console.log(issue)
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          {/* Clean spinner */}
+          <div className="inline-flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-emerald-500/20 rounded-full" />
+            <div className="absolute w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+          
+          {/* Subtle text */}
+          <div>
+            <p className="text-gray-300 text-sm font-medium">Loading Issue</p>
+            <p className="text-gray-500 text-xs mt-1">This will just take a moment</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
 
@@ -343,7 +390,7 @@ console.log(issue)
             </div>
 
             {/* Staff Information */}
-            {issue.assignedStaff && (
+            {user && issue.assignedStaff && (
               <div className="bg-linear-to-br from-blue-900/20 to-cyan-900/20 rounded-3xl border border-blue-500/30 p-8">
                 <h3 className="text-2xl font-bold text-white mb-6 flex items-center space-x-3">
                   <Shield className="w-6 h-6 text-blue-500" />

@@ -213,6 +213,7 @@ const ManageIssues = () => {
       case 'In-Progress': return 'bg-blue-500/20 text-blue-400';
       case 'Resolved': return 'bg-emerald-500/20 text-emerald-400';
       case 'Closed': return 'bg-gray-500/20 text-gray-400';
+      case 'Rejected': return 'bg-red-500/20 text-red-400'
       default: return 'bg-gray-500/20 text-gray-400';
     }
   };
@@ -521,9 +522,9 @@ const ManageIssues = () => {
                               
                               <button 
                                 onClick={() => handleDelete(issue._id)}
-                                className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-red-400 hover:bg-zinc-600 transition-colors"
+                                className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-red-400 hover:bg-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 title="Delete Issue"
-                              >
+                                disabled={issue?.status !== 'Pending'}>
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>

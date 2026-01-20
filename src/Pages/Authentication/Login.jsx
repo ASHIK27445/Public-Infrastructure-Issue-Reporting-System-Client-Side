@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 import { RotatingTriangles } from 'react-loader-spinner';
 import { GoEye, GoEyeClosed } from "react-icons/go";
-import { ArrowRight, CheckCircle, Shield, LogIn, Mail, Lock, User, Key } from 'lucide-react';
+import { ArrowRight, CheckCircle, Shield, LogIn, Mail, Lock, User, Key, Check } from 'lucide-react';
 
 const Login = () => {
     const {loginUser, user, signInWithGoogle} = use(AuthContext)
@@ -14,7 +14,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
     const location = useLocation()
-    
+    console.log(location?.state)
     const handleLogin = (e) =>{
         e.preventDefault()
         
@@ -72,25 +72,25 @@ const Login = () => {
       setShowPassword(!showPassword)
     }
     
-    if(loginloading){
+    if (loginloading) {
       return (
-        <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 flex justify-center items-center">
-          <div className="text-center">
-            <RotatingTriangles
-              visible={true}
-              height="80"
-              width="80"
-              color="#10b981"
-              ariaLabel="rotating-triangles-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-            />
-            <p className="mt-6 text-lg text-emerald-400 font-semibold">Logging you in...</p>
+        <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+          <div className="text-center space-y-4">
+            {/* Shield with check animation */}
+            <div className="relative inline-block">
+              <Shield className="w-10 h-10 text-emerald-500" />
+              <Check className="w-4 h-4 text-emerald-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-ping" />
+            </div>
+            
+            <div>
+              <p className="text-gray-300">Security check</p>
+              <p className="text-gray-500 text-sm mt-1">Verifying identity</p>
+            </div>
           </div>
         </div>
       )
     }
-
+    
     const handleDemoLogin = () => {
       setEmail('citizen.test@gmail.com');
       setPassword('Hatake12');
