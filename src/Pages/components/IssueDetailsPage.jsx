@@ -19,7 +19,8 @@ import {
   FileText,
   Send,
   Flag,
-  Loader2
+  Loader2,
+  CircleX
 } from 'lucide-react';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -119,6 +120,7 @@ const IssueDetailsPage = () => {
       case 'In Progress': return 'from-blue-500 to-cyan-500';
       case 'Pending': return 'from-yellow-500 to-amber-500';
       case 'Closed': return 'from-gray-500 to-slate-500';
+      case 'Rejected': return 'from-red-500 to-rose-500'
       default: return 'from-gray-500 to-slate-500';
     }
   };
@@ -140,6 +142,7 @@ const IssueDetailsPage = () => {
       case 'status_change': return <CheckCircle className="w-5 h-5 text-amber-500" />;
       case 'boost': return <TrendingUp className="w-5 h-5 text-purple-500" />;
       case 'comment': return <Send className="w-5 h-5 text-gray-400" />;
+      case 'rejected': return <CircleX className="w-5 h-5 text-red-600"></CircleX>;
       default: return <Clock className="w-5 h-5 text-gray-400" />;
     }
   }
@@ -152,6 +155,14 @@ const IssueDetailsPage = () => {
     if(role === 'staff'){
       toast("Staff can't give vote")
       return;
+    }
+    if(issue?.assgnInto === null){
+      toast("The issue is not assigned yet.")
+      return
+    }
+    if(issue?.status === 'Rejected' || issue?.status === 'Pending'){
+      toast("You can't upvote. Status Rejected or Pending")
+      return
     }
     setUpvoting(true)
     axiosSecure.post(`/upvote/${issue._id}`)
@@ -285,9 +296,6 @@ const IssueDetailsPage = () => {
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-transparent to-transparent" />
-                <div className="absolute bottom-4 right-4 bg-black/50 text-white text-sm px-3 py-1 rounded-full">
-                  Demo Image
-                </div>
               </div>
 
               {/* Description */}
@@ -300,9 +308,6 @@ const IssueDetailsPage = () => {
                   <p className="text-gray-300 leading-relaxed whitespace-pre-line">
                     {issue?.description}
                   </p>
-                  <div className="mt-4 text-sm text-gray-500">
-                    (This is demo content. All functionality is disabled.)
-                  </div>
                 </div>
               </div>
 
@@ -598,6 +603,52 @@ const IssueDetailsPage = () => {
                         </div>
                       </div>
                     </div>
+                    
+                    {console.log(timelines.changes)}
+                  {timelines?.changes?.map((entry, index) => (
+                    <div key={index} className="relative pl-16 pb-6">
+                      {/* Icon */}
+                      <div className="absolute left-4 top-0 w-10 h-10 bg-zinc-900 border-2 border-emerald-500/30 rounded-full flex items-center justify-center">
+                        {getTimelineIcon(entry.type)}
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="bg-zinc-800/50 rounded-2xl p-4 border border-zinc-700">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className={`font-bold ${entry.type === 'rejected' ? 'text-red-500' : 'text-white'}`}>
+                            {entry.title}</div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(entry.createdAt).toLocaleTimeString([], { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </div>
+                        </div>
+                        
+                        {entry.description && (
+                          <p className="text-sm text-gray-400 mb-3">{entry.description}</p>
+                        )}
+                        
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center space-x-2">
+                            <div className={`px-2 py-1 rounded-full ${
+                              entry.role === 'admin' ? 'bg-red-500/20 text-red-400' :
+                              entry.role === 'staff' ? 'bg-blue-500/20 text-blue-400' :
+                              'bg-emerald-500/20 text-emerald-400'
+                            }`}>
+                              {entry.role}
+                            </div>
+                            <span className="text-gray-500">by {
+                              entry.updatedBy === 'admin' ? 'System Admin' : entry.updatedBy
+                              }</span>
+                          </div>
+                          <div className="text-gray-500">
+                            {new Date(entry.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
 
                 </div>
               </div>
