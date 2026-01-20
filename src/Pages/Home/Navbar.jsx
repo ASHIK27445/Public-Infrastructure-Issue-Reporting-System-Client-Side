@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { AuthContext } from '../AuthProvider/AuthContext';
 import { use, useState } from "react";
 import { toast } from "react-toastify";
@@ -21,7 +21,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false)
   const [logoutLoading, setLogoutLoading] = useState(false)
-
+  const location = useLocation()
   const handleLogout = () => {
     setLogoutLoading(true)
     logoutUser()
@@ -49,7 +49,7 @@ const Navbar = () => {
       icon: <LogOut className="w-4 h-4" />,
       className: "text-red-400 hover:text-red-300"
     },
-  ];
+  ]
 
   if (logoutLoading) {
   return (
@@ -84,8 +84,7 @@ const Navbar = () => {
           <div className="shrink-0 min-w-50">
             <NavLink 
               to="/" 
-              className="flex items-center space-x-3 group"
-            >
+              className="flex items-center space-x-3 group">
               <div className="w-12 h-12 bg-linear-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
                 <MapPin className="w-7 h-7 text-white" />
               </div>
@@ -226,6 +225,7 @@ const Navbar = () => {
               <div className="flex items-center space-x-2 sm:space-x-4">
                 <NavLink
                   to="/login"
+                  state={{from: location.pathname}}
                   className="px-4 py-2 sm:px-6 sm:py-3 border-2 border-emerald-500/50 rounded-2xl font-bold text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500 transition-all duration-300 whitespace-nowrap"
                 >
                   Login
