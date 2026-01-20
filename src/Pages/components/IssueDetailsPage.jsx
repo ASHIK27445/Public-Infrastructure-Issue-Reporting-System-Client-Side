@@ -204,6 +204,15 @@ const IssueDetailsPage = () => {
     setComment('');
   };
 
+  const successRate = () =>{
+    const issueCount = issue?.reporterIssueCount
+    const rejectIssueCount = issue?.reportRejectedIssueCount ? issue?.reportRejectedIssueCount : 0
+
+    const successRate = ((issueCount - rejectIssueCount)/issueCount) * 100
+
+    return successRate
+  }
+console.log(issue)
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
 
@@ -493,7 +502,7 @@ const IssueDetailsPage = () => {
                 </div>
                 <div className="text-sm text-gray-400">
                   <span className="text-white">Success rate:</span>{' '}
-                  {issue.reporterSuccessRate}%
+                  {successRate().toFixed(2)}%
                 </div>
               </div>
             </div>
@@ -604,7 +613,6 @@ const IssueDetailsPage = () => {
                       </div>
                     </div>
                     
-                    {console.log(timelines.changes)}
                   {timelines?.changes?.map((entry, index) => (
                     <div key={index} className="relative pl-16 pb-6">
                       {/* Icon */}
