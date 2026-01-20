@@ -20,7 +20,11 @@ import {
   Send,
   Flag,
   Loader2,
-  CircleX
+  CircleX,
+  Loader,
+  Pickaxe,
+  CircleCheckBig,
+  BookmarkCheck
 } from 'lucide-react';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -64,61 +68,12 @@ const IssueDetailsPage = () => {
     fetchTime();
   },[axiosSecure, id])
 
-  // console.log(id, timelines)
-
-  // Demo timeline data
-  const timeline = [
-    {
-      id: 1,
-      type: 'created',
-      title: 'Issue Reported',
-      description: 'Issue was initially reported by citizen',
-      role: 'Citizen',
-      updatedBy: 'John Doe',
-      createdAt: '2024-01-15T10:30:00Z'
-    },
-    {
-      id: 2,
-      type: 'assigned',
-      title: 'Assigned to Department',
-      description: 'Issue assigned to Public Works Department',
-      role: 'Admin',
-      updatedBy: 'System Admin',
-      createdAt: '2024-01-15T14:15:00Z'
-    },
-    {
-      id: 3,
-      type: 'status_change',
-      title: 'Status Updated',
-      description: 'Issue marked as In Progress',
-      role: 'Staff',
-      updatedBy: 'Sarah Johnson',
-      createdAt: '2024-01-16T09:45:00Z'
-    },
-    {
-      id: 4,
-      type: 'boost',
-      title: 'Priority Boosted',
-      description: 'Issue priority boosted to High through payment',
-      role: 'Citizen',
-      updatedBy: 'John Doe',
-      createdAt: '2024-01-16T11:30:00Z'
-    },
-    {
-      id: 5,
-      type: 'comment',
-      title: 'New Comment',
-      description: 'Road crew dispatched for inspection',
-      role: 'Staff',
-      updatedBy: 'Sarah Johnson',
-      createdAt: '2024-01-17T08:20:00Z'
-    }
-  ];
   const getStatusColor = (status) => {
     switch (status) {
       case 'Resolved': return 'from-emerald-500 to-teal-500';
       case 'In Progress': return 'from-blue-500 to-cyan-500';
       case 'Pending': return 'from-yellow-500 to-amber-500';
+      case 'Working': return 'from-purple-500 to-pink-500';
       case 'Closed': return 'from-gray-500 to-slate-500';
       case 'Rejected': return 'from-red-500 to-rose-500'
       default: return 'from-gray-500 to-slate-500';
@@ -137,10 +92,13 @@ const IssueDetailsPage = () => {
 
   const getTimelineIcon = (type) => {
     switch (type) {
-      case 'created': return <User className="w-5 h-5 text-emerald-500" />;
+      case 'created': return <User className="w-5 h-5 text-amber-700" />;
       case 'assigned': return <Shield className="w-5 h-5 text-blue-500" />;
-      case 'status_change': return <CheckCircle className="w-5 h-5 text-amber-500" />;
-      case 'boost': return <TrendingUp className="w-5 h-5 text-purple-500" />;
+      case 'In-Progress': return <Loader className="w-5 h-5 text-amber-500" />;
+      case 'Working': return <Pickaxe className="w-5 h-5 text-purple-500" />;
+      case 'Resolved': return <CircleCheckBig className="w-5 h-5 text-green-600" />;
+      case 'Closed': return <BookmarkCheck className={`w-5 h-5 ${issue?.closeNote ? 'text-red-500' : 'text-white'}`} />;
+      case 'boost': return <TrendingUp className="w-5 h-5 text-pink-500" />;
       case 'comment': return <Send className="w-5 h-5 text-gray-400" />;
       case 'rejected': return <CircleX className="w-5 h-5 text-red-600"></CircleX>;
       default: return <Clock className="w-5 h-5 text-gray-400" />;
@@ -507,65 +465,8 @@ console.log(issue)
               </div>
             </div>
 
-            {/* Timeline Section */}
-            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-3">
-                <Clock className="w-5 h-5 text-amber-500" />
-                <span>Issue Timeline</span>
-              </h3>
-              
-              <div className="space-y-6">
-                <div className="relative">
-                  {/* Timeline line */}
-                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-emerald-500/20" />
-                  
-                  {timeline.map((entry, index) => (
-                    <div key={entry.id} className="relative pl-16 pb-6">
-                      {/* Icon */}
-                      <div className="absolute left-4 top-0 w-10 h-10 bg-zinc-900 border-2 border-emerald-500/30 rounded-full flex items-center justify-center">
-                        {getTimelineIcon(entry.type)}
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="bg-zinc-800/50 rounded-2xl p-4 border border-zinc-700">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="font-bold text-white">{entry.title}</div>
-                          <div className="text-xs text-gray-500">
-                            {new Date(entry.createdAt).toLocaleTimeString([], { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </div>
-                        </div>
-                        
-                        {entry.description && (
-                          <p className="text-sm text-gray-400 mb-3">{entry.description}</p>
-                        )}
-                        
-                        <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center space-x-2">
-                            <div className={`px-2 py-1 rounded-full ${
-                              entry.role === 'Admin' ? 'bg-red-500/20 text-red-400' :
-                              entry.role === 'Staff' ? 'bg-blue-500/20 text-blue-400' :
-                              'bg-emerald-500/20 text-emerald-400'
-                            }`}>
-                              {entry.role}
-                            </div>
-                            <span className="text-gray-500">by {entry.updatedBy}</span>
-                          </div>
-                          <div className="text-gray-500">
-                            {new Date(entry.createdAt).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
 
-
-            {/*realtimeline for test*/}
+            {/*Timeline Section*/}
             <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
               <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-3">
                 <Clock className="w-5 h-5 text-amber-500" />
