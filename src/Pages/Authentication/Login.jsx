@@ -15,7 +15,7 @@ const Login = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const redirectTo = location.state?.from || '/'
-    // console.log(redirectTo)
+
     const handleLogin = (e) =>{
         e.preventDefault()
         
@@ -27,8 +27,11 @@ const Login = () => {
                 .then(res => {
                   e.target.reset()
                   setTimeout(()=>{
+
                     setLoginloading(false)
-                    navigate(redirectTo)
+                    navigate(redirectTo, { replace: true });
+
+
                     toast.success(`Welcome back!`,{
                       autoClose: 1200
                     })

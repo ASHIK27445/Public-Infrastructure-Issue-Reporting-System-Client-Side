@@ -15,7 +15,7 @@ const {user, loading} = use(AuthContext)
     }
     // console.log(user, user?.isBlocked)
     if(!user || user?.isBlocked ){
-        return <Navigate to='/login' state={location.pathname}></Navigate>
+        return <Navigate to='/login' state={{ from: location.pathname }} replace></Navigate>
     }
     return children
 }
