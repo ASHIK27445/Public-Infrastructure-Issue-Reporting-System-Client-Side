@@ -142,9 +142,11 @@ const AllIssuesPage = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'Resolved': return 'from-emerald-500 to-teal-500';
-      case 'In Progress': return 'from-blue-500 to-cyan-500';
+      case 'In-Progress': return 'from-blue-500 to-cyan-500';
       case 'Pending': return 'from-yellow-500 to-amber-500';
       case 'Closed': return 'from-gray-500 to-slate-500';
+      case 'Rejected': return 'from-red-500 to-rose-500';
+      case 'Working': return 'from-purple-500 to-pink-500';
       default: return 'from-gray-500 to-slate-500';
     }
   };

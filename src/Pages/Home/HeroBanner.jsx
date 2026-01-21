@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
+import { AuthContext } from '../AuthProvider/AuthContext';
+import { toast } from 'react-toastify';
 
 const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-
+  const {role} = use(AuthContext)
+  const navigate = useNavigate()
   const bannerSlides = [
     {
       title: "Transform Your City",
@@ -32,6 +36,14 @@ const HeroBanner = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const handleStaffReportIsse = () => {
+    if(role === 'staff'){
+      toast.error("staff can't report.")
+      return;
+    }else{
+      navigate('dashboard/dashboard/addissues')
+    }
+  }
   return (
     //relative h-screen overflow-hidden
     <section className="relative min-h-[120vh] overflow-hidden"> 
@@ -75,14 +87,14 @@ const HeroBanner = () => {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <button className={`group px-8 py-5 bg-linear-to-r ${slide.accent} rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3`}>
+                  <Link onClick={handleStaffReportIsse} className={`group px-8 py-5 bg-linear-to-r ${slide.accent} rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3`}>
                     <span>Report an Issue</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </Link>
                   
-                  <button className="px-8 py-5 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl font-bold text-lg text-white hover:bg-white/20 transition-all duration-300">
+                  <Link to="/allissues" className="px-8 py-5 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl font-bold text-lg text-white hover:bg-white/20 transition-all duration-300">
                     View All Issues
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

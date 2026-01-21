@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router";
+import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { AuthContext } from '../AuthProvider/AuthContext';
 import { use, useState } from "react";
 import { toast } from "react-toastify";
@@ -22,6 +22,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [logoutLoading, setLogoutLoading] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const handleLogout = () => {
     setLogoutLoading(true)
     logoutUser()
@@ -74,6 +75,15 @@ const Navbar = () => {
       </div>
     </div>
   );
+  }
+
+  const handleStaffReportIsse = () => {
+      if(role === 'staff'){
+        toast.error("staff can't report.")
+        return;
+      }else{
+        navigate('dashboard/dashboard/addissues')
+      }
   }
   return (
     <nav className="sticky top-0 z-50 w-full bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
@@ -131,13 +141,13 @@ const Navbar = () => {
             </button>
             
             {/* Report Button */}
-            <NavLink
-              to="dashboard/dashboard/addissues"
+            <Link
+              onClick={handleStaffReportIsse}
               className="hidden md:flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300"
             >
               <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="whitespace-nowrap">Report Issue</span>
-            </NavLink>
+            </Link>
 
             {/* User Menu */}
             {user ? (
