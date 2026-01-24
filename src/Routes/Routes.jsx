@@ -29,6 +29,7 @@ import HelpCenter from "../Pages/Others/HelpCenter"
 import HowItWorks from "../Pages/Home/HowItWorks"
 // import Features from "../Pages/Others/Features"
 import Features from "../Pages/Home/Features"
+import PaymentSuccess from "../Pages/components/PaymentSuccess"
 // import HowItWorks from "../Pages/Others/HowItWorks"
 export const router = createBrowserRouter([
     {
@@ -116,6 +117,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'assignedIssues', Component: AssignedIssues
+            },
+            {
+                path: 'payment-success', Component: PaymentSuccess
             }
 
         ]

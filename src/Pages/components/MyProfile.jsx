@@ -37,6 +37,7 @@ const MyProfile = () => {
     address: citizen?.address || '',
   });
 
+
   // Handle form input changes
   const handleInputChange = (e) => {
     setFormData({
@@ -71,32 +72,6 @@ const MyProfile = () => {
     }
   };
 
-  // Handle premium subscription
-  const handleSubscribe = async () => {
-    setPaymentLoading(true);
-
-    try {
-      // In a real app, integrate with payment gateway (SSL Commerz, Stripe, etc.)
-      const response = await axiosSecure.post('/user/subscribe', {
-        amount: 1000,
-        userId: citizen._id
-      });
-
-      if (response.data.success) {
-        toast.success('🎉 Congratulations! You are now a Premium member!');
-        // Refresh page to show premium badge
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-      }
-    } catch (error) {
-      console.error('Error subscribing:', error);
-      toast.error('Payment failed. Please try again.');
-    } finally {
-      setPaymentLoading(false);
-    }
-  };
-
   // Cancel edit mode
   const handleCancelEdit = () => {
     setIsEditing(false);
@@ -105,7 +80,23 @@ const MyProfile = () => {
       phone: citizen?.phone || '',
       address: citizen?.address || '',
     });
-  };
+  }
+
+  const handleSubscribe = () => {
+    if(!citizen._id || citizen.isPremium){
+      toast('Citizen Not found/Premium!')
+      return
+    }
+
+    axiosSecure.post('/create-checkout-session')
+      .then(res => {
+        console.log(res.data)
+        window.location.href = res.data.sessionURL
+      })
+
+      
+
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 p-6">
@@ -459,8 +450,8 @@ const MyProfile = () => {
 
                   <button
                     onClick={handleSubscribe}
-                    disabled={paymentLoading || citizen?.isBlocked}
-                    className="w-full px-6 py-4 bg-linear-to-r from-yellow-500 to-amber-500 rounded-2xl text-white font-black text-lg hover:shadow-yellow-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                    disabled={paymentLoading || citizen?.isBlocked || citizen?.isPremium}
+                    className="w-full px-6 py-4 bg-linear-to-r from-yellow-500 to-amber-500 rounded-2xl text-white font-black text-lg hover:shadow-yellow-500/50 hover:cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                   >
                     {paymentLoading ? (
                       <>
