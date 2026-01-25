@@ -9,6 +9,7 @@ const AuthProvider = ({children}) => {
     const [role, setRole] = useState(null)
     const [mUser, setMUser] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [mLoading, setMLoading] = useState(false)
     const loginUser = (email, password) => {
         return signInWithEmailAndPassword(auth, email, password)
     }
@@ -36,6 +37,7 @@ const AuthProvider = ({children}) => {
 
     useEffect(()=>{
         if(!user){return}
+        setMLoading(true)
         axios.get(`http://localhost:3000/user/role/${user?.email}`)
             .then((res)=>{
             //     console.log('Full response:', res.data)  // Check this
@@ -44,6 +46,7 @@ const AuthProvider = ({children}) => {
                 setRole(res.data.role)
             })
             .catch(err=> console.log(err))
+            .finally(()=> {setMLoading(false)})
     },[user])
 
     // useEffect(()=>{
@@ -62,7 +65,7 @@ const AuthProvider = ({children}) => {
         createUserEP,
         logoutUser,
         profileUpdate,
-        loading, setUser, role, setRole, mUser
+        loading, setUser, role, setRole, mUser, mLoading
     }
     return(
         <AuthContext value={authInfo}>

@@ -32,7 +32,7 @@ import { AuthContext } from '../AuthProvider/AuthContext';
 import { toast} from "react-toastify"
 
 const IssueDetailsPage = () => {
-  const {role, user, mUser} = use(AuthContext)
+  const {role, user, mUser, mLoading} = use(AuthContext)
   const [comment, setComment] = useState('');
   const [upvoting, setUpvoting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -55,7 +55,6 @@ const IssueDetailsPage = () => {
         
         setIssue(issueResponse.data)
         setCount(upvotesRes.data.count || 0);
-        setHasUpvoted(upvotesRes.data.hasUpvoted || false)
         setTimeline(timelineResponse.data)
     }catch (err){
       console.log(err)
@@ -65,9 +64,20 @@ const IssueDetailsPage = () => {
     }
   }
 
+  console.log(mUser?._id)
+  console.log(hasUpvoted)
   useEffect(()=> {
     fetchAllData()
-  }, [axiosSecure, id])
+    if(mUser?._id) {
+    axiosSecure.get(`/upvote-info/${id}?userId=${mUser?._id}`)
+      .then(res=> {
+        console.log(res)
+        setCount(res.data.count || 0);
+        setHasUpvoted(res.data.hasUpvoted || false)
+      } )
+    }
+
+  }, [axiosSecure, id, mUser?._id])
 
   // const fetchIssues = () =>{
   //     axiosSecure.get(`/detailIssues/${id}`)
@@ -218,6 +228,8 @@ const IssueDetailsPage = () => {
       </div>
     );
   }
+
+
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
 
@@ -367,7 +379,7 @@ const IssueDetailsPage = () => {
                   <span>Upvote</span>
                   <span className="bg-zinc-900 px-3 py-1 rounded-full text-sm">{count}</span>
                 </button>
-
+                  {console.log(hasUpvoted)}
                 <button
                   onClick={handleBoost}
                   className="group flex items-center space-x-3 px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 rounded-2xl font-bold text-white hover:shadow-purple-500/50 transition-all"

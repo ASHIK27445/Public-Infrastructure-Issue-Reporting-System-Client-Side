@@ -343,6 +343,7 @@ const AddIssue = () => {
                 rows={6}
                 className="w-full px-6 py-4 bg-zinc-800 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                 maxLength={500}
+                minLength={60}
                 required
                 disabled={!canSubmit}
                 onChange={(e) => setDescLength(e.target.value.length)}
