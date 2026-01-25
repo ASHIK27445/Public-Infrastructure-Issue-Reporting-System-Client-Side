@@ -25,7 +25,7 @@ import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { toast } from 'react-toastify';
 
 const MyProfile = () => {
-  const { user } = use(AuthContext);
+  const { user, role } = use(AuthContext);
   const { citizen } = useOutletContext();
   const axiosSecure = useAxiosSecure();
   const [isEditing, setIsEditing] = useState(false);
@@ -136,13 +136,70 @@ const MyProfile = () => {
         {/* Header Section */}
         <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden mb-6">
           {/* Cover Photo */}
-          <div className="h-40 bg-linear-to-r from-emerald-600 via-teal-600 to-cyan-600 relative">
-            <div className="absolute inset-0 bg-black/20"></div>
-            {citizen?.isPremium && (
+          <div className="h-40 relative overflow-hidden">
+            {/* Admin Cover with Dark Theme */}
+            {role === 'admin' ? (
+              <div className="absolute inset-0">
+                <img
+                  src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+                  alt="Admin Cover"
+                  className="w-full h-full object-cover"/>
+                <div className="absolute inset-0 bg-linear-to-r from-gray-900/70 via-gray-800/70 to-black/70"></div>
+                {/* Grid Overlay for Tech Look */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] 
+                bg-size-[20px_20px]"></div>
+              </div>
+            ) : role === 'staff' ? (
+              /* Staff Cover with Blue Theme */
+              <div className="absolute inset-0">
+                <img
+                  src="/wp51.jpg"
+                  alt="Anime Dark Theme"
+                  className="w-full h-full object-cover"/>
+                <div className="absolute inset-0 bg-linear-to-r from-blue-900/60 via-indigo-900/60 to-purple-900/60"></div>
+              </div>
+            ) : citizen?.isPremium ? (
+              /* Premium Citizen Cover */
+              <div className="absolute inset-0">
+                <img
+                  src={"/wp12.jpg" || "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"}
+                  alt="Premium Cover"
+                  className="w-full h-full object-cover"/>
+                <div className="absolute inset-0 bg-linear-to-r from-purple-900/60 via-pink-900/60 to-blue-900/60"></div>
+              </div>
+            ) : (
+              /* Default Citizen Cover */
+              <div className="bg-linear-to-r from-emerald-600 via-teal-600 to-cyan-600 h-full">
+                <div className="absolute inset-0 bg-black/20"></div>
+                {/* Subtle Pattern */}
+                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_30%,#ffffff,transparent_50%)]"></div>
+              </div>
+            )}
+            
+            {/* Badges */}
+            {role === 'admin' && (
               <div className="absolute top-4 right-4">
-                <div className="bg-linear-to-r from-yellow-500 to-amber-500 px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg">
+                <div className="bg-linear-to-r from-red-600 via-orange-500 to-amber-500 px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg backdrop-blur-sm border border-amber-500/30">
+                  <Shield className="w-5 h-5 text-white" />
+                  <span className="text-white font-bold text-sm tracking-wider">ADMIN</span>
+                </div>
+              </div>
+            )}
+            
+            {role === 'staff' && (
+              <div className="absolute top-4 right-4">
+                <div className="bg-linear-to-r from-blue-600 via-indigo-500 to-purple-500 px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg backdrop-blur-sm border border-blue-400/30">
+                  <User className="w-5 h-5 text-white" />
+                  <span className="text-white font-bold text-sm tracking-wider">STAFF</span>
+                </div>
+              </div>
+            )}
+            
+            {role === 'citizen' && citizen?.isPremium && (
+              <div className="absolute top-4 right-4">
+                <div className="bg-linear-to-r from-yellow-500 via-amber-500 to-orange-500 px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg backdrop-blur-sm border border-yellow-400/30">
                   <Crown className="w-5 h-5 text-white" />
-                  <span className="text-white font-bold text-sm">PREMIUM</span>
+                  <span className="text-white font-bold text-sm tracking-wider">PREMIUM</span>
                 </div>
               </div>
             )}
@@ -206,9 +263,11 @@ const MyProfile = () => {
               <div className="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700 rounded-2xl p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">Total Issues</p>
+                    <p className="text-gray-400 text-sm">
+                      {role === 'staff' ? 'Total Assigned Issue' : 'Total issues'}
+                    </p>
                     <p className="text-2xl font-black text-white mt-1">
-                      {citizen?.issueCount || 0}
+                      {role === 'staff' ? citizen?.assignIssued : citizen?.issueCount || 0}
                     </p>
                   </div>
                   <FileText className="w-8 h-8 text-emerald-500" />
@@ -397,7 +456,8 @@ const MyProfile = () => {
 
           {/* Right Column - Premium Subscription */}
           <div className="md:col-span-1">
-            {!citizen?.isPremium ? (
+            {role === 'citizen' || role === 'admin' ? 
+              (!citizen?.isPremium ? (
               <div className="bg-linear-to-br from-yellow-900/30 to-amber-900/30 rounded-3xl border-2 border-yellow-500/30 p-6 relative overflow-hidden">
                 {/* Decorative Background */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-yellow-500/10 to-transparent rounded-full blur-3xl"></div>
@@ -470,8 +530,7 @@ const MyProfile = () => {
                     </p>
                   )}
                 </div>
-              </div>
-            ) : (
+              </div>) : (
               <div className="bg-linear-to-br from-yellow-900/30 to-amber-900/30 rounded-3xl border-2 border-yellow-500/30 p-6">
                 <div className="flex items-center justify-center w-16 h-16 bg-linear-to-r from-yellow-500 to-amber-500 rounded-2xl mb-4 shadow-lg">
                   <Sparkles className="w-8 h-8 text-white" />
@@ -504,8 +563,59 @@ const MyProfile = () => {
                     🎉 Thank you for being a Premium member!
                   </p>
                 </div>
-              </div>
-            )}
+              </div>) ) : (
+              <div className="bg-linear-to-br from-blue-900/30 to-purple-900/30 rounded-3xl border-2 border-blue-500/30 p-6">
+                <div className="flex items-center justify-center w-16 h-16 bg-linear-to-r from-blue-500 to-purple-500 rounded-2xl mb-4 shadow-lg">
+                  <Shield className="w-8 h-8 text-white" />
+                </div>
+
+                <h3 className="text-2xl font-black text-white mb-2">
+                  Staff Account
+                </h3>
+                
+                <div className="space-y-4 mb-6">
+                  <div className="bg-zinc-900/50 rounded-2xl p-4 border border-zinc-700">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-gray-400 text-sm">Account Type</span>
+                      <span className="text-blue-400 font-bold">STAFF</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-sm">Access Level</span>
+                      <span className="text-purple-400 font-bold">Full Access</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4">
+                    <h4 className="text-blue-400 font-bold mb-2">Staff Benefits</h4>
+                    <ul className="text-gray-300 text-sm space-y-2">
+                      <li className="flex items-center">
+                        <CheckCircle className="w-4 h-4 text-emerald-400 mr-2" />
+                        Unlimited issue management
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="w-4 h-4 text-emerald-400 mr-2" />
+                        Priority system access
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="w-4 h-4 text-emerald-400 mr-2" />
+                        Direct admin tools
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <p className="text-gray-400 text-xs">
+                    Verified staff member since {citizen?.createdAt 
+                      ? new Date(citizen.createdAt).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          year: 'numeric' 
+                        })
+                      : 'N/A'
+                    }
+                  </p>
+                </div>
+              </div>)}
           </div>
         </div>
       </div>
