@@ -87,15 +87,13 @@ const MyProfile = () => {
       toast('Citizen Not found/Premium!')
       return
     }
-
-    axiosSecure.post('/create-checkout-session')
+    setPaymentLoading(true)
+    axiosSecure.post('/create-checkout-session', {type: 'premium'})
       .then(res => {
         console.log(res.data)
         window.location.href = res.data.sessionURL
-      })
-
-      
-
+      }).catch(err=> console.log(err))
+        .finally(()=> setPaymentLoading(false))
   }
 
   return (
@@ -449,21 +447,21 @@ const MyProfile = () => {
                   </div>
 
                   <button
-                    onClick={handleSubscribe}
-                    disabled={paymentLoading || citizen?.isBlocked || citizen?.isPremium}
-                    className="w-full px-6 py-4 bg-linear-to-r from-yellow-500 to-amber-500 rounded-2xl text-white font-black text-lg hover:shadow-yellow-500/50 hover:cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                  >
-                    {paymentLoading ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        <span>Processing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="w-5 h-5" />
-                        <span>Subscribe Now</span>
-                      </>
-                    )}
+                      onClick={handleSubscribe}
+                      disabled={paymentLoading || citizen?.isBlocked || citizen?.isPremium}
+                      className="w-full px-6 py-4 bg-linear-to-r from-yellow-500 to-amber-500 rounded-2xl text-white font-black text-lg hover:shadow-yellow-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                    >
+                      {paymentLoading ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <span>Processing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="w-5 h-5" />
+                          <span>Subscribe Now</span>
+                        </>
+                      )}
                   </button>
 
                   {citizen?.isBlocked && (

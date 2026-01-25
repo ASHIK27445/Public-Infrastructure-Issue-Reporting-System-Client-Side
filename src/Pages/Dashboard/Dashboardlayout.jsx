@@ -10,11 +10,17 @@ const DashboardLayout = () => {
     const {user} = use(AuthContext)
     const [citizen, setCitizen] = useState(null)
 
-    useEffect(()=>{
-      axiosSecure.get('/user/citizen')
+    const refreshCitizen = async() => {
+      return await axiosSecure.get('/user/citizen')
         .then(res=> setCitizen(res.data) )
         .catch(err=> console.log(err))
-    },[axiosSecure])
+    }
+
+    useEffect(()=>{
+      if(user?.email){
+        refreshCitizen()
+      }
+    },[user, axiosSecure])
 
     // console.log(citizen)
     return(
@@ -23,7 +29,7 @@ const DashboardLayout = () => {
       
 
       <main className="flex-1 overflow-y-auto">
-        <Outlet context={{ citizen }}></Outlet>
+        <Outlet context={{ citizen, refreshCitizen }}></Outlet>
         <ToastContainer></ToastContainer>
       </main>
     </div>
