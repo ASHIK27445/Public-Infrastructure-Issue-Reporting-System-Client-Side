@@ -35,6 +35,7 @@ const IssueDetailsPage = () => {
   const {role, user, mUser, mLoading} = use(AuthContext)
   const [comment, setComment] = useState('');
   const [upvoting, setUpvoting] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [issue, setIssue] = useState([])
   const axiosSecure = useAxiosSecure()
@@ -64,14 +65,13 @@ const IssueDetailsPage = () => {
     }
   }
 
-  console.log(mUser?._id)
-  console.log(hasUpvoted)
+  // console.log(mUser?._id)
+  // console.log(hasUpvoted)
   useEffect(()=> {
     fetchAllData()
     if(mUser?._id) {
     axiosSecure.get(`/upvote-info/${id}?userId=${mUser?._id}`)
       .then(res=> {
-        console.log(res)
         setCount(res.data.count || 0);
         setHasUpvoted(res.data.hasUpvoted || false)
       } )
@@ -171,16 +171,24 @@ const IssueDetailsPage = () => {
       }).catch(err => console.log(err))
   }
 
+  console.log(isOwnIssue, issue?._id)
+  console.log('Boost Request Payload:', { type: 'normal_boost', issueId: issue?._id });
+
   const handleBoost = () => {
-    const confirmed = window.confirm(
-      'Demo: Boost this issue to High Priority for 100 Tk?\n\n' +
-      'Boosted issues appear above normal issues and get faster resolution.\n\n' +
-      '(Payment functionality disabled in demo)'
-    );
-    
-    if (confirmed) {
-      alert('Demo: Issue boosted to High Priority! (Functionality disabled in demo)');
+    if(!isOwnIssue && !issue?.id){
+      toast.error("You can't boost other issues.")
+      return
     }
+      setPaymentLoading(true)
+      axiosSecure.post('/create-checkout-session', {type: 'normal_boost', issueId: issue?._id})
+      .then(res => {
+        console.log(res.data)
+        window.location.href = res.data.sessionURL
+      }).catch(err=> {
+        console.log(err)
+        toast.error(err)
+      })
+        .finally(()=> setPaymentLoading(false))
   }
 
   const handleDelete = () => {
@@ -379,17 +387,73 @@ const IssueDetailsPage = () => {
                   <span>Upvote</span>
                   <span className="bg-zinc-900 px-3 py-1 rounded-full text-sm">{count}</span>
                 </button>
-                  {console.log(hasUpvoted)}
-                <button
-                  onClick={handleBoost}
-                  className="group flex items-center space-x-3 px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 rounded-2xl font-bold text-white hover:shadow-purple-500/50 transition-all"
-                >
-                  <TrendingUp className="w-5 h-5" />
-                  <span>Boost Priority</span>
-                  <span className="flex items-center space-x-1 bg-purple-800 px-3 py-1 rounded-full text-sm">
-                    <span>100 Tk</span>
-                  </span>
-                </button>
+  
+                {/* Boost Button */}
+                {issue?.status === 'Rejected' ? (
+                  // Case 0: Issue is rejected - সবচেয়ে আগে check
+                  <button
+                    disabled
+                    className="flex items-center space-x-3 px-6 py-3 bg-linear-to-r from-red-900 to-rose-900 rounded-2xl font-bold text-white border border-red-500/30 cursor-not-allowed"
+                    title="This issue has been rejected"
+                  >
+                    <TrendingUp className="w-5 h-5 text-red-400" />
+                    <span className="text-red-300">Cannot Boost</span>
+                    <span className="flex items-center space-x-1 bg-red-900/50 px-3 py-1 rounded-full text-sm border border-red-500/30">
+                      <span className="text-red-300">Rejected</span>
+                    </span>
+                  </button>
+                ) : issue?.isBoosted ? (
+                  // Case 1: Issue already boosted
+                  <button
+                    disabled
+                    className="flex items-center space-x-3 px-6 py-3 bg-linear-to-r from-purple-900 to-pink-900 rounded-2xl font-bold text-white border border-purple-500/30 cursor-not-allowed"
+                  >
+                    <TrendingUp className="w-5 h-5 text-purple-400" />
+                    <span className="text-purple-300">Issue Boosted</span>
+                    <span className="flex items-center space-x-1 bg-purple-900/50 px-3 py-1 rounded-full text-sm border border-purple-500/30">
+                      <span className="text-purple-300">✓</span>
+                    </span>
+                  </button>
+                ) : isOwnIssue ? (
+                  // Case 2: User's own issue (can boost) 
+                  <button
+                    onClick={handleBoost}
+                    disabled={paymentLoading}
+                    className={`group flex items-center space-x-3 px-6 py-3 rounded-2xl font-bold transition-all ${
+                      paymentLoading 
+                        ? 'bg-purple-700 cursor-not-allowed' 
+                        : 'bg-linear-to-r from-purple-600 to-pink-600 hover:shadow-purple-500/50'
+                    }`}
+                  >
+                    {paymentLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <TrendingUp className="w-5 h-5" />
+                        <span>Boost Priority</span>
+                        <span className="flex items-center space-x-1 bg-purple-800 px-3 py-1 rounded-full text-sm">
+                          <span>100 Tk</span>
+                        </span>
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  // Case 3: Not user's issue - Blue color
+                  <button
+                    disabled
+                    className="flex items-center space-x-3 px-6 py-3 bg-linear-to-r from-blue-900 to-cyan-900 rounded-2xl font-bold text-white cursor-not-allowed border border-blue-500/30"
+                    title="You can only boost your own issues"
+                  >
+                    <TrendingUp className="w-5 h-5 text-blue-400" />
+                    <span className="text-blue-300">Not Boosted</span>
+                    <span className="flex items-center space-x-1 bg-blue-900/50 px-3 py-1 rounded-full text-sm border border-blue-500/30">
+                      <span className="text-blue-300">N/A</span>
+                    </span>
+                  </button>
+                )}
 
                 <button 
                   onClick={() => alert('Demo: Report issue functionality')}
