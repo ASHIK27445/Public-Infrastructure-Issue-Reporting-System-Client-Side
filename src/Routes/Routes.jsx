@@ -32,6 +32,7 @@ import Features from "../Pages/Home/Features"
 import PaymentSuccess from "../Pages/components/PaymentSuccess"
 import PaymentCancel from "../Pages/components/PaymentCancel"
 import PaymentBoostSuccess from "../Pages/Home/PaymentBoostSuccess"
+import PaymentHistory from "../Pages/components/PaymentHistory"
 // import HowItWorks from "../Pages/Others/HowItWorks"
 export const router = createBrowserRouter([
     {
@@ -128,6 +129,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'payment-cancel', Component: PaymentCancel
+            },
+            {
+                path:'payment-history', Component: PaymentHistory
             }
 
         ]
