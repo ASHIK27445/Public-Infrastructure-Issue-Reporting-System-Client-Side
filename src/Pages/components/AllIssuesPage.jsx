@@ -27,7 +27,7 @@ const AllIssuesPage = () => {
     category: '',
     status: '',
     priority: '',
-    sortBy: 'newest'
+    sortBy: 'priority'
   });
   const [showFilters, setShowFilters] = useState(false);
   const [upvoting, setUpvoting] = useState({});
@@ -135,7 +135,7 @@ const AllIssuesPage = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ category: '', status: '', priority: '', sortBy: 'newest' });
+    setFilters({ category: '', status: '', priority: '', sortBy: 'priority' });
     setSearchTerm('');
   };
 

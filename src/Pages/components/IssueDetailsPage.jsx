@@ -25,7 +25,8 @@ import {
   Pickaxe,
   CircleCheckBig,
   BookmarkCheck,
-  SquarePen
+  SquarePen,
+  OctagonX
 } from 'lucide-react';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -348,7 +349,7 @@ const IssueDetailsPage = () => {
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
-                  <div className="text-3xl font-black text-emerald-500 mb-2">{count}</div>
+                  <div className={`text-3xl font-black mb-2 ${issue?.status === 'Rejected' ? 'text-red-500' : 'text-emerald-500'}`}>{count}</div>
                   <div className="text-sm text-gray-400">Upvotes</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
@@ -369,24 +370,34 @@ const IssueDetailsPage = () => {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-4">
-                <button
-                  onClick={handleUpvote}
-                  disabled={upvoting || isOwnIssue}
-                  className={`flex items-center space-x-3 px-6 py-3 rounded-2xl font-bold transition-all ${
-                    hasUpvoted || isOwnIssue
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-not-allowed'
-                      : 'bg-zinc-800 text-white hover:bg-zinc-700'
-                  }`}
-                  title={isOwnIssue ? "You cannot upvote your own issue" : ""}
-                >
-                  {upvoting ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <ThumbsUp className="w-5 h-5" />
-                  )}
-                  <span>Upvote</span>
-                  <span className="bg-zinc-900 px-3 py-1 rounded-full text-sm">{count}</span>
-                </button>
+                {issue?.status === 'Rejected' ?
+                  <button
+                    disabled={true}
+                    className='flex items-center space-x-3 px-6 py-3 rounded-2xl font-bold transition-allbg-emerald-500/20 bg-linear-to-r from-red-900 to-rose-900 text-red-300 border border-red-500/30 cursor-not-allowed'>
+                    <OctagonX className="w-5 h-5 animate-pulse text-red-300" />
+                    <span>Upvote</span>
+                    <span className="bg-red-900 border border- border-red-500 text-red-200 px-3 py-1 rounded-full text-sm">{count}</span>
+                  </button> :
+                  <button
+                    onClick={handleUpvote}
+                    disabled={upvoting || isOwnIssue}
+                    className={`flex items-center space-x-3 px-6 py-3 rounded-2xl font-bold transition-all ${
+                      hasUpvoted || isOwnIssue
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-not-allowed'
+                        : 'bg-zinc-800 text-white hover:bg-zinc-700 cursor-pointer'
+                    }`}
+                    title={isOwnIssue ? "You cannot upvote your own issue" : ""}
+                  >
+                    {upvoting ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <ThumbsUp className="w-5 h-5" />
+                    )}
+                    <span>Upvote</span>
+                    <span className="bg-zinc-900 px-3 py-1 rounded-full text-sm">{count}</span>
+                  </button>
+                }
+
   
                 {/* Boost Button */}
                 {issue?.status === 'Rejected' ? (
