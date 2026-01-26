@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { NavLink } from 'react-router';
 import { 
   Search, 
@@ -13,12 +13,15 @@ import {
   ArrowUp,
   ArrowDown,
   Loader2,
-  Calendar
+  Calendar,
+  Circle
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import useAxiosSecure from '../../Hooks/useAxiosSecure'
+import { AuthContext } from '../AuthProvider/AuthContext';
 const AllIssuesPage = () => {
+  const {mUser, user, role} = use(AuthContext)
   const [issues, setIssues] = useState([]);
   const [filteredIssues, setFilteredIssues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,9 +35,9 @@ const AllIssuesPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [upvoting, setUpvoting] = useState({});
   const axiosSecure = useAxiosSecure()
+  const [hasUpvoted, setHasUpvoted] = useState({})
 
-  // Fetch issues from backend
-  useEffect(() => {
+  const allissuesFetch = () => {
     setLoading(true);
     axios.get('http://localhost:3000/allissues')
       .then(res => {
@@ -46,7 +49,27 @@ const AllIssuesPage = () => {
         toast.error('Failed to fetch issues');
       })
       .finally(() => setLoading(false));
-  }, []);
+  }
+
+  const upvotesFetch = () => {
+    if(!mUser?._id) return;
+
+    axios.get('http://localhost:3000/all-upvotes')
+     .then(res => {
+      // console.log(res.data);
+      const upvoteMap = {}
+      res.data.forEach(issue=> {
+        upvoteMap[issue?._id] = !!issue.upvoteUsers[mUser._id]
+      })
+      setHasUpvoted(upvoteMap)
+     })
+  }
+
+
+  useEffect(() => {
+    allissuesFetch();
+    upvotesFetch()
+  }, [mUser]);
 
   const categories = [
     'Road & Traffic',
@@ -104,31 +127,39 @@ const AllIssuesPage = () => {
     setFilteredIssues(result);
   }, [issues, searchTerm, filters]);
 
-  const handleUpvote = async (issueId) => {
-    if (upvoting[issueId]) return;
-
-    setUpvoting(prev => ({ ...prev, [issueId]: true }));
-
-    try {
-      const res = await axiosSecure.post(`/upvote/${issueId}`);
-      const { upvoteCount, hasUpvoted } = res.data;
-
-      setIssues(prev =>
-        prev.map(issue =>
-          issue._id === issueId
-            ? { ...issue, upvoteCount, userUpvoted: hasUpvoted }
-            : issue
-        )
-      );
-
-      toast.success(hasUpvoted ? "Upvoted successfully" : "Upvote removed");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to upvote");
-    } finally {
-      setUpvoting(prev => ({ ...prev, [issueId]: false }));
+  const handleUpvote = (issue) => {
+    if(!user){
+      toast("login first")
+      return;
     }
-  };
+    if(role === 'staff'){
+      toast("Staff can't give vote")
+      return;
+    }
+    if(issue?.assgnInto === null){
+      toast("The issue is not assigned yet.")
+      return
+    }
+    if(issue?.status === 'Rejected'){
+      toast("You can't upvote. Status Rejected")
+      return
+    }
+    setUpvoting(prev => ({ ...prev, [issue._id]: true }))
+    axiosSecure.post(`/upvote/${issue._id}`)
+      .then((res)=> {
+        if(res.data.success){
+          setHasUpvoted(prev => ({ ...prev, [issue._id]: res.data.hasUpvoted }))
+          setIssues(prevIssues =>
+              prevIssues.map(i =>
+                i._id === issue._id
+                  ? { ...i, upvoteCount: res.data.upvoteCount }
+                  : i
+              )
+            )
+          setUpvoting(prev => ({ ...prev, [issue._id]: false }))
+        }
+      }).catch(err => console.log(err))
+  }
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: prev[key] === value ? '' : value }));
@@ -181,7 +212,30 @@ const AllIssuesPage = () => {
             Browse, search, and filter community-reported infrastructure issues.
             Upvote important issues to help prioritize them.
           </p>
+          <div className="mt-6 flex flex-wrap items-center gap-5 text-sm text-gray-300">
+            <div className="flex items-center gap-2">
+              <Circle className="w-4 h-4 text-emerald-500 fill-emerald-500" />
+              <span>Already upvoted</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Circle className="w-4 h-4 text-zinc-400 fill-zinc-400" />
+              <span>Available for upvote</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Circle className="w-4 h-4 text-red-500 fill-red-500" />
+              <span>Rejected issue (Upvote disabled)</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Circle className="w-4 h-4 text-blue-500 fill-blue-500" />
+              <span>Your reported issue</span>
+            </div>
+          </div>
+          
         </div>
+        
       </div>
 
       {/* Search & Filters */}
@@ -389,17 +443,36 @@ const AllIssuesPage = () => {
                     </div>
 
                     <div className="flex items-center justify-between pt-4 border-t border-zinc-700">
-                      <button
-                        onClick={() => handleUpvote(issue._id)}
-                        disabled={upvoting[issue._id] || issue.userUpvoted}
+                    <button
+                        onClick={() => handleUpvote(issue)}
+                        disabled={
+                          upvoting[issue._id] || issue.reportBy === mUser?._id || issue.status === 'Rejected'
+                        }
                         className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all ${
-                          issue.userUpvoted ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600 hover:text-white'
-                        } ${upvoting[issue._id] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      issue.status === 'Rejected'
+                        ? 'bg-linear-to-r from-red-500 to-rose-500 text-red-300 border border-red-500/30 cursor-not-allowed'
+                        : issue.reportBy === mUser?._id
+                        ? 'bg-blue-700 text-blue-200 border border-blue-500/30 cursor-not-allowed'
+                        : hasUpvoted[issue._id]
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 '
+                        : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600 hover:text-white cursor-pointer'
+                    }`}
+                        title={
+                          issue.reportBy === mUser?._id
+                            ? "You cannot upvote your own issue"
+                            : issue.status === 'Rejected'
+                            ? "Cannot upvote a rejected issue"
+                            : ""
+                        }
                       >
-                        {upvoting[issue._id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <ThumbsUp className="w-4 h-4" />}
+                        {upvoting[issue._id] ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <ThumbsUp className="w-4 h-4" />
+                        )}
                         <span className="font-bold">{issue.upvoteCount}</span>
                         <span>Upvote</span>
-                      </button>
+                    </button>
 
                       <NavLink to={`/issues/${issue._id}`} className="group/btn flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold text-sm hover:shadow-emerald-500/50 transition-all">
                         <span>View Details</span>

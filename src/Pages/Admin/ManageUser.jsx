@@ -7,7 +7,11 @@ import {
   CreditCard,
   Lock,
   Unlock,
-  Crown
+  Crown,
+  ChessKing,
+  ChessKnight,
+  ChessBishop,
+  Star
 } from 'lucide-react';
 import { AuthContext } from '../AuthProvider/AuthContext';
 import useAxiosSecure from '../../Hooks/useAxiosSecure'
@@ -89,6 +93,26 @@ const ManageUsers = () => {
             </h1>
             <p className="text-gray-400">View and manage all citizen users</p>
           </div>
+          <div className="py-2.5 flex justify-between items-center">
+            <div className="flex items-center gap-4 text-sm text-gray-400">
+              <div className="flex items-center gap-1">
+                <Crown className="w-4 h-4 text-yellow-500" />
+                <span>Admin</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <ChessKnight className="w-4 h-4 text-red-500" />
+                <span>Staff</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <ChessBishop className="w-4 h-4 text-blue-800" />
+                <span>Citizen</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 text-yellow-600" />
+                <span>Premium</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -127,11 +151,23 @@ const ManageUsers = () => {
                               alt={user.name}
                               className="w-full h-full object-cover"
                             />
-                            {user?.isPremium === true && (
+                            {user?.role !== 'admin' && user?.isPremium === true && (
                               <div className="absolute -top-1 -right-1">
-                                <Crown className="w-6 h-6 text-yellow-500" fill="currentColor" />
+                                <Star className="w-6 h-6 text-yellow-500" fill="currentColor" color='white' strokeWidth={1} />
                               </div>
                             )}
+                            {user?.role === 'staff' && (
+                              <div className="absolute -top-1 -right-1">
+                                <ChessKnight className="w-6 h-6 text-red-500" fill="currentColor" color='white' strokeWidth={1} />
+                              </div>)}
+                            {!user?.isPremium && user?.role === 'citizen' && (
+                              <div className="absolute -top-1 -right-1">
+                                <ChessBishop className="w-6 h-6 text-blue-800" fill="currentColor" color='white' strokeWidth={1} />
+                              </div>)}
+                            {user?.role === 'admin' && (
+                              <div className="absolute -top-1 -right-1">
+                                <Crown className="w-6 h-6 text-yellow-600" fill="currentColor"  />
+                              </div>)}
                           </div>
                         </div>
                         <div>
@@ -164,8 +200,7 @@ const ManageUsers = () => {
                         <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${
                           user?.isPremium === true 
                             ? 'bg-linear-to-r from-yellow-500/20 to-amber-500/20 text-yellow-400'
-                            : 'bg-gray-500/20 text-gray-400'
-                        }`}>
+                            : 'bg-gray-500/20 text-gray-400'}`}>
                           {user?.isPremium === true && <Crown className="w-3 h-3" />}
                           <span>{user?.isPremium ? 'Premium' : 'Free'}</span>
                         </div>

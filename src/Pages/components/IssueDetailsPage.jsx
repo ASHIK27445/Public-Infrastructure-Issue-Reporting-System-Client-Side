@@ -109,7 +109,7 @@ const IssueDetailsPage = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'Resolved': return 'from-emerald-500 to-teal-500';
-      case 'In Progress': return 'from-blue-500 to-cyan-500';
+      case 'In-Progress': return 'from-blue-500 to-cyan-500';
       case 'Pending': return 'from-yellow-500 to-amber-500';
       case 'Working': return 'from-purple-500 to-pink-500';
       case 'Closed': return 'from-gray-500 to-slate-500';
@@ -157,8 +157,8 @@ const IssueDetailsPage = () => {
       toast("The issue is not assigned yet.")
       return
     }
-    if(issue?.status === 'Rejected' || issue?.status === 'Pending'){
-      toast("You can't upvote. Status Rejected or Pending")
+    if(issue?.status === 'Rejected'){
+      toast("You can't upvote. Status Rejected")
       return
     }
     setUpvoting(true)
@@ -172,8 +172,8 @@ const IssueDetailsPage = () => {
       }).catch(err => console.log(err))
   }
 
-  console.log(isOwnIssue, issue?._id)
-  console.log('Boost Request Payload:', { type: 'normal_boost', issueId: issue?._id });
+  // console.log(isOwnIssue, issue?._id)
+  // console.log('Boost Request Payload:', { type: 'normal_boost', issueId: issue?._id });
 
   const handleBoost = () => {
     if(!isOwnIssue && !issue?.id){
@@ -401,7 +401,7 @@ const IssueDetailsPage = () => {
   
                 {/* Boost Button */}
                 {issue?.status === 'Rejected' ? (
-                  // Case 0: Issue is rejected - সবচেয়ে আগে check
+                  // Case 0: Issue is rejected 
                   <button
                     disabled
                     className="flex items-center space-x-3 px-6 py-3 bg-linear-to-r from-red-900 to-rose-900 rounded-2xl font-bold text-white border border-red-500/30 cursor-not-allowed"
