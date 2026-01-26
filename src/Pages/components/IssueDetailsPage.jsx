@@ -31,6 +31,7 @@ import {
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { AuthContext } from '../AuthProvider/AuthContext';
 import { toast} from "react-toastify"
+import axios from 'axios';
 
 const IssueDetailsPage = () => {
   const {role, user, mUser, mLoading} = use(AuthContext)
@@ -42,6 +43,7 @@ const IssueDetailsPage = () => {
   const axiosSecure = useAxiosSecure()
   const {id} = useParams()
   const [count, setCount] = useState(0)
+  const [viewCount, setViewCount] = useState(issue?.viewsCount)
   const [hasUpvoted, setHasUpvoted] = useState(false)
   const [timelines, setTimeline] = useState({})
   const [loading, setLoading] = useState(true)
@@ -79,6 +81,29 @@ const IssueDetailsPage = () => {
     }
 
   }, [axiosSecure, id, mUser?._id])
+
+  //view Count useEffect
+  useEffect(() => {
+    if(!id) return;
+    
+    const viewedIssues = JSON.parse(sessionStorage.getItem('viewedIssues') || '[]')
+
+    if(viewedIssues.includes(id)) return
+
+    const timer = setTimeout(() => {
+      axios.post(`http://localhost:3000/view-count/${id}`)
+        .then(res => {
+          console.log('View counted', res.data, res.data.viewsCount)
+          setViewCount(res.data.viewsCount)
+          viewedIssues.push(id);
+          sessionStorage.setItem("viewedIssues", JSON.stringify(viewedIssues))
+        })
+        .catch(err => console.log(err));
+    }, 5000);
+
+    // cleanup if user leaves early
+    return () => clearTimeout(timer);
+  }, [id])
 
   // const fetchIssues = () =>{
   //     axiosSecure.get(`/detailIssues/${id}`)
@@ -353,11 +378,11 @@ const IssueDetailsPage = () => {
                   <div className="text-sm text-gray-400">Upvotes</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
-                  <div className="text-3xl font-black text-blue-500 mb-2">{issue?.views}</div>
+                  <div className="text-3xl font-black text-blue-500 mb-2">{viewCount || issue?.viewsCount}</div>
                   <div className="text-sm text-gray-400">Views</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
-                  <div className="text-3xl font-black text-amber-500 mb-2">{issue?.comments}</div>
+                  <div className="text-3xl font-black text-amber-500 mb-2">{issue?.comments || 0}</div>
                   <div className="text-sm text-gray-400">Comments</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
