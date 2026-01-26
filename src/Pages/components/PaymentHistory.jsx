@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { 
   CreditCard, 
   Calendar, 
@@ -308,12 +308,12 @@ const PaymentHistory = () => {
                               <Download className="w-4 h-4" />
                             </button>
                             
-                            <button
-                              onClick={() => navigate(`/payment-details/${payment._id}`)}
+                            <Link
+                              to={`/dashboard/payment-details/${payment?._id}`}
                               className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition-colors text-sm"
                             >
                               Details
-                            </button>
+                            </Link>
                           </div>
                         </td>
                       </tr>
