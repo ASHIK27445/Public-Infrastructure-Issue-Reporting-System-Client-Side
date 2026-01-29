@@ -91,7 +91,7 @@ const IssueDetailsPage = () => {
     if(viewedIssues.includes(id)) return
 
     const timer = setTimeout(() => {
-      axios.post(`http://localhost:3000/view-count/${id}`)
+      axios.post(`hhttps://piirms.vercel.app/view-count/${id}`)
         .then(res => {
           console.log('View counted', res.data, res.data.viewsCount)
           setViewCount(res.data.viewsCount)

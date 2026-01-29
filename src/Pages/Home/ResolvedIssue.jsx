@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapPin, CheckCircle, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router';
 
 const ResolvedIssues = () => {
   const resolvedIssues = [
@@ -84,11 +85,11 @@ const ResolvedIssues = () => {
     <section className="py-32 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <div className="inline-block px-6 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 mb-6">
+          <div className="inline-block px-6 py-2 rounded-full bg-linear-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 mb-6">
             <span className="text-emerald-400 font-semibold text-sm uppercase tracking-wider">Success Stories</span>
           </div>
           <h2 className="text-5xl md:text-7xl font-black text-white mb-6">
-            Latest <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Resolved</span> Issues
+            Latest <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Resolved</span> Issues
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             Real problems, real solutions. See how we're transforming communities one issue at a time.
@@ -99,7 +100,7 @@ const ResolvedIssues = () => {
           {resolvedIssues.map((issue, index) => (
             <div 
               key={issue.id}
-              className="group relative bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-3xl overflow-hidden border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105"
+              className="group relative bg-linear-to-br from-zinc-900 to-zinc-800 rounded-3xl overflow-hidden border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="relative h-64 overflow-hidden">
@@ -108,17 +109,17 @@ const ResolvedIssues = () => {
                   alt={issue.title} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/40 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-zinc-900/40 to-transparent" />
                 
                 <div className="absolute top-4 right-4">
-                  <div className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center space-x-2 shadow-lg">
+                  <div className="px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-full flex items-center space-x-2 shadow-lg">
                     <CheckCircle className="w-4 h-4 text-white" />
                     <span className="text-white font-bold text-xs">{issue.status}</span>
                   </div>
                 </div>
 
                 <div className="absolute top-4 left-4">
-                  <div className={`px-4 py-2 bg-gradient-to-r ${getPriorityColor(issue.priority)} rounded-full shadow-lg`}>
+                  <div className={`px-4 py-2 bg-linear-to-r ${getPriorityColor(issue.priority)} rounded-full shadow-lg`}>
                     <span className="text-white font-bold text-xs">{issue.priority}</span>
                   </div>
                 </div>
@@ -150,16 +151,18 @@ const ResolvedIssues = () => {
               </div>
 
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/20 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-emerald-500/20 to-transparent" />
               </div>
             </div>
           ))}
         </div>
 
         <div className="text-center mt-16">
-          <button className="group px-10 py-5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3 mx-auto">
-            <span>Explore All Issues</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <button>
+            <Link to='/allissues' className="group px-10 py-5 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3 mx-auto">
+              <span>Explore All Issues</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </button>
         </div>
       </div>

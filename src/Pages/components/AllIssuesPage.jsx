@@ -36,13 +36,17 @@ const AllIssuesPage = () => {
   const [upvoting, setUpvoting] = useState({});
   const axiosSecure = useAxiosSecure()
   const [hasUpvoted, setHasUpvoted] = useState({})
+  const [page, setPage] = useState(1)
+  const [limit] = useState(8)
+  const [hasMore, setHasMore] = useState(true)
 
   const allissuesFetch = () => {
     setLoading(true);
-    axios.get('http://localhost:3000/allissues')
+    axios.get(`http://localhost:3000/allissues?page=${page}&limit=${limit}`)
       .then(res => {
         setIssues(res.data);
         setFilteredIssues(res.data);
+        setHasMore(res.data.length === limit)
       })
       .catch(err => {
         console.error(err);
@@ -69,7 +73,7 @@ const AllIssuesPage = () => {
   useEffect(() => {
     allissuesFetch();
     upvotesFetch()
-  }, [mUser]);
+  }, [page, mUser]);
 
   const categories = [
     'Road & Traffic',
@@ -82,7 +86,7 @@ const AllIssuesPage = () => {
     'Other'
   ];
 
-  const statuses = ['Pending', 'In Progress', 'Resolved', 'Closed'];
+  const statuses = ['Pending', 'In-Progress', 'Resolved', 'Rejected', 'Working', 'Closed'];
   const priorities = ['Low', 'Normal', 'High', 'Critical'];
 
   // Filter and search issues
@@ -241,7 +245,7 @@ const AllIssuesPage = () => {
       {/* Search & Filters */}
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800 py-6">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -403,10 +407,10 @@ const AllIssuesPage = () => {
               </button>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 auto-rows-fr">
               {filteredIssues.map(issue => (
-                <div key={issue._id} className="group relative bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl overflow-hidden border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105">
-                  <div className="relative h-48 overflow-hidden">
+                <div key={issue._id} className="group relative bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl overflow-hidden border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105 h-full flex flex-col">
+                  <div className="relative h-48 overflow-hidden shrink-0">
                     <img src={issue.mainPhoto} alt={issue.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-zinc-900/40 to-transparent" />
                     <div className={`absolute top-4 right-4 px-4 py-2 bg-linear-to-r ${getStatusColor(issue.status)} rounded-full flex items-center space-x-2 shadow-lg`}>
@@ -418,11 +422,13 @@ const AllIssuesPage = () => {
                     </div>
                   </div>
 
-                  <div className="p-6">
+                  <div className="p-6 flex flex-col flex-1">
                     <div className="mb-3">
                       <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-medium">{issue.category}</span>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-emerald-400 transition-colors">{issue.title}</h3>
+                    <div className='flex flex-col grow'>
+                      <h3 className="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-emerald-400 transition-colors">{issue.title}</h3>
+                    </div>
                     <p className="text-gray-400 text-sm mb-4 line-clamp-2">{issue.description}</p>
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                       <div className="flex items-center space-x-2">
@@ -442,7 +448,7 @@ const AllIssuesPage = () => {
                       <span className="text-xs text-gray-400">Reported by {issue.reporterName}</span>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-zinc-700">
+                    <div className="flex items-center justify-between pt-4 border-t border-zinc-700 mt-auto">
                     <button
                         onClick={() => handleUpvote(issue)}
                         disabled={
@@ -471,7 +477,6 @@ const AllIssuesPage = () => {
                           <ThumbsUp className="w-4 h-4" />
                         )}
                         <span className="font-bold">{issue.upvoteCount}</span>
-                        <span>Upvote</span>
                     </button>
 
                       <NavLink to={`/issues/${issue._id}`} className="group/btn flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold text-sm hover:shadow-emerald-500/50 transition-all">
@@ -486,6 +491,20 @@ const AllIssuesPage = () => {
           )}
         </div>
       )}
+
+      <div className="flex justify-center items-center space-x-2 mt-7 pb-10">
+        {Array.from({ length: hasMore ? page + 1 : page }, (_, i) => i + 1).map((num) => (
+          <button
+            key={num}
+            onClick={() => setPage(num)}
+            className={`px-4 py-2 rounded-xl border ${
+              page === num ? 'bg-emerald-500 text-white' : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
+            }`}
+          >
+            {num}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
