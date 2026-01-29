@@ -116,6 +116,14 @@ const DashboardAside = () => {
       roles: ['admin', 'staff']
     },
     {
+      id: 'reviewIssues',
+      name: 'Review Issues',
+      icon: <BookAlert className='w-5 h-5'></BookAlert>,
+      path: 'review-issues',
+      roles: ['staff'],
+      requireSuperStaff: true
+    },
+    {
       id: 'notifications',
       name: 'Notifications',
       icon: <Bell className="w-5 h-5" />,
@@ -219,6 +227,7 @@ const DashboardAside = () => {
           {navItems.map((item) => {
              if (item.roles && !item.roles.includes(role)) return null;
 
+             if (item.requireSuperStaff && !(role === 'staff' && mUser?.position === 'super')) return null
              return(
             <NavLink
               key={item.id}

@@ -188,8 +188,8 @@ const AllIssuesPage = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'Critical': return 'from-red-500 to-orange-500';
-      case 'High': return 'from-orange-500 to-yellow-500';
+      case 'Critical': return 'from-red-800 to-orange-500';
+      case 'High': return 'from-red-500 to-orange-500';
       case 'Normal': return 'from-emerald-500 to-teal-500';
       case 'Low': return 'from-blue-500 to-cyan-500';
       default: return 'from-gray-500 to-slate-500';
@@ -417,7 +417,7 @@ const AllIssuesPage = () => {
                       {getStatusIcon(issue.status)}
                       <span className="text-white font-bold text-xs">{issue.status}</span>
                     </div>
-                    <div className={`absolute top-4 left-4 px-4 py-2 bg-linear-to-r ${getPriorityColor(issue.priority)} rounded-full shadow-lg`}>
+                    <div className={`absolute top-4 left-4 px-4 py-2 bg-linear-to-r ${getPriorityColor(issue.priority)} rounded-full flex items-center shadow-lg`}>
                       <span className="text-white font-bold text-xs">{issue.priority}</span>
                     </div>
                   </div>

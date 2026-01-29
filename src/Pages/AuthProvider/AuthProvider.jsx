@@ -40,7 +40,7 @@ const AuthProvider = ({children}) => {
     useEffect(()=>{
         if(!user){return}
         setMLoading(true)
-        axios.get(`/user/role/${user?.email}`)
+        axios.get(`http://localhost:3000/user/role/${user?.email}`)
             .then((res)=>{
             //     console.log('Full response:', res.data)  // Check this
             // console.log('Role value:', res.data.role)
@@ -55,7 +55,7 @@ const AuthProvider = ({children}) => {
     //     axios.get()
     // })
 
-    // console.log(role, citizen)
+    // console.log(role, mUser, user)
     const googleProvider = new GoogleAuthProvider()
     const signInWithGoogle = () => {
         return signInWithPopup(auth, googleProvider)

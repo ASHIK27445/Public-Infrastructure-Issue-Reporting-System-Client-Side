@@ -144,7 +144,6 @@ const ManageStaff = () => {
 
   }
 
-  console.log(selectedStaff)
 
   const handleEditStaff = (e) => {
     e.preventDefault();

@@ -159,6 +159,7 @@ const Navbar = () => {
                         src={user?.photoURL || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + user?.displayName}
                         alt={user?.displayName}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-emerald-500 rounded-full border-2 border-zinc-900" />
@@ -180,18 +181,20 @@ const Navbar = () => {
                     
                     {/* User Info */}
                     <div className="flex items-center space-x-3 p-3 rounded-xl bg-linear-to-r from-emerald-500/10 to-teal-500/10 mb-4">
-                      <div className="w-12 h-12 rounded-full overflow-hidden">
+                      <div className="shrink-0 w-12 h-12 rounded-full overflow-hidden">
                         <img
-                          src={user?.photoURL || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + user?.displayName}
-                          alt={user?.displayName}
-                          className="w-full h-full object-cover"
+                          src={user?.photoURL || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + (user?.displayName || "default")}
+                          alt={user?.displayName || "User Avatar"}
+                          className="w-12 h-12 object-cover"
+                          loading="lazy"
                         />
                       </div>
-                      <div className="flex-1">
-                        <div className="text-white font-bold truncate">{user?.displayName}</div>
-                        <div className="text-emerald-400 text-sm truncate">{user?.email}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-white font-bold truncate">{user?.displayName || "Unknown User"}</div>
+                        <div className="text-emerald-400 text-sm truncate">{user?.email || "No Email"}</div>
                       </div>
                     </div>
+
 
                     {/* Menu Items */}
                     <div className="space-y-1">
