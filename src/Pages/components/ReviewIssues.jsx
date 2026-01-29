@@ -19,7 +19,6 @@ const ReviewIssues = () => {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedIssueId, setSelectedIssueId] = useState('');
-  const [rejectReason, setRejectReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState('all');
   const [reviewIssues, setReviewIssues] = useState([])
@@ -41,37 +40,29 @@ const ReviewIssues = () => {
 
   const openRejectModal = (issueId) => {
     setSelectedIssueId(issueId);
-    setRejectReason('');
     setShowRejectModal(true);
   };
 
-  const handleApproveIssue = () => {
-    setActionLoading(true);
-    // Demo approval - just update the status locally
-    setTimeout(() => {
-      // In real app, you would update the issue in the database
-      console.log(`Issue ${selectedIssueId} approved`);
-      setShowApproveModal(false);
-      setActionLoading(false);
-    }, 1000);
+  const handleIssuesReview = () => {
+    if (!selectedIssueId) return
+    const issue = reviewIssues.find(i => i._id === selectedIssueId)
+    if (!issue) return
+
+    setActionLoading(true)
+    const newReviewValue = !issue?.isReviewed
+
+    axiosSecure.patch(`/update-review/${selectedIssueId}`, {isReviewed: newReviewValue})
+        .then(res => {
+            console.log(res.data)
+            if(res.data.modifiedCount > 0){
+              setReviewIssues(prev=> prev.map(i=> 
+                i._id === selectedIssueId ? {...i, isReviewed: newReviewValue} : i))
+            }
+            setShowApproveModal(false)
+            setShowRejectModal(false)
+        }).catch(err => console.log(err))
+          .finally(()=> setActionLoading(false))
   }
-
-  const handleRejectIssue = () => {
-    if (!rejectReason.trim()) {
-      alert('Please provide a reason for rejection');
-      return;
-    }
-
-    setActionLoading(true);
-    // Demo rejection - just update the status locally
-    setTimeout(() => {
-      // In real app, you would update the issue in the database
-      console.log(`Issue ${selectedIssueId} rejected with reason: ${rejectReason}`);
-      setShowRejectModal(false);
-      setRejectReason('');
-      setActionLoading(false);
-    }, 1000);
-  };
 
   const filteredIssues = reviewIssues.filter(issue => {
     if (filterStatus === 'all') return true;
@@ -219,8 +210,7 @@ const ReviewIssues = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </Link>
-
-                        {issue.isReviewed === false && (
+                        {issue?.isReviewed === false && (
                           <button 
                             onClick={() => openApproveModal(issue._id)}
                             className="p-2 bg-linear-to-r from-emerald-500/20 to-teal-500/20 rounded-lg text-emerald-400 hover:text-white hover:from-emerald-500/30 hover:to-teal-500/30 transition-colors"
@@ -230,7 +220,7 @@ const ReviewIssues = () => {
                           </button>
                         )}
 
-                        {issue.isReviewed && (
+                        {issue?.isReviewed === true && (
                           <button 
                             onClick={() => openRejectModal(issue._id)}
                             className="p-2 bg-linear-to-r from-red-500/20 to-orange-500/20 rounded-lg text-red-400 hover:text-white hover:from-red-500/30 hover:to-orange-500/30 transition-colors"
@@ -291,7 +281,7 @@ const ReviewIssues = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handleApproveIssue}
+                  onClick={handleIssuesReview}
                   disabled={actionLoading}
                   className="flex-1 px-4 py-2.5 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg disabled:opacity-50 transition-all"
                 >
@@ -318,12 +308,10 @@ const ReviewIssues = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-xl font-bold text-white">Reject Issue</h3>
-                  <p className="text-sm text-gray-400 mt-1">Provide reason for rejection</p>
                 </div>
                 <button 
                   onClick={() => {
                     setShowRejectModal(false);
-                    setRejectReason('');
                   }}
                   className="text-gray-400 hover:text-white"
                 >
@@ -333,39 +321,14 @@ const ReviewIssues = () => {
             </div>
             
             <div className="p-5">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Rejection Reason *
-                </label>
-                <textarea
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  placeholder="Explain why this issue is being rejected..."
-                  className="w-full h-32 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors resize-none"
-                  required
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  This reason will be visible to the reporter
-                </p>
-              </div>
-
               <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg mb-4">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="text-sm text-red-300 font-medium">Warning</p>
                     <p className="text-xs text-red-400 mt-1">
-                      Once rejected, the reporter will be notified and cannot resubmit the same issue.
+                      Once Rejected, this means citizen can ban for it.
                     </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-xs text-yellow-300">Demo Notice: This action won't persist.</p>
                   </div>
                 </div>
               </div>
@@ -376,7 +339,6 @@ const ReviewIssues = () => {
                 <button
                   onClick={() => {
                     setShowRejectModal(false);
-                    setRejectReason('');
                   }}
                   className="flex-1 px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-gray-300 rounded-lg"
                   disabled={actionLoading}
@@ -384,8 +346,8 @@ const ReviewIssues = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handleRejectIssue}
-                  disabled={!rejectReason.trim() || actionLoading}
+                  onClick={handleIssuesReview}
+                  disabled={actionLoading}
                   className="flex-1 px-4 py-2.5 bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-lg disabled:opacity-50 transition-all"
                 >
                   {actionLoading ? (
