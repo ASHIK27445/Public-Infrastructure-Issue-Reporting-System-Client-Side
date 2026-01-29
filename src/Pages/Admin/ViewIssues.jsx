@@ -318,23 +318,23 @@ const ViewAllIssues = () => {
 
           {/* Table */}
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full ">
               <thead>
                 <tr className="border-b border-zinc-700">
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Issue Details</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Category</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Status</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Priority</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Boosted</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Assigned Staff</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Actions</th>
+                  <th className="text-left py-2 px-4 text-gray-400 font-medium text-sm">Issue Details</th>
+                  <th className="text-left py-2 px-4 text-gray-400 font-medium text-sm">Category</th>
+                  <th className="text-left py-2 px-4 text-gray-400 font-medium text-sm">Status</th>
+                  <th className="text-left py-2 px-4 text-gray-400 font-medium text-sm">Priority</th>
+                  <th className="text-left py-2 px-4 text-gray-400 font-medium text-sm">Boosted</th>
+                  <th className="text-left py-2 px-4 text-gray-400 font-medium text-sm">Assigned Staff</th>
+                  <th className="text-left py-2 px-4 text-gray-400 font-medium text-sm">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {issues?.map((issue) => (
                   <tr key={issue?._id} className="border-b border-zinc-700 hover:bg-zinc-800/50 transition-colors">
-                    <td className="py-4 px-6">
-                      <div className="flex items-center space-x-4">
+                    <td className="py-2 px-4">
+                      <div className="flex items-center space-x-2">
                         <div className="relative">
                           <div className="w-14 h-14 rounded-xl overflow-hidden">
                             <img 
@@ -355,26 +355,26 @@ const ViewAllIssues = () => {
                       </div>
                     </td>
                     
-                    <td className="py-4 px-6">
+                    <td className="py-2 px-4">
                       <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-medium">
                         {issue?.category}
                       </span>
                     </td>
                     
-                    <td className="py-4 px-6">
+                    <td className="py-2 px-4">
                       <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(issue?.status)}`}>
                         {getStatusIcon(issue?.status)}
                         <span>{issue?.status}</span>
                       </div>
                     </td>
                     
-                    <td className="py-4 px-6">
+                    <td className="py-2 px-4">
                       <div className={`px-3 py-1 rounded-full text-xs font-bold ${getPriorityColor(issue?.priority)}`}>
                         {issue?.priority}
                       </div>
                     </td>
                     
-                    <td className="py-4 px-6">
+                    <td className="py-2 px-4">
                       {issue?.isBoosted ? (
                         <div className="flex items-center space-x-2">
                           <div className="p-2 bg-linear-to-r from-purple-500/20 to-pink-500/20 rounded-lg">
@@ -383,7 +383,7 @@ const ViewAllIssues = () => {
                           <div>
                             <div className="text-white text-sm font-medium">Boosted</div>
                             <div className="text-xs text-gray-400">
-                              Until: {new Date(issue?.boostedUntil).toLocaleDateString()}
+                              {new Date(issue?.boostedAt).toLocaleDateString()}
                             </div>
                           </div>
                         </div>
@@ -394,7 +394,7 @@ const ViewAllIssues = () => {
                       )}
                     </td>
                     
-                    <td className="py-4 px-6">
+                    <td className="py-2 px-4">
                       {issue?.assignInto ? (
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-zinc-600">

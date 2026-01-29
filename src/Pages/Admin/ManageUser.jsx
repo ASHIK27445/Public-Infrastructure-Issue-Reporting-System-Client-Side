@@ -151,8 +151,8 @@ const ManageUsers = () => {
                               alt={user.name}
                               className="w-full h-full object-cover"
                             />
-                            {user?.role !== 'admin' && user?.isPremium === true && (
-                              <div className="absolute -top-1 -right-1">
+                            {user?.isPremium === true && (
+                              <div className="absolute -top-1 -left-1">
                                 <Star className="w-6 h-6 text-yellow-500" fill="currentColor" color='white' strokeWidth={1} />
                               </div>
                             )}
@@ -160,7 +160,7 @@ const ManageUsers = () => {
                               <div className="absolute -top-1 -right-1">
                                 <ChessKnight className="w-6 h-6 text-red-500" fill="currentColor" color='white' strokeWidth={1} />
                               </div>)}
-                            {!user?.isPremium && user?.role === 'citizen' && (
+                            {user?.role === 'citizen' && (
                               <div className="absolute -top-1 -right-1">
                                 <ChessBishop className="w-6 h-6 text-blue-800" fill="currentColor" color='white' strokeWidth={1} />
                               </div>)}
