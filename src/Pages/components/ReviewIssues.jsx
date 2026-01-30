@@ -23,6 +23,7 @@ const ReviewIssues = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [reviewIssues, setReviewIssues] = useState([])
   const axiosSecure = useAxiosSecure()
+  const [loading, setLoading] = useState(false)
 
   //for pagination
   const [currentPage, setCurrentPage] = useState(1)
@@ -30,17 +31,21 @@ const ReviewIssues = () => {
   const [totalItems, setTotalItems] = useState(0)
   const [search, setSearch] = useState('')
   const [isReviewedFilter, setIsReviewedFilter] = useState('')
+  const [monthFilter, setMonthFilter] = useState("")
+  const [yearFilter, setYearFilter] = useState('')
 
 
   useEffect(()=>{
-    axiosSecure.get( `/review-issues?page=${currentPage}&isReviewed=${isReviewedFilter}&search=${search}`)
+    setLoading(true)
+    axiosSecure.get( `/review-issues?page=${currentPage}&isReviewed=${isReviewedFilter}&search=${search}&month=${monthFilter}&year=${yearFilter}`)
         .then(res=> {
             console.log(res.data)
             setReviewIssues(res.data.result)
             setTotalItems(res.data.total)
             setTotalPages(Math.ceil(res.data.total/8))
+            setLoading(false)
         }).catch(err=> console.log(err))
-  }, [axiosSecure, currentPage, isReviewedFilter, search])
+  }, [axiosSecure, currentPage, isReviewedFilter, search, monthFilter, yearFilter])
   
   const openApproveModal = (issueId) => {
     setSelectedIssueId(issueId);
@@ -105,26 +110,54 @@ const ReviewIssues = () => {
                 onClick={() => {
                   setIsReviewedFilter('')
                 }}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${isReviewedFilter === '' ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700'}`}
-              >
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${isReviewedFilter === '' ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700'}`}>
                 All Issues
               </button>
               <button
                 onClick={() => setIsReviewedFilter('true')}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${isReviewedFilter === 'true' ? 'bg-emerald-500 text-white' : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700'}`}
-              >
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${isReviewedFilter === 'true' ? 'bg-emerald-500 text-white' : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700'}`}>
                 Reviewed
               </button>
               <button
                 onClick={() => setIsReviewedFilter('false')}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${isReviewedFilter === 'false' ? 'bg-yellow-500 text-white' : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700'}`}
-              >
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${isReviewedFilter === 'false' ? 'bg-yellow-500 text-white' : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700'}`}>
                 Not Reviewed
               </button>
             </div>
           </div>
 
           <div className="flex items-center space-x-4">
+            <select
+              value={monthFilter}
+              onChange={e => setMonthFilter(e.target.value)}
+              className="px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="" className="bg-zinc-900 text-gray-300">All Months</option>
+              <option value="0" className="bg-zinc-900 text-gray-300">January</option>
+              <option value="1" className="bg-zinc-900 text-gray-300">February</option>
+              <option value="2" className="bg-zinc-900 text-gray-300">March</option>
+              <option value="3" className="bg-zinc-900 text-gray-300">April</option>
+              <option value="4" className="bg-zinc-900 text-gray-300">May</option>
+              <option value="5" className="bg-zinc-900 text-gray-300">June</option>
+              <option value="6" className="bg-zinc-900 text-gray-300">July</option>
+              <option value="7" className="bg-zinc-900 text-gray-300">August</option>
+              <option value="8" className="bg-zinc-900 text-gray-300">September</option>
+              <option value="9" className="bg-zinc-900 text-gray-300">October</option>
+              <option value="10" className="bg-zinc-900 text-gray-300">November</option>
+              <option value="11" className="bg-zinc-900 text-gray-300">December</option>
+            </select>
+
+            <select
+              value={yearFilter}
+              onChange={e => {
+                setYearFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="" className="bg-zinc-900 text-gray-300">All Years</option>
+              <option value="2027" className="bg-zinc-900 text-gray-300">2027</option>
+              <option value="2026" className="bg-zinc-900 text-gray-300">2026</option>
+              <option value="2025" className="bg-zinc-900 text-gray-300">2025</option>
+            </select>
             <div className="relative">
               <input
                 type="text"
@@ -170,10 +203,39 @@ const ReviewIssues = () => {
                 </tr>
               </thead>
               <tbody>
-                {
+                { loading ? (
+                  <>
+                      {[...Array(4)].map((_, index) => (
+                        <tr key={index} className="border-b border-zinc-700 animate-pulse">
+                          <td className="py-4 px-6">
+                            <div className="flex items-center space-x-4">
+                              <div className="w-14 h-14 bg-zinc-700 rounded-xl"></div>
+                              <div className="space-y-2 flex-1">
+                                <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
+                                <div className="h-3 bg-zinc-700 rounded w-1/2"></div>
+                                <div className="h-3 bg-zinc-700 rounded w-full"></div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="h-6 bg-zinc-700 rounded-full w-20"></div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="h-4 bg-zinc-700 rounded w-24"></div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-8 h-8 bg-zinc-700 rounded-lg"></div>
+                              <div className="w-8 h-8 bg-zinc-700 rounded-lg"></div>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </>
+                ) :
                   reviewIssues.length > 0 ?
                 (reviewIssues.map((issue) => (
-                    <tr key={issue._id} className="border-b border-zinc-700 hover:bg-zinc-800/50 transition-colors">
+                  <tr key={issue._id} className="border-b border-zinc-700 hover:bg-zinc-800/50 transition-colors">
                       <td className="py-4 px-6">
                         <div className="flex items-center space-x-4">
                           <div className="relative">
@@ -244,7 +306,7 @@ const ReviewIssues = () => {
                           )}
                         </div>
                       </td>
-                    </tr>
+                  </tr>
                   ))) : (    
                   <tr>
                     <td colSpan={4} className="py-6 text-center text-gray-400">
