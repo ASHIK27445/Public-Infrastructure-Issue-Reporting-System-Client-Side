@@ -48,6 +48,14 @@ const IssueDetailsPage = () => {
   const [timelines, setTimeline] = useState({})
   const [loading, setLoading] = useState(true)
   const isOwnIssue = issue?.reportBy === mUser?._id
+  // State for report modal
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportType, setReportType] = useState('')
+  const [reportDetails, setReportDetails] = useState('')
+  const [isAnonymous, setIsAnonymous] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [reportLoading, setReportLoading] = useState(false)
+
 
   const fetchAllData = async() =>{
     setLoading(true)
@@ -243,6 +251,45 @@ const IssueDetailsPage = () => {
     return successRate
   }
 
+  const handleReportSubmit = (e) => {
+    e.preventDefault()
+    if(!user){
+      toast.error('login first')
+      return
+    }
+    if(role !== 'citizen' || isOwnIssue){
+      toast.error('You cannot report the issue.')
+      return
+    }
+    if(!issue?._id || !mUser?._id) return
+    
+    const reportData = {
+      reportType,
+      reportDetails,
+      isAnonymous,
+      reporterId: mUser?._id,
+      reporterName: isAnonymous ? 'Anonymous' : mUser?.name,
+    }
+    console.log(reportData)
+    setReportLoading(true)
+    axiosSecure.post(`/report-issue/${issue._id}`, reportData)
+      .then(res => {
+        console.log(res.data)
+        setReportLoading(false)
+        if(res.data.success){
+          setShowReportModal(false)
+          setReportType('')
+          setReportDetails('')
+          setIsAnonymous(false)
+          setShowSuccessModal(true)
+        }
+        if(res.data.error){
+          toast.error(res.data.message)
+        }
+      }).catch(err => toast.error(err) )
+
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
@@ -354,6 +401,7 @@ const IssueDetailsPage = () => {
                   src={issue?.mainPhoto}
                   alt={issue?.title}
                   className="w-full h-full object-cover"
+                  loading='lazy'
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-transparent to-transparent" />
               </div>
@@ -492,11 +540,16 @@ const IssueDetailsPage = () => {
                 )}
 
                 <button 
-                  onClick={() => alert('Demo: Report issue functionality')}
+                  onClick={()=> setShowReportModal(true)}
                   className="flex items-center space-x-3 px-6 py-3 bg-zinc-800 rounded-2xl text-white font-bold hover:bg-zinc-700 transition-all"
                 >
                   <Flag className="w-5 h-5" />
-                  <span>Report Issue</span>
+                  <span>Flag Issue</span>
+                  {role === 'admin' || role === 'staff' && (
+                    <span className="flex items-center space-x-1 bg-red-900/50 px-3 py-1 rounded-full text-sm border border-blue-500/30">
+                      <span className="text-white">{issue?.reportCount || 0}</span>
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
@@ -516,6 +569,7 @@ const IssueDetailsPage = () => {
                         src={issue.assignedStaff.photoURL}
                         alt={issue.assignedStaff.name}
                         className="w-full h-full object-cover"
+                        loading='lazy'
                       />
                     </div>
                     <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
@@ -597,6 +651,7 @@ const IssueDetailsPage = () => {
                     src={issue?.reporterPhoto}
                     alt={issue.reporterName}
                     className="w-full h-full object-cover"
+                    loading='lazy'
                   />
                 </div>
                 {/* {
@@ -759,6 +814,110 @@ const IssueDetailsPage = () => {
           </div>
         </div>
       )}
+
+      {/*Report issue modal*/}
+      {  showReportModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8 max-w-lg w-full">
+            <h3 className="text-2xl font-bold text-white mb-6 flex items-center space-x-3">
+              <Flag className="w-6 h-6 text-amber-500" />
+              <span>Report This Issue</span>
+            </h3>
+            
+            {/* Report Form */}
+            <form onSubmit={handleReportSubmit} className="space-y-6">
+              {/* Report Type */}
+              <div>
+                <label className="block text-white mb-3">What's wrong with this issue?</label>
+                <select 
+                  value={reportType}
+                  onChange={(e) => setReportType(e.target.value)}
+                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-2xl text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="">Select a reason</option>
+                  <option value="false-info">False or Misleading Information</option>
+                  <option value="spam">Spam or Advertisement</option>
+                  <option value="duplicate">Duplicate Issue</option>
+                  <option value="resolved">Already Resolved</option>
+                  <option value="inappropriate">Inappropriate Content</option>
+                  <option value="privacy">Privacy Concern</option>
+                  <option value="other">Other Issues</option>
+                </select>
+              </div>
+              
+              {/* Details */}
+              <div>
+                <label className="block text-white mb-3">Please provide details</label>
+                <textarea
+                  value={reportDetails}
+                  onChange={(e) => setReportDetails(e.target.value)}
+                  placeholder="Explain what's wrong with this issue..."
+                  className="w-full h-32 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 resize-none"
+                  rows="4"
+                />
+              </div>
+              
+              {/* Anonymity Option */}
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="anonymous"
+                  checked={isAnonymous}
+                  onChange={(e) => setIsAnonymous(e.target.checked)}
+                  className="w-5 h-5 rounded bg-zinc-800 border-zinc-700"
+                />
+                <label htmlFor="anonymous" className="text-gray-300">
+                  Report anonymously (your identity will be hidden)
+                </label>
+              </div>
+              
+              {/* Buttons */}
+              <div className="flex space-x-4 pt-4">
+                <button
+                  onClick={() => setShowReportModal(false)}
+                  className="flex-1 px-6 py-3 bg-zinc-700 rounded-2xl text-white font-bold hover:bg-zinc-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  type='submit'
+                  disabled={!reportType || !reportDetails || reportLoading}
+                  className="flex-1 px-6 py-3 bg-linear-to-r from-amber-500 to-orange-500 rounded-2xl text-white font-bold hover:shadow-amber-500/50 disabled:opacity-50 flex items-center justify-center">
+                  {reportLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      Submitting...
+                    </>
+                  ) : (
+                    'Submit Report'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>)
+      }
+
+      {/*Report Success Modal */}
+      {  showSuccessModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-linear-to-br from-emerald-900/20 to-teal-900/20 border border-emerald-500/30 rounded-3xl p-8 text-center">
+            <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-white mb-2">Report Submitted!</h3>
+            <p className="text-gray-300 mb-6">
+              Thank you for helping us improve the platform. 
+              Our team will review your report within 24 hours.
+            </p>
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="px-6 py-3 bg-emerald-500 rounded-2xl text-white font-bold"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+        )
+      }
     </div>
   );
 };

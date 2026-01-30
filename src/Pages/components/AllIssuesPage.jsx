@@ -411,7 +411,7 @@ const AllIssuesPage = () => {
               {filteredIssues.map(issue => (
                 <div key={issue._id} className="group relative bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl overflow-hidden border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105 h-full flex flex-col">
                   <div className="relative h-48 overflow-hidden shrink-0">
-                    <img src={issue.mainPhoto} alt={issue.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <img src={issue.mainPhoto} alt={issue.title} loading='lazy' className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-zinc-900/40 to-transparent" />
                     <div className={`absolute top-4 right-4 px-4 py-2 bg-linear-to-r ${getStatusColor(issue.status)} rounded-full flex items-center space-x-2 shadow-lg`}>
                       {getStatusIcon(issue.status)}
@@ -443,7 +443,7 @@ const AllIssuesPage = () => {
 
                     <div className="flex items-center space-x-2 mb-6">
                       <div className="w-6 h-6 rounded-full overflow-hidden">
-                        <img src={issue.reporterPhoto} alt={issue.reporterName} className="w-full h-full object-cover" />
+                        <img src={issue.reporterPhoto} alt={issue.reporterName} loading='lazy' className="w-full h-full object-cover" />
                       </div>
                       <span className="text-xs text-gray-400">Reported by {issue.reporterName}</span>
                     </div>
