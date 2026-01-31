@@ -68,7 +68,7 @@ const CitizenDashboard = () => {
     setLoading(true)
     axiosSecure.get(`/user/stats?range=${range}`)
       .then(res=> {
-        // console.log(res.data)
+        console.log(res.data)
         setLoading(false)
         setStats(res.data)
         setCategoryDistribution(res.data.categoryDistribution)
@@ -81,7 +81,7 @@ const CitizenDashboard = () => {
     // setLoading(true)
     axiosSecure.get('/user/dashboard/recent-issues')
       .then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         setRecentIssues(res.data.result)
         setUserAchievementStates(res.data.dashboardQuickStats)
         // setLoading(false)
@@ -102,8 +102,10 @@ const CitizenDashboard = () => {
     {
       title: 'Total Issues',
       value: stats?.totalIssues || 0,
-      change: '+12%',
-      trend: 'up',
+      change: stats?.totalIssuesPercentage
+      ? `${stats.totalIssuesPercentage > 0 ? '+' : ''}${stats.totalIssuesPercentage}%`
+      : '0%',
+      trend: stats?.totalIssuesPercentage >= 0 ? 'up' : 'down',
       icon: <AlertTriangle className="w-6 h-6" />,
       color: 'from-blue-500 to-cyan-500',
       linear: 'bg-linear-to-br'
@@ -111,8 +113,10 @@ const CitizenDashboard = () => {
     {
       title: 'Pending Issues',
       value: stats?.pendingIssues || 0,
-      change: '-5%',
-      trend: 'down',
+      change: stats?.pendingIssuesPercentage
+      ? `${stats.pendingIssuesPercentage > 0 ? '+' : ''}${stats.pendingIssuesPercentage}%`
+      : '0%',
+      trend: stats?.pendingIssuesPercentage >= 0 ? 'up' : 'down',
       icon: <Clock className="w-6 h-6" />,
       color: 'from-amber-500 to-yellow-500',
       linear: 'bg-linear-to-br'
@@ -622,7 +626,7 @@ const CitizenDashboard = () => {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Achievements */}
           <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
-            {console.log(userAchievementStates)}
+            {/* {console.log(userAchievementStates)} */}
             <h3 className="text-xl font-bold text-white mb-6">Your Achievements</h3>
             <div className="grid grid-cols-2 gap-4">
               {[
