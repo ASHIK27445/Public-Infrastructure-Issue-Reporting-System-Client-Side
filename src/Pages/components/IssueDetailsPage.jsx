@@ -33,7 +33,7 @@ import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { AuthContext } from '../AuthProvider/AuthContext';
 import { toast} from "react-toastify"
 import axios from 'axios';
-
+import { io } from 'socket.io-client'
 const IssueDetailsPage = () => {
   const {role, user, mUser, mLoading} = use(AuthContext)
   const [upvoting, setUpvoting] = useState(false);
@@ -77,40 +77,138 @@ const [socket, setSocket] = useState(null)
     }
   };
 
-// প্রতি ৩ সেকেন্ডে poll করুন
-useEffect(() => {
-  if (!id) return;
-  
-  const intervalId = setInterval(() => {
-    fetchComments();
-  }, 1200);
-  
-  return () => clearInterval(intervalId);
+  useEffect(() => {
+  fetchComments(); // এই line টি যোগ করুন
 }, [id]);
 
-  // Add comment
-  const handleAddComment = async (e) => {
-    e.preventDefault();
-    if (!commentText.trim() || !user) return;
-
-    setCommentLoading(true);
-    try {
-      const response = await axiosSecure.post(`/comments/${id}`, {
-        commentText: commentText.trim()
-      });
-
-      if (response.data.success) {
-        setCommentText('');
-        fetchComments(); // Refresh comments
+// Socket.IO connection setup
+  useEffect(() => {
+    // Create Socket.IO connection
+    const newSocket = io('http://localhost:3000', {
+      withCredentials: true,
+      transports: ['websocket', 'polling'] // fallback support
+    });
+    
+    setSocket(newSocket);
+    
+    // Connection events
+    newSocket.on('connect', () => {
+      console.log('✅ Socket.IO connected:', newSocket.id);
+    });
+    
+    newSocket.on('disconnect', () => {
+      console.log('❌ Socket.IO disconnected');
+    });
+    
+    newSocket.on('connect_error', (error) => {
+      console.error('Socket.IO connection error:', error);
+    });
+    
+    // Cleanup on unmount
+    return () => {
+      if (newSocket) {
+        newSocket.disconnect();
       }
-    } catch (error) {
-      console.error('Error adding comment:', error);
-    } finally {
-      setCommentLoading(false);
+    };
+  }, []);
+  
+  // Join issue room when issue loads
+// Update the useEffect for Socket.IO listeners:
+useEffect(() => {
+  if (socket && id) {
+    socket.emit('join-issue', id);
+    console.log(`📨 Joined issue room: ${id}`);
+    
+    // Listen for real-time comments
+    socket.on('new-comment-received', (data) => {
+      console.log('📢 New comment received via Socket.IO:', data);
+      
+      if (data.comment.commentby !== mUser?._id?.toString()) {
+        setComments(prev => {
+          const exists = prev.some(c => c._id === data.comment._id);
+          if (!exists) {
+            return [data.comment, ...prev];
+          }
+          return prev;
+        });
+        
+        toast.info(`💬 ${data.comment.commenterName} commented on this issue`);
+      }
+    });
+    
+    // Listen for real-time replies
+    socket.on('new-reply-received', (data) => {
+      console.log('📢 New reply received:', data);
+      
+      setComments(prev => prev.map(comment => {
+        if (comment._id === data.commentId) {
+          // Check if reply already exists
+          const replyExists = comment.replies?.some(r => r._id === data.reply._id);
+          if (!replyExists) {
+            return {
+              ...comment,
+              replies: [...(comment.replies || []), data.reply]
+            };
+          }
+        }
+        return comment;
+      }));
+      
+      toast.info(`💬 New reply on a comment`);
+    });
+    
+    // Listen for comment deletions
+    socket.on('comment-deleted', (data) => {
+      setComments(prev => prev.filter(comment => comment._id !== data.commentId));
+    });
+  }
+  
+  // Cleanup listeners
+  return () => {
+    if (socket) {
+      socket.off('new-comment-received');
+      socket.off('new-reply-received');
+      socket.off('comment-deleted');
+      socket.emit('leave-issue', id);
     }
   };
+}, [socket, id, mUser?._id]);
+   // Update handleAddComment function
+const handleAddComment = async (e) => {
+  e.preventDefault();
+  if (!commentText.trim() || !user) return;
 
-  // Add reply
+  setCommentLoading(true);
+  try {
+    const response = await axiosSecure.post(`/comments/${id}`, {
+      commentText: commentText.trim()
+    });
+
+    if (response.data.success) {
+      setCommentText('');
+      
+      // Optimistic update - add to UI immediately
+      setComments(prev => [response.data.comment, ...prev]);
+      
+      // No need to emit here - backend already broadcasts
+      // if (socket) {
+      //   socket.emit('new-comment', {
+      //     issueId: id,
+      //     comment: response.data.comment
+      //   });
+      // }
+      
+      toast.success('Comment added successfully!');
+    }
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    toast.error('Failed to add comment');
+  } finally {
+    setCommentLoading(false);
+  }
+};
+  
+  // Update handleAddReply function
   const handleAddReply = async (commentId) => {
     if (!replyText.trim()) return;
 
@@ -124,26 +222,52 @@ useEffect(() => {
       if (response.data.success) {
         setReplyText('');
         setReplyingTo(null);
-        fetchComments(); // Refresh comments
+        
+        // Refresh comments
+        fetchComments();
+        
+        // Emit Socket.IO event
+        if (socket) {
+          socket.emit('new-reply', {
+            issueId: id,
+            commentId: commentId,
+            reply: response.data.reply
+          });
+        }
+        
+        toast.success('Reply added successfully!');
       }
     } catch (error) {
       console.error('Error adding reply:', error);
+      toast.error('Failed to add reply');
     } finally {
       setReplyLoading(false);
     }
   };
-
-  // Delete comment
+  
+  // Update handleDeleteComment function
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm('Are you sure you want to delete this comment?')) return;
 
     try {
       const response = await axiosSecure.delete(`/comments/${commentId}`);
       if (response.data.success) {
-        fetchComments(); // Refresh comments
+        // Remove from UI
+        setComments(prev => prev.filter(comment => comment._id !== commentId));
+        
+        // Emit Socket.IO event
+        if (socket) {
+          socket.emit('delete-comment', {
+            issueId: id,
+            commentId: commentId
+          });
+        }
+        
+        toast.success('Comment deleted');
       }
     } catch (error) {
       console.error('Error deleting comment:', error);
+      toast.error('Failed to delete comment');
     }
   };
 
@@ -568,6 +692,13 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
+          <div className="fixed top-4 right-4 z-50">
+      <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+        socket?.connected ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+      }`}>
+        {socket?.connected ? '🟢 Live' : '🔴 Offline'}
+      </div>
+    </div>
 
       {/* Header */}
       {role === 'admin' &&
