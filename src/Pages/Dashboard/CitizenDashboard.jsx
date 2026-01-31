@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router';
+import { NavLink, useOutletContext } from 'react-router';
 import { 
   AlertTriangle, 
   Clock, 
@@ -25,7 +25,8 @@ import {
   Filter,
   Download,
   MoreVertical,
-  ChevronRight
+  ChevronRight,
+  ChevronUp
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -47,31 +48,44 @@ import useAxiosSecure from '../../Hooks/useAxiosSecure'
 import { useQuery } from '@tanstack/react-query'
 import ChartLoading from './ChartLoading';
 const CitizenDashboard = () => {
+  const {citizen} = useOutletContext()
   const [stats, setStats] = useState(null);
   const [recentIssues, setRecentIssues] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [timeRange, setTimeRange] = useState('month');
+  const [loading, setLoading] = useState(false)
   const [range, setRange] = useState('30d')
   const axiosSecure = useAxiosSecure()
   const [categoryDistribution, setCategoryDistribution] = useState([])
   const [priorityDistribution, setPriorityDistribution] = useState([])
   const [resolutionTimeData, setResolutionTimeData] = useState([])
+  const [userAchievementStates, setUserAchievementStates] = useState([])
 
   useEffect(() => {
-    fetchDashboardData();
-  }, [timeRange, range]);
+    fetchDashboardData()
+    recentIssueFetch()
+  }, [range])
 
   const fetchDashboardData = async () => {
     setLoading(true)
     axiosSecure.get(`/user/stats?range=${range}`)
       .then(res=> {
-        console.log(res.data)
+        // console.log(res.data)
         setLoading(false)
         setStats(res.data)
         setCategoryDistribution(res.data.categoryDistribution)
         setPriorityDistribution(res.data.priorityDistribution)
         setResolutionTimeData(res.data.resolutionTimeData)
       })
+  }
+
+  const recentIssueFetch = () => {
+    // setLoading(true)
+    axiosSecure.get('/user/dashboard/recent-issues')
+      .then(res => {
+        console.log(res.data)
+        setRecentIssues(res.data.result)
+        setUserAchievementStates(res.data.dashboardQuickStats)
+        // setLoading(false)
+      }).catch(err=> toast.error(err))
   }
 
   const { data: issuesOverTimeData, isLoading: loadingIssues } = useQuery({
@@ -143,13 +157,31 @@ const CitizenDashboard = () => {
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'Resolved': return 'from-emerald-500 to-teal-500';
-      case 'In Progress': return 'from-blue-500 to-cyan-500';
-      case 'Pending': return 'from-amber-500 to-yellow-500';
-      default: return 'from-gray-500 to-slate-500';
+      case 'Resolved': return 'from-emerald-500 to-teal-500'
+      case 'In-Progress': return 'from-blue-500 to-cyan-500'
+      case 'Pending': return 'from-amber-500 to-yellow-500'
+      case 'Working': return 'from-violet-500 to-pink-500'
+      case 'Rejected': return 'from-red-500 to-rose-500'
+      default: return 'from-gray-500 to-slate-500'
     }
   }
 
+  const moneySave = () => {
+    const issueCount = userAchievementStates?.issueCount || 0
+    const issueSubmitSave = issueCount * 350
+    const resolvedIssueCount = userAchievementStates?.resolvedCount
+    const resolvedSaved = resolvedIssueCount * 1050
+    const rejectCount = userAchievementStates?.rejectCount
+    const rejectSaved = rejectCount * 320
+
+    const totalSaved = issueSubmitSave + resolvedSaved + rejectSaved
+
+    if(totalSaved>=1000){
+      return `${(totalSaved / 1000).toFixed(1)}k`
+    }
+
+    return totalSaved
+   }
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
@@ -473,22 +505,23 @@ const CitizenDashboard = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-zinc-700">
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Issue</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Category</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Status</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Priority</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Created</th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">Actions</th>
+                  <th className="text-left py-2 px-2 text-gray-400 font-medium text-sm">Issue</th>
+                  <th className="text-left py-2 px-2 text-gray-400 font-medium text-sm">View & Upvotes</th>
+                  <th className="text-left py-2 px-2 text-gray-400 font-medium text-sm">Category</th>
+                  <th className="text-left py-2 px-2 text-gray-400 font-medium text-sm">Status</th>
+                  <th className="text-left py-2 px-2 text-gray-400 font-medium text-sm">Priority</th>
+                  <th className="text-left py-2 px-2 text-gray-400 font-medium text-sm">Created</th>
+                  <th className="text-left py-2 px-2 text-gray-400 font-medium text-sm">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {recentIssues.map((issue) => (
-                  <tr key={issue.id} className="border-b border-zinc-700 hover:bg-zinc-800/50 transition-colors">
-                    <td className="py-4 px-6">
-                      <div className="flex items-center space-x-3">
+                  <tr key={issue._id} className="border-b border-zinc-700 hover:bg-zinc-800/50 transition-colors">
+                    <td className="py-2 px-2">
+                      <div className="flex items-center space-x-1">
                         <div className="w-10 h-10 rounded-xl overflow-hidden">
                           <img 
-                            src={issue.image} 
+                            src={issue.mainPhoto} 
                             alt={issue.title}
                             className="w-full h-full object-cover"
                           />
@@ -502,19 +535,46 @@ const CitizenDashboard = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6">
-                      <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-medium">
+                    <td className="py-2 px-2">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center">
+                            <div className="flex items-center space-x-1">
+                              <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                                <ChevronUp className="w-3 h-3 text-emerald-400" />
+                              </div>
+                              <span className="text-sm text-white font-medium">
+                                {issue?.upvoteCount || 0}
+                              </span>
+                              <span className="text-xs text-gray-400">Upvotes</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-1">
+                              <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                <Eye className="w-3 h-3 text-blue-400" />
+                              </div>
+                              <span className="text-sm text-white font-medium">
+                                {issue?.viewsCount || 0}
+                              </span>
+                              <span className="text-xs text-gray-400">Views</span>
+                            </div>
+                          </div>
+                        </div>
+                    </td>
+                    <td className="py-2 px-2">
+                      <span className="py-1 px-1 text-emerald-400 rounded-full text-xs font-medium">
                         {issue.category}
                       </span>
                     </td>
-                    <td className="py-4 px-6">
-                      <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-bold bg-linear-to-r ${getStatusColor(issue.status)} text-white`}>
+                    <td className="py-2 px-2">
+                      <div className={`inline-flex items-center space-x-2 px-2 py-1 rounded-full text-xs font-bold bg-linear-to-r ${getStatusColor(issue.status)} text-white`}>
                         {issue.status === 'Resolved' ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                         <span>{issue.status}</span>
                       </div>
                     </td>
-                    <td className="py-4 px-6">
-                      <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+                    <td className="py-2 px-2">
+                      <div className={`px-2 py-1 rounded-full text-center text-xs font-bold ${
                         issue.priority === 'High' ? 'bg-red-500/20 text-red-400' :
                         issue.priority === 'Normal' ? 'bg-emerald-500/20 text-emerald-400' :
                         'bg-blue-500/20 text-blue-400'
@@ -522,10 +582,10 @@ const CitizenDashboard = () => {
                         {issue.priority}
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-gray-300 text-sm">
+                    <td className="py-2 px-2 text-gray-300 text-sm">
                       {new Date(issue.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="py-4 px-6">
+                    <td className="py-2 px-2">
                       <div className="flex items-center space-x-2">
                         <NavLink
                           to={`/issues/${issue.id}`}
@@ -534,9 +594,6 @@ const CitizenDashboard = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </NavLink>
-                        <button className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-white hover:bg-zinc-600 transition-colors">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -565,15 +622,18 @@ const CitizenDashboard = () => {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Achievements */}
           <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+            {console.log(userAchievementStates)}
             <h3 className="text-xl font-bold text-white mb-6">Your Achievements</h3>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { title: 'First Report', earned: true, icon: <Star className="w-5 h-5" /> },
-                { title: '5 Issues Reported', earned: true, icon: <Target className="w-5 h-5" /> },
-                { title: 'Community Hero', earned: false, icon: <Shield className="w-5 h-5" /> },
-                { title: 'Fast Resolver', earned: true, icon: <Zap className="w-5 h-5" /> },
-                { title: 'Top Contributor', earned: false, icon: <Users className="w-5 h-5" /> },
-                { title: 'Perfect Record', earned: false, icon: <CheckCircle className="w-5 h-5" /> },
+                { title: 'First Report', earned: citizen?.issueCount > 0, icon: <Star className="w-5 h-5" /> },
+                { title: '5 Issues Reported', earned: citizen?.issueCount >= 5 , icon: <Target className="w-5 h-5" /> },
+                { title: 'Community Hero', earned: citizen?.solvedIssue >= 5 && citizen?.issueCount >= 6, icon: <Shield className="w-5 h-5" /> },
+                { title: 'Fast Resolver',earned: userAchievementStates?.smallAvgResolutionDay > 10 , icon: <Zap className="w-5 h-5" /> },
+                { title: 'Top Contributor', earned: userAchievementStates.mostUpvotes> 100, icon: <Users className="w-5 h-5" /> },
+                { title: 'Perfect Record', 
+                  earned: citizen?.solvedIssue >= 10 && citizen.issueCount >= 10 && userAchievementStates.mostViewsIssue>49 && userAchievementStates.mostUpvotes> 49, 
+                  icon: <CheckCircle className="w-5 h-5" /> },
               ].map((achievement, index) => (
                 <div 
                   key={index} 
@@ -617,18 +677,18 @@ const CitizenDashboard = () => {
                     <div className="text-sm text-gray-400">Higher than city average</div>
                   </div>
                 </div>
-                <div className="text-2xl font-black text-emerald-400">84%</div>
+                <div className="text-2xl font-black text-emerald-400">{((userAchievementStates?.issueCount - (userAchievementStates?.rejectCount || 0))/userAchievementStates?.issueCount * 100).toFixed(2)}%</div>
               </div>
               
               <div className="flex items-center justify-between p-4 bg-blue-500/10 rounded-2xl border border-blue-500/30">
                 <div className="flex items-center space-x-3">
                   <Clock className="w-5 h-5 text-blue-400" />
                   <div>
-                    <div className="font-medium text-white">Avg. Response Time</div>
+                    <div className="font-medium text-white">Avg. resolved time </div>
                     <div className="text-sm text-gray-400">Faster than average</div>
                   </div>
                 </div>
-                <div className="text-2xl font-black text-blue-400">18h</div>
+                <div className="text-2xl font-black text-blue-400">{userAchievementStates?.smallAvgResolutionDay || 0}d</div>
               </div>
               
               <div className="flex items-center justify-between p-4 bg-purple-500/10 rounded-2xl border border-purple-500/30">
@@ -639,7 +699,7 @@ const CitizenDashboard = () => {
                     <div className="text-sm text-gray-400">Estimated community impact</div>
                   </div>
                 </div>
-                <div className="text-2xl font-black text-purple-400">৳2.5k</div>
+                <div className="text-2xl font-black text-purple-400">৳{moneySave()}</div>
               </div>
               
               <div className="flex items-center justify-between p-4 bg-amber-500/10 rounded-2xl border border-amber-500/30">
@@ -654,73 +714,11 @@ const CitizenDashboard = () => {
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   )
 }
-
-// Sample data
-const sampleStats = {
-  totalIssues: 42,
-  pendingIssues: 8,
-  inProgressIssues: 12,
-  resolvedIssues: 22,
-  totalPayments: 1500,
-  successRate: 84
-};
-
-const sampleIssues = [
-  {
-    id: 1,
-    title: "Broken Streetlight",
-    category: "Electricity",
-    status: "Resolved",
-    priority: "High",
-    location: "Park Avenue",
-    image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=200&h=200&fit=crop",
-    createdAt: "2024-12-15"
-  },
-  {
-    id: 2,
-    title: "Large Pothole",
-    category: "Road & Traffic",
-    status: "In Progress",
-    priority: "Critical",
-    location: "Main Street",
-    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=200&h=200&fit=crop",
-    createdAt: "2024-12-18"
-  },
-  {
-    id: 3,
-    title: "Water Leakage",
-    category: "Water Supply",
-    status: "Pending",
-    priority: "Normal",
-    location: "Green Valley",
-    image: "https://images.unsplash.com/photo-1584467541268-b040f83be3fd?w=200&h=200&fit=crop",
-    createdAt: "2024-12-20"
-  },
-  {
-    id: 4,
-    title: "Garbage Overflow",
-    category: "Sanitation",
-    status: "Resolved",
-    priority: "Normal",
-    location: "Central Market",
-    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=200&h=200&fit=crop",
-    createdAt: "2024-12-10"
-  },
-  {
-    id: 5,
-    title: "Damaged Footpath",
-    category: "Road & Traffic",
-    status: "Pending",
-    priority: "Low",
-    location: "Oak Street",
-    image: "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=200&h=200&fit=crop",
-    createdAt: "2024-12-22"
-  }
-];
 
 export default CitizenDashboard;
