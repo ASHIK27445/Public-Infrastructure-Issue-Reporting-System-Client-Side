@@ -1,7 +1,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { NavLink, useNavigate, useParams } from 'react-router';
 import { 
-  ArrowLeft, 
+  ArrowLeft, Reply,
   Edit, 
   Trash2, 
   AlertTriangle, 
@@ -26,7 +26,8 @@ import {
   CircleCheckBig,
   BookmarkCheck,
   SquarePen,
-  OctagonX
+  OctagonX,
+  MessageSquare
 } from 'lucide-react';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -35,7 +36,6 @@ import axios from 'axios';
 
 const IssueDetailsPage = () => {
   const {role, user, mUser, mLoading} = use(AuthContext)
-  const [comment, setComment] = useState('');
   const [upvoting, setUpvoting] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -55,6 +55,261 @@ const IssueDetailsPage = () => {
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [reportLoading, setReportLoading] = useState(false)
+  
+
+  //comment
+// Add these state declarations near your other useState calls:
+const [commentText, setCommentText] = useState('');
+const [comments, setComments] = useState([]);
+const [replyingTo, setReplyingTo] = useState(null);
+const [replyText, setReplyText] = useState('');
+const [commentLoading, setCommentLoading] = useState(false);
+const [replyLoading, setReplyLoading] = useState(false);
+const [socket, setSocket] = useState(null)
+
+  // Fetch comments
+  const fetchComments = async () => {
+    try {
+      const response = await axiosSecure.get(`/comments/${id}`);
+      setComments(response.data);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
+
+// প্রতি ৩ সেকেন্ডে poll করুন
+useEffect(() => {
+  if (!id) return;
+  
+  const intervalId = setInterval(() => {
+    fetchComments();
+  }, 1200);
+  
+  return () => clearInterval(intervalId);
+}, [id]);
+
+  // Add comment
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim() || !user) return;
+
+    setCommentLoading(true);
+    try {
+      const response = await axiosSecure.post(`/comments/${id}`, {
+        commentText: commentText.trim()
+      });
+
+      if (response.data.success) {
+        setCommentText('');
+        fetchComments(); // Refresh comments
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
+  // Add reply
+  const handleAddReply = async (commentId) => {
+    if (!replyText.trim()) return;
+
+    setReplyLoading(true);
+    try {
+      const response = await axiosSecure.post(
+        `/comments/${commentId}/reply`,
+        { replyText: replyText.trim() }
+      );
+
+      if (response.data.success) {
+        setReplyText('');
+        setReplyingTo(null);
+        fetchComments(); // Refresh comments
+      }
+    } catch (error) {
+      console.error('Error adding reply:', error);
+    } finally {
+      setReplyLoading(false);
+    }
+  };
+
+  // Delete comment
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm('Are you sure you want to delete this comment?')) return;
+
+    try {
+      const response = await axiosSecure.delete(`/comments/${commentId}`);
+      if (response.data.success) {
+        fetchComments(); // Refresh comments
+      }
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    }
+  };
+
+  // Format date
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Render comment
+  const renderComment = (comment) => (
+    <div key={comment._id} className="mb-6">
+      {/* Comment Header */}
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700">
+            {comment.commenterPhoto ? (
+              <img 
+                src={comment.commenterPhoto} 
+                alt={comment.commenterName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-white">
+                <User className="w-6 h-6" />
+              </div>
+            )}
+          </div>
+          <div>
+            <div className="font-bold text-white">{comment.commenterName}</div>
+            <div className="text-xs text-gray-400">
+              {comment.commenterRole} • {formatDate(comment.commentedAt)}
+            </div>
+          </div>
+        </div>
+
+        {/* Delete button (owner or admin) */}
+        {(mUser?._id === comment.commentby.toString() || role === 'admin') && (
+          <button
+            onClick={() => handleDeleteComment(comment._id)}
+            className="text-red-400 hover:text-red-300 p-1"
+            title="Delete comment"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {/* Comment Text */}
+      <div className="ml-12 mb-3">
+        {comment.isToxic ? (
+          <div className="bg-red-900/30 border border-red-700/50 rounded-lg p-3">
+            <div className="flex items-center text-red-400 mb-1">
+              <AlertTriangle className="w-4 h-4 mr-2" />
+              <span className="text-sm">This comment has been hidden due to inappropriate content</span>
+            </div>
+            <div className="text-xs text-gray-400">
+              Toxicity score: {(comment.toxicityScore * 100).toFixed(0)}%
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-300 bg-gray-800/50 rounded-lg p-3">
+            {comment.commentText}
+          </p>
+        )}
+      </div>
+
+      {/* Reply Button */}
+      <div className="ml-12 flex items-center space-x-4">
+        <button
+          onClick={() => setReplyingTo(replyingTo === comment._id ? null : comment._id)}
+          className="flex items-center text-blue-400 hover:text-blue-300 text-sm"
+        >
+          <Reply className="w-4 h-4 mr-1" />
+          Reply
+        </button>
+      </div>
+
+
+
+      {/* Replies */}
+      {comment.replies && comment.replies.length > 0 && (
+        <div className="ml-12 mt-4 space-y-4">
+          {comment.replies.map((reply, index) => (
+            <div key={index} className="border-l-2 border-gray-700 pl-4">
+              {/* Reply Header */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
+                    {reply.replierPhoto ? (
+                      <img 
+                        src={reply.replierPhoto} 
+                        alt={reply.replierName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-white">
+                        <User className="w-4 h-4" />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="font-medium text-white text-sm">{reply.replierName}</div>
+                    <div className="text-xs text-gray-400">
+                      {reply.replierRole} • {formatDate(reply.repliedAt)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Reply Text */}
+              <div className="ml-10">
+                {reply.isToxic ? (
+                  <div className="bg-red-900/20 border border-red-700/30 rounded-lg p-2 text-sm">
+                    <div className="flex items-center text-red-400">
+                      <AlertTriangle className="w-3 h-3 mr-1" />
+                      <span className="text-xs">Hidden due to inappropriate content</span>
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      Toxicity: {(reply.toxicityScore * 100).toFixed(0)}%
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-gray-300 text-sm bg-gray-800/30 rounded-lg p-2">
+                    {reply.repliedText}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+            {/* Reply Form */}
+      {replyingTo === comment._id && (
+        <div className="ml-12 mt-3">
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder="Write a reply..."
+              className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+              onKeyPress={(e) => e.key === 'Enter' && handleAddReply(comment._id)}
+            />
+            <button
+              onClick={() => handleAddReply(comment._id)}
+              disabled={!replyText.trim() || replyLoading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm disabled:opacity-50"
+            >
+              {replyLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                'Send'
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
 
 
   const fetchAllData = async() =>{
@@ -610,31 +865,74 @@ const IssueDetailsPage = () => {
             )}
 
             {/* Comment Section */}
-            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
-              <h3 className="text-2xl font-bold text-white mb-6">Add Comment</h3>
-              
-              <form onSubmit={handleCommentSubmit}>
+      {/* Comment Section */}
+      <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8 mt-8">
+        <h3 className="text-2xl font-bold text-white mb-6 flex items-center space-x-3">
+          <MessageSquare className="w-6 h-6 text-emerald-500" />
+          <span>Comments ({comments.length})</span>
+        </h3>
+
+        {/* Comment Form */}
+        {user && (
+          <form onSubmit={handleAddComment} className="mb-8">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
+                {user.photoURL ? (
+                  <img 
+                    src={user.photoURL} 
+                    alt={user.displayName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white">
+                    <User className="w-6 h-6" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
                 <textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Add your comment or update about this issue... (Demo mode)"
-                  className="w-full h-32 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors resize-none mb-4"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Write your comment..."
+                  className="w-full h-24 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 resize-none focus:outline-none focus:border-emerald-500"
                 />
-                
-                <div className="flex items-center justify-between">
+                <div className="flex justify-between items-center mt-3">
                   <div className="text-sm text-gray-400">
-                    Demo Mode - Comments are simulated
+                    Comments are automatically checked for inappropriate content
                   </div>
                   <button
                     type="submit"
-                    className="flex items-center space-x-2 px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all"
+                    disabled={!commentText.trim() || commentLoading}
+                    className="flex items-center space-x-2 px-6 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50"
                   >
-                    <Send className="w-4 h-4" />
-                    <span>Post Comment</span>
+                    {commentLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        <span>Post Comment</span>
+                      </>
+                    )}
                   </button>
                 </div>
-              </form>
+              </div>
             </div>
+          </form>
+        )}
+
+        {/* Comments List */}
+        <div className="mt-8">
+          {comments.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No comments yet. Be the first to comment!</p>
+            </div>
+          ) : (
+            comments.map(renderComment)
+          )}
+        </div>
+      </div>
+      
           </div>
 
           {/* Right Column - Timeline & Reporter */}
@@ -918,6 +1216,9 @@ const IssueDetailsPage = () => {
         </div>
         )
       }
+
+
+      
     </div>
   );
 };
