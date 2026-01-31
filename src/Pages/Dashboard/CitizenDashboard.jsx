@@ -215,7 +215,7 @@ const CitizenDashboard = () => {
                 <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               </div>
               
-              <button className="p-2 bg-zinc-800 border border-zinc-700 rounded-2xl text-gray-400 hover:text-white hover:bg-zinc-700 transition-colors">
+              <button onClick={() => window.print()} className="p-2 bg-zinc-800 border border-zinc-700 rounded-2xl text-gray-400 hover:text-white hover:bg-zinc-700 transition-colors">
                 <Download className="w-5 h-5" />
               </button>
             </div>
@@ -681,7 +681,15 @@ const CitizenDashboard = () => {
                     <div className="text-sm text-gray-400">Higher than city average</div>
                   </div>
                 </div>
-                <div className="text-2xl font-black text-emerald-400">{((userAchievementStates?.issueCount - (userAchievementStates?.rejectCount || 0))/userAchievementStates?.issueCount * 100).toFixed(2)}%</div>
+                {/* {console.log(userAchievementStates, userAchievementStates.issueCount, userAchievementStates.rejectCount)} */}
+                <div className="text-2xl font-black text-emerald-400">
+                  {(() => {
+                    const value = ((userAchievementStates?.issueCount - (userAchievementStates?.rejectCount || 0)) / 
+                                  userAchievementStates?.issueCount * 100);
+                    
+                    return isNaN(value) || !isFinite(value) ? 0 : value.toFixed(2);
+                  })()}%
+                </div>
               </div>
               
               <div className="flex items-center justify-between p-4 bg-blue-500/10 rounded-2xl border border-blue-500/30">

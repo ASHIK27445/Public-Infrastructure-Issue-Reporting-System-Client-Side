@@ -1,5 +1,4 @@
 import { Outlet } from "react-router"
-import CitizenDashboard from "./CitizenDashboard"
 import DashboardAside from "./DashboardAside"
 import { use, useEffect, useState } from "react"
 import useAxiosSecure from "../../Hooks/useAxiosSecure"

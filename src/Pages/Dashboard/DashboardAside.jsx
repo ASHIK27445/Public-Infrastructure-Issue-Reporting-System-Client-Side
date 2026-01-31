@@ -57,7 +57,7 @@ const DashboardAside = () => {
       name: 'My Issues',
       icon: <BookAlert className="w-5 h-5" />,
       path: 'dashboard/myissues',
-      roles: ['admin', 'citizen']
+      roles: ['staff']
     },
     {
       id: 'addissues',
@@ -113,7 +113,7 @@ const DashboardAside = () => {
       name: 'Assigned Issues',
       icon: <NotepadText className='w-5 h-5'></NotepadText>,
       path: 'assignedIssues',
-      roles: ['admin', 'staff']
+      roles: ['staff']
     },
     {
       id: 'reviewIssues',
@@ -129,7 +129,7 @@ const DashboardAside = () => {
       icon: <Bell className="w-5 h-5" />,
       path: '/notifications',
       badge: 3,
-      roles: ['admin', 'citizen']
+      roles: ['admin']
     },
     {
       id: 'settings',
@@ -139,20 +139,22 @@ const DashboardAside = () => {
       roles: ['admin']
     },
     {
-      id: 'help',
-      name: 'Help & Support',
-      icon: <HelpCircle className="w-5 h-5" />,
-      path: 'timeline',
-      roles: ['admin', 'citizen']
-    },
-    {
       id: 'payment-history',
       name: 'Payment History',
       icon: <BadgePoundSterling className='w-5 h-5'/>,
       path: 'payment-history',
       roles: ['citizen']
+    },
+    {
+      id: 'help',
+      name: 'Help & Support',
+      icon: <HelpCircle className="w-5 h-5" />,
+      path: 'help-support',
+      roles: ['admin', 'citizen']
     }
-  ];
+  ]
+
+
 
   // console.log(user, mUser, role)
   return (
@@ -213,11 +215,15 @@ const DashboardAside = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-400">Member Since</span>
-              <span className="text-sm text-white">2024</span>
+              <span className="text-sm text-white">
+                {mUser?.createdAt ? new Date(mUser?.createdAt).getFullYear() : 'NA'}
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-400">Community Score</span>
-              <span className="text-sm text-emerald-400 font-bold">85/100</span>
+              <span className="text-sm text-emerald-400 font-bold">
+                {((mUser?.issueCount - (mUser?.rejectedIssueCount || 0)) / mUser?.issueCount * 100) || 100}/100
+                </span>
             </div>
           </div>
         </div>
@@ -273,21 +279,21 @@ const DashboardAside = () => {
                 <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
                 <span className="text-sm text-gray-400">Active Issues</span>
               </div>
-              <span className="text-sm font-bold text-white">8</span>
+              <span className="text-sm font-bold text-white">{mUser?.issueCount || 0}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                 <span className="text-sm text-gray-400">Resolved</span>
               </div>
-              <span className="text-sm font-bold text-white">24</span>
+              <span className="text-sm font-bold text-white">{mUser?.solvedIssue || 0}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                <span className="text-sm text-gray-400">This Month</span>
+                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                <span className="text-sm text-gray-400">Rejected Issues</span>
               </div>
-              <span className="text-sm font-bold text-white">5</span>
+              <span className="text-sm font-bold text-white">{mUser?.rejectedIssueCount || 0}</span>
             </div>
           </div>
         </div>

@@ -426,7 +426,7 @@ const IssueDetailsPage = () => {
                   <div className="text-sm text-gray-400">Upvotes</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
-                  <div className="text-3xl font-black text-blue-500 mb-2">{viewCount || issue?.viewsCount}</div>
+                  <div className="text-3xl font-black text-blue-500 mb-2">{viewCount || issue?.viewsCount || 0}</div>
                   <div className="text-sm text-gray-400">Views</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">

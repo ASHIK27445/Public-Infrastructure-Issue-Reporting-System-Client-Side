@@ -42,7 +42,7 @@ const PaymentHistory = () => {
     setLoading(true);
     axiosSecure.get(`/user-payment-history/${citizen?._id}`)
         .then(res => {
-            console.log(res.data)
+            // console.log(res.data)
             setPayments(res.data)
         }).catch(err=> console.log(err))
         .finally(()=> {setLoading(false)})

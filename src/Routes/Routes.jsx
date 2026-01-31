@@ -13,7 +13,6 @@ import ManageIssues from "../Pages/components/ManageIssues"
 import PrivateRouter from "../Pages/Authentication/PrivateRouter"
 import MyIssuePage from "../Pages/components/MyIssuePage"
 import MyProfile from "../Pages/components/MyProfile"
-import TimelinePage from "../Pages/components/TimeLinePage"
 import ManageStaff from "../Pages/Admin/ManageStaff"
 import ManageUsers from "../Pages/Admin/ManageUser"
 import ViewIssues from "../Pages/Admin/ViewIssues"
@@ -35,6 +34,7 @@ import PaymentBoostSuccess from "../Pages/Home/PaymentBoostSuccess"
 import PaymentHistory from "../Pages/components/PaymentHistory"
 import PaymentDetails from "../Pages/components/PaymentDetails"
 import ReviewIssues from "../Pages/components/ReviewIssues"
+import HelpSupport from "../Pages/components/HelpSupport"
 // import HowItWorks from "../Pages/Others/HowItWorks"
 export const router = createBrowserRouter([
     {
@@ -109,7 +109,7 @@ export const router = createBrowserRouter([
                 path: 'dashboard/myProfile', Component: MyProfile
             },
             {
-                path:'timeline', Component: TimelinePage
+                path:'help-support', Component: HelpSupport
             },
             {
                 path:'manageStaff', Component: ManageStaff

@@ -25,7 +25,7 @@ const AssignedIssues = () => {
   const { mUser, role } = use(AuthContext);
   const axiosSecure = useAxiosSecure();
   const [assignedIssues, setAssignedIssues] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(null);
   const [notification, setNotification] = useState(null);
 

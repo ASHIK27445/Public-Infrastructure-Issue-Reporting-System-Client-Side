@@ -17,7 +17,7 @@ import {
 import { useTheme } from "../Theme/ThemeContext";
 
 const Navbar = () => {
-  const {user, logoutUser, role} = use(AuthContext);
+  const {user, mUser, logoutUser, role} = use(AuthContext);
   const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false)
   const [logoutLoading, setLogoutLoading] = useState(false)
@@ -218,18 +218,27 @@ const Navbar = () => {
                     </div>
 
                     {/* Stats */}
+                    { (role === 'staff' || role === 'citizen') &&
                     <div className="mt-4 pt-4 border-t border-zinc-700">
                       <div className="grid grid-cols-2 gap-2">
                         <div className="text-center p-2 rounded-xl bg-zinc-900/50">
-                          <div className="text-emerald-400 font-bold">12</div>
-                          <div className="text-xs text-gray-400">Reports</div>
+                          <div className="text-emerald-400 font-bold">
+                            {mUser?.role === 'staff' ? mUser?.assignIssued || 0 : 
+                            mUser?.role === 'citizen' ? mUser?.issueCount || 0 : 0 }</div>
+                          <div className="text-xs text-gray-400">
+                            {mUser?.role === 'staff' ? 'Assign' : 'Report'}
+                          </div>
                         </div>
                         <div className="text-center p-2 rounded-xl bg-zinc-900/50">
-                          <div className="text-emerald-400 font-bold">8</div>
+                          <div className="text-emerald-400 font-bold">
+                            {mUser?.role === 'staff' ? mUser?.resolvedIssued || 0 : 
+                            mUser?.role === 'citizen' ? mUser?.solvedIssue || 0 : 0 }
+                          </div>
                           <div className="text-xs text-gray-400">Resolved</div>
                         </div>
                       </div>
                     </div>
+                    }
                   </div>
                 </div>
               </div>
@@ -290,7 +299,7 @@ const Navbar = () => {
             ))}
             
             <NavLink
-              to="/report"
+              onClick={handleStaffReportIsse}
               className="flex items-center justify-center space-x-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg mt-4"
             >
               <AlertTriangle className="w-5 h-5" />
