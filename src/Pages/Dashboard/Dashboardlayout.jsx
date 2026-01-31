@@ -4,7 +4,9 @@ import DashboardAside from "./DashboardAside"
 import { use, useEffect, useState } from "react"
 import useAxiosSecure from "../../Hooks/useAxiosSecure"
 import { AuthContext } from "../AuthProvider/AuthContext"
-import {ToastContainer } from 'react-toastify';
+import {ToastContainer } from 'react-toastify'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
 const DashboardLayout = () => {
     const axiosSecure = useAxiosSecure()
     const {user} = use(AuthContext)
@@ -22,6 +24,8 @@ const DashboardLayout = () => {
       }
     },[user, axiosSecure])
 
+    const queryClient = new QueryClient()
+
     // console.log(citizen)
     return(
     <div className="flex min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
@@ -29,7 +33,9 @@ const DashboardLayout = () => {
       
 
       <main className="flex-1 overflow-y-auto">
-        <Outlet context={{ citizen, refreshCitizen }}></Outlet>
+        <QueryClientProvider client={queryClient}>
+          <Outlet context={{ citizen, refreshCitizen }}></Outlet>
+        </QueryClientProvider>
         <ToastContainer></ToastContainer>
       </main>
     </div>
