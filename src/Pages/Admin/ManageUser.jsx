@@ -80,7 +80,7 @@ const ManageUsers = () => {
         iconColor: "#dc2626"
       });
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">

@@ -26,17 +26,18 @@ import {
   CircleCheckBig,
   BookmarkCheck,
   SquarePen,
-  OctagonX
+  OctagonX,
+  MessageSquare
 } from 'lucide-react';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { AuthContext } from '../AuthProvider/AuthContext';
 import { toast} from "react-toastify"
 import axios from 'axios';
+import CommentSection from './CommentSection';
 
 const IssueDetailsPage = () => {
   const {role, user, mUser, mLoading} = use(AuthContext)
-  const [comment, setComment] = useState('');
-  const [upvoting, setUpvoting] = useState(false);
+  const [upvoting, setUpvoting] = useState(false)
   const [paymentLoading, setPaymentLoading] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [issue, setIssue] = useState([])
@@ -48,6 +49,7 @@ const IssueDetailsPage = () => {
   const [timelines, setTimeline] = useState({})
   const [loading, setLoading] = useState(true)
   const isOwnIssue = issue?.reportBy === mUser?._id
+
   // State for report modal
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportType, setReportType] = useState('')
@@ -55,6 +57,15 @@ const IssueDetailsPage = () => {
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [reportLoading, setReportLoading] = useState(false)
+
+  //State for comment section
+  const [commentText, setCommentText] = useState('')
+  const [comments, setComments] = useState([])
+  const [replyingTo, setReplyingTo] = useState(null)
+  const [replyText, setReplyText] = useState('')
+  const [commentLoading, setCommentLoading] = useState(false)
+  const [replyLoading, setReplyLoading] = useState(false)
+  const [commentDeleteLaoding, setCommentDeleteLaoding] = useState(false)
 
 
   const fetchAllData = async() =>{
@@ -112,32 +123,6 @@ const IssueDetailsPage = () => {
     // cleanup if user leaves early
     return () => clearTimeout(timer);
   }, [id])
-
-  // const fetchIssues = () =>{
-  //     axiosSecure.get(`/detailIssues/${id}`)
-  //     .then(res =>{
-  //       setIssue(res.data)
-  //     })
-  //     .catch(err =>{console.log(err)})
-  // }
-  // const fetchUpvote = () => {
-  //   axiosSecure.get(`/upvote-info/${id}`)
-  //     .then((res)=> {
-  //       setCount(res.data.count || 0)
-  //       setHasUpvoted(res.data.hasUpvoted || false)
-  //     }).catch(err=> console.log(err))
-  // }
-  // const fetchTime = () => {
-  //   axiosSecure.get(`/timeline/${id}`)
-  //     .then(res=> setTimeline(res.data))
-  //     .catch(err=> console.log(err))
-  // }
-  // useEffect(()=>{
-  //   fetchIssues();
-  //   fetchUpvote();
-  //   fetchTime();
-  // },[axiosSecure, id])
-
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -234,14 +219,6 @@ const IssueDetailsPage = () => {
     alert('Demo: Edit functionality (Disabled in demo)');
   }
 
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-    if (!comment.trim()) return;
-    
-    alert(`Demo: Comment posted: "${comment}"\n(Functionality disabled in demo)`);
-    setComment('');
-  }
-
   const successRate = () =>{
     const issueCount = issue?.reporterIssueCount
     const rejectIssueCount = issue?.reportRejectedIssueCount ? issue?.reportRejectedIssueCount : 0
@@ -290,6 +267,79 @@ const IssueDetailsPage = () => {
 
   }
 
+  //Comment Section
+  const fetchComment = () => {
+    axiosSecure.get(`/comments/${id}`)
+      .then(res => {
+        setComments(res.data)
+      }).catch(err=> console.log(err))
+  }
+
+  useEffect(()=> {
+    if(!id) return
+
+    const pollingInterval = setInterval(()=> {
+      fetchComment()
+    }, 1200)
+
+    return () => clearInterval(pollingInterval)
+  }, [id])
+
+  const handleAddComment = (e) => {
+    e.preventDefault()
+
+    if(!user || !commentText.trim()) return
+
+    setCommentLoading(true)
+    axiosSecure.post(`/comments/${id}`,{
+      commentText: commentText.trim()
+    }).then(res => {
+      console.log(res.data)
+      if(res.data.success){
+        setCommentText('')
+        fetchComment()
+      }
+      setCommentLoading(false)
+    }).catch(err=> toast.error(err))
+  }
+
+  const handleAddReply = (commentId) => {
+    if(!user || !replyText.trim()) return
+
+    setReplyLoading(true)
+    axiosSecure.post(`/comments/reply/${commentId}`, {
+      replyText: replyText.trim()
+    }).then(res=>{
+      console.log(res.data)
+      if(res.data.success){
+        setReplyText('')
+        setReplyingTo(null)
+        fetchComment()
+      }
+      setReplyLoading(false)
+    }).catch(err=> toast.error(err))
+  }
+
+  const handleDeleteComment = (commentId) => {
+    setCommentDeleteLaoding(true)
+    axiosSecure.delete(`/comments/${commentId}`)
+      .then(res=> {
+        if (res.data.success) {
+          fetchComment()
+          setCommentDeleteLaoding(false)
+        }
+      })
+  }
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
@@ -309,7 +359,6 @@ const IssueDetailsPage = () => {
       </div>
     );
   }
-
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
@@ -430,7 +479,7 @@ const IssueDetailsPage = () => {
                   <div className="text-sm text-gray-400">Views</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
-                  <div className="text-3xl font-black text-amber-500 mb-2">{issue?.comments || 0}</div>
+                  <div className="text-3xl font-black text-amber-500 mb-2">{comments.length || 0}</div>
                   <div className="text-sm text-gray-400">Comments</div>
                 </div>
                 <div className="bg-zinc-800/50 rounded-2xl p-4 text-center">
@@ -610,31 +659,92 @@ const IssueDetailsPage = () => {
             )}
 
             {/* Comment Section */}
-            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
-              <h3 className="text-2xl font-bold text-white mb-6">Add Comment</h3>
-              
-              <form onSubmit={handleCommentSubmit}>
-                <textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Add your comment or update about this issue... (Demo mode)"
-                  className="w-full h-32 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors resize-none mb-4"
-                />
-                
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-400">
-                    Demo Mode - Comments are simulated
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8 mt-8">
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center space-x-3">
+                <MessageSquare className="w-6 h-6 text-emerald-500" />
+                <span>Comments ({comments.length})</span>
+              </h3>
+
+              {/* Comment Form*/}
+              {user && (
+                <form onSubmit={handleAddComment} className="mb-8">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-700 shrink-0">
+                      {user.photoURL ? (
+                        <img 
+                          src={user.photoURL} 
+                          alt={user.displayName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-white">
+                          <User className="w-6 h-6" />
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex-1">
+                      <textarea
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        placeholder="Write your comment..."
+                        className="w-full h-24 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 resize-none focus:outline-none focus:border-emerald-500"
+                      />
+                      <div className="flex justify-between items-center mt-3">
+                        <div className="text-sm text-gray-400">
+                          Comments are automatically checked for inappropriate content
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={!commentText.trim() || commentLoading}
+                          className="flex items-center space-x-2 px-6 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50"
+                        >
+                          {commentLoading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4" />
+                              <span>Post Comment</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <button
-                    type="submit"
-                    className="flex items-center space-x-2 px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-bold hover:shadow-emerald-500/50 transition-all"
-                  >
-                    <Send className="w-4 h-4" />
-                    <span>Post Comment</span>
-                  </button>
-                </div>
-              </form>
+                </form>
+              )}
+
+              {/* Comments List */}
+              <div className="mt-8">
+                {comments.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>No comments yet. Be the first to comment!</p>
+                  </div>
+                ) : (
+                  comments.map((comment) => (
+                    <CommentSection
+                      key={comment._id}
+                      comment={comment}
+                      mUser={mUser}
+                      role={role}
+                      replyingTo={replyingTo}
+                      replyText={replyText}
+                      replyLoading={replyLoading}
+                      onDeleteComment={handleDeleteComment}
+                      onReplyClick={(commentId) => 
+                        setReplyingTo(replyingTo === commentId ? null : commentId)
+                      }
+                      onReplyTextChange={setReplyText}
+                      onReplySubmit={handleAddReply}
+                      formatDate={formatDate}
+                      commentDeleteLaoding = {commentDeleteLaoding}
+                    />
+                  ))
+                )}
+              </div>
             </div>
+
           </div>
 
           {/* Right Column - Timeline & Reporter */}
@@ -711,7 +821,7 @@ const IssueDetailsPage = () => {
                         </div>
                         
   
-                          <p className="text-sm text-gray-400 mb-3">Issue was initially reported by {timelines.issueCreatorRole}</p>
+                        <p className="text-sm text-gray-400 mb-3">Issue was initially reported by {timelines.issueCreatorRole}</p>
                         
                         <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center space-x-2">
