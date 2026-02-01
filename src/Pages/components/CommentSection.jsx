@@ -6,6 +6,8 @@ const CommentSection= ({
   onReplyClick, onReplyTextChange, onReplySubmit, formatDate, commentDeleteLaoding }) => {
   
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [showAllReplies, setShowAllReplies] = useState(false)
+  const repliesToShow = showAllReplies ? comment.replies : comment.replies?.slice(0, 2)
   return (
     <div className="mb-6">
       {/* Comment Header */}
@@ -103,7 +105,7 @@ const CommentSection= ({
       {/* Replies */}
       {comment.replies && comment.replies.length > 0 && (
         <div className="ml-12 mt-4 space-y-4">
-          {comment.replies.map((reply, index) => (
+          {repliesToShow.map((reply, index) => (
             <div key={index} className="border-l-2 border-gray-700 pl-4">
               {/* Reply Header */}
               <div className="flex items-center justify-between mb-2">
@@ -150,6 +152,16 @@ const CommentSection= ({
               </div>
             </div>
           ))}
+
+          {/* View all / Collapse Button */}
+          {comment.replies.length > 2 && (
+            <button
+              onClick={() => setShowAllReplies(!showAllReplies)}
+              className="text-blue-400 text-sm mt-1 ml-10 hover:underline"
+            >
+              {showAllReplies ? 'Collapse replies' : `View all ${comment.replies.length} replies`}
+            </button>
+          )}
         </div>
       )}
 
