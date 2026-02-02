@@ -353,3 +353,9 @@ body {
 [data-theme="light"] footer a.bg-zinc-800.hover\:text-white:hover svg {
   color: white !important;
 }
+
+/* only this select, only light theme */
+[data-theme="light"] .forthisonly option {
+  background-color: #f4f4f5 !important; /* zinc-100 */
+  color: #18181b !important;
+}
