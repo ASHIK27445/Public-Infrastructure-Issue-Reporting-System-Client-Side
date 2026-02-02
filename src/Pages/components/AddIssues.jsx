@@ -113,6 +113,7 @@ const AddIssue = () => {
   const [gettingLocation, setGettingLocation] = useState(false);
   const [gpsAccuracy, setGpsAccuracy] = useState(null);
   const [gpsHeading, setGpsHeading] = useState(0);
+  const [submitLoading, setSubmitLoading] = useState(false)
   
   const axiosSecure = useAxiosSecure();
   const { user } = useContext(AuthContext);
@@ -460,6 +461,8 @@ const AddIssue = () => {
       const shortlocation = getSmartAddress(selectedLocation?.address)
       const locationAt = {lat: selectedLocation.lat, lng:selectedLocation.lng}
 
+      // console.log(locationAt)
+
       if (imgbbResponse.data.success) {
         const mainPhoto = imgbbResponse.data.data.display_url;
 
@@ -470,12 +473,11 @@ const AddIssue = () => {
           mainPhoto,
           citizenEmail: user?.email,
           location: shortlocation,
-          locationAt: locationAt,
-          submittedAt: new Date().toISOString()
+          locationAt: locationAt
         };
         // console.log(issueData)
         // console.log(shortlocation)
-
+        // console.log(locationAt)
         const response = await axiosSecure.post('/addissue', issueData);
 
         if (response.data) {

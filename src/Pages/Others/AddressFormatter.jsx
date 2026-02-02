@@ -15,9 +15,12 @@ export const getSmartAddress = (fullAddress) => {
       // Extract district name (remove " district" suffix)
       const districtName = part.substring(0, part.length - 9).trim();
       
-      // Only add if it's a meaningful district name
-      if (districtName && !resultParts.includes(districtName)) {
-        resultParts.push(districtName);
+      // Only add if it's a meaningful district name AND not already in resultParts
+      if (districtName) {
+        const exists = resultParts.some(p => p.toLowerCase() === districtName.toLowerCase());
+        if (!exists) {
+          resultParts.push(districtName);
+        }
       }
       continue;
     }
@@ -69,19 +72,65 @@ export const getSmartAddress = (fullAddress) => {
                   lowerPart === 'mymensingh' ||
                   lowerPart.includes('thana');
     
-    // Priority order: Street > Area > City
-    // But we want to keep the sequence
-    
     // Add part if it's meaningful
-    if (isStreet || isArea || isCity || resultParts.length < 2) {
-      // Avoid duplicates
-      if (!resultParts.includes(part)) {
+    // Priority: Always include city, include area/street if space permits
+    if (isCity) {
+      // Always include city name (Dhaka, Chittagong, etc.)
+      const exists = resultParts.some(p => p.toLowerCase() === part.toLowerCase());
+      if (!exists) {
         resultParts.push(part);
+      }
+    } else if (isStreet || isArea || resultParts.length < 2) {
+      // For street/area, add only if we have less than 2 parts already
+      // OR if it's one of the first few parts of the address
+      if (i < 3 || resultParts.length < 3) {
+        const exists = resultParts.some(p => p.toLowerCase() === part.toLowerCase());
+        if (!exists) {
+          resultParts.push(part);
+        }
       }
     }
     
-    // Stop when we have 3 parts
-    if (resultParts.length >= 3) break;
+    // Modified: Don't break at 3 parts if we haven't found the city yet
+    // Only break if we have at least 3 parts AND we have a city
+    const hasCity = resultParts.some(p => 
+      ['dhaka', 'chittagong', 'sylhet', 'khulna', 'rajshahi', 'barisal', 'rangpur', 'mymensingh']
+      .includes(p.toLowerCase())
+    );
+    
+    if (resultParts.length >= 4 || (resultParts.length >= 3 && hasCity)) {
+      break;
+    }
+  }
+  
+  // If we don't have a city but have other parts, try to find city
+  if (resultParts.length > 0) {
+    const hasCity = resultParts.some(p => 
+      ['dhaka', 'chittagong', 'sylhet', 'khulna', 'rajshahi', 'barisal', 'rangpur', 'mymensingh']
+      .includes(p.toLowerCase())
+    );
+    
+    if (!hasCity) {
+      // Look for city in the original parts
+      for (const part of parts) {
+        const lowerPart = part.toLowerCase();
+        if (lowerPart === 'dhaka' ||
+            lowerPart === 'chittagong' ||
+            lowerPart === 'sylhet' ||
+            lowerPart === 'khulna' ||
+            lowerPart === 'rajshahi' ||
+            lowerPart === 'barisal' ||
+            lowerPart === 'rangpur' ||
+            lowerPart === 'mymensingh') {
+          
+          const exists = resultParts.some(p => p.toLowerCase() === part.toLowerCase());
+          if (!exists) {
+            resultParts.push(part);
+            break;
+          }
+        }
+      }
+    }
   }
   
   // Ensure we have at least something
@@ -105,17 +154,20 @@ export const getSmartAddress = (fullAddress) => {
     resultParts.push(parts[0]);
   }
   
-  // Format: remove "Dhaka" if it appears multiple times
-  const uniqueParts = resultParts.filter((part, index, array) => {
+  // Remove duplicates (case insensitive)
+  const uniqueParts = [];
+  const seen = new Set();
+  
+  for (const part of resultParts) {
     const lowerPart = part.toLowerCase();
-    if (lowerPart === 'dhaka') {
-      return array.findIndex(p => p.toLowerCase() === 'dhaka') === index;
+    if (!seen.has(lowerPart)) {
+      seen.add(lowerPart);
+      uniqueParts.push(part);
     }
-    return true;
-  });
+  }
   
   const result = uniqueParts.join(', ');
   
   // Final cleanup - if result is too long
-  return result.length > 50 ? result + '...' : result;
+  return result.length > 100 ? result.substring(0, 100) + '...' : result;
 };
