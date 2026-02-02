@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {Link} from 'react-router'
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import { 
   AlertTriangle, 
@@ -10,11 +11,12 @@ import {
   ZoomOut,
   Navigation,
   Eye,
-  Info
+  Info,
+  Calendar
 } from 'lucide-react';
-import 'leaflet/dist/leaflet.css';
+import '../../Leaflet.css';
 import L from 'leaflet';
-
+import useAxios from '../../Hooks/useAxios';
 // Fix for default markers in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -37,6 +39,7 @@ const MapView = () => {
   const [mapCenter] = useState([23.8103, 90.4125]); // Dhaka, Bangladesh
   const [zoomLevel, setZoomLevel] = useState(12);
   const [viewMode, setViewMode] = useState('normal'); // normal, heatmap, clusters
+  const axiosInstance = useAxios()
 
   // Sample data - replace with API call
   const sampleIssues = [
@@ -125,7 +128,7 @@ const MapView = () => {
       location: { lat: 23.814, lng: 90.408 },
       status: 'resolved',
       priority: 'low',
-      category: 'public-space',
+      category: 'Parks & Recreation',
       reportedBy: 'Robert Johnson',
       date: '2024-12-12',
       upvotes: 4,
@@ -146,12 +149,22 @@ const MapView = () => {
     }
   ];
 
-  useEffect(() => {
-    // In real app, fetch from API
-    setIssues(sampleIssues);
-    setFilteredIssues(sampleIssues);
-  }, []);
+  const fetchData = () => {
+    axiosInstance.get('/map-view/issues')
+      .then(res=>{
+        console.log(res.data)
+        setIssues(res.data)
+        setFilteredIssues(res.data)
+      }).catch(err=> console.log(err))
+  }
 
+  useEffect(() => {
+    fetchData()
+
+  }, [axiosInstance]);
+
+
+  console.log(issues, filteredIssues)
   // Filter and search issues
   useEffect(() => {
     let result = [...issues];
@@ -187,10 +200,10 @@ const MapView = () => {
     const iconAnchor = [16, 32];
     
     const priorityColors = {
-      critical: '#ef4444', // red
-      high: '#f97316', // orange
-      medium: '#eab308', // yellow
-      low: '#3b82f6' // blue
+      Critical: '#ef4444', // red
+      High: '#f97316', // orange
+      Normal: '#eab308', // yellow
+      Low: '#3b82f6' // blue
     };
     
     const color = priorityColors[priority] || '#6b7280'; // default gray
@@ -218,10 +231,12 @@ const MapView = () => {
   // Status and priority badges
   const getStatusBadge = (status) => {
     const statusConfig = {
-      pending: { color: 'bg-yellow-500/20 text-yellow-400', text: 'Pending' },
-      'in-progress': { color: 'bg-blue-500/20 text-blue-400', text: 'In Progress' },
-      resolved: { color: 'bg-emerald-500/20 text-emerald-400', text: 'Resolved' },
-      closed: { color: 'bg-gray-500/20 text-gray-400', text: 'Closed' }
+      Pending: { color: 'bg-yellow-500/20 text-yellow-400', text: 'Pending' },
+      'In-Progress': { color: 'bg-blue-500/20 text-blue-400', text: 'In-Progress' },
+      Resolved: { color: 'bg-emerald-500/20 text-emerald-400', text: 'Resolved' },
+      Working: { color: 'bg-violet-500/20 text-violet-400', text: 'Working' },
+      Rejected: { color: 'bg-red-500/20 text-red-400', text: 'Reejected' },
+      Closed: { color: 'bg-gray-500/20 text-gray-400', text: 'Closed' }
     };
     return statusConfig[status] || { color: 'bg-gray-500/20 text-gray-400', text: 'Unknown' };
   };
@@ -229,30 +244,29 @@ const MapView = () => {
   const getPriorityBadge = (priority) => {
     const priorityConfig = {
       critical: { color: 'bg-red-500/20 text-red-400', text: 'Critical' },
-      high: { color: 'bg-orange-500/20 text-orange-400', text: 'High' },
-      medium: { color: 'bg-yellow-500/20 text-yellow-400', text: 'Medium' },
-      low: { color: 'bg-blue-500/20 text-blue-400', text: 'Low' }
+      High: { color: 'bg-orange-500/20 text-orange-400', text: 'High' },
+      Normal: { color: 'bg-yellow-500/20 text-yellow-400', text: 'Normal' },
+      Low: { color: 'bg-blue-500/20 text-blue-400', text: 'Low' }
     };
     return priorityConfig[priority] || { color: 'bg-gray-500/20 text-gray-400', text: 'Normal' };
   };
+const handleZoomIn = () => {
+  if (mapRef.current) {
+    mapRef.current.setZoom(mapRef.current.getZoom() + 1);
+  }
+};
 
-  const handleZoomIn = () => {
-    if (mapRef.current) {
-      mapRef.current.setZoom(mapRef.current.getZoom() + 1);
-    }
-  };
+const handleZoomOut = () => {
+  if (mapRef.current) {
+    mapRef.current.setZoom(mapRef.current.getZoom() - 1);
+  }
+};
 
-  const handleZoomOut = () => {
-    if (mapRef.current) {
-      mapRef.current.setZoom(mapRef.current.getZoom() - 1);
-    }
-  };
-
-  const handleResetView = () => {
-    if (mapRef.current) {
-      mapRef.current.setView(mapCenter, zoomLevel);
-    }
-  };
+const handleResetView = () => {
+  if (mapRef.current) {
+    mapRef.current.setView(mapCenter, zoomLevel);
+  }
+};
 
   const handleLocateUser = () => {
     if (navigator.geolocation) {
@@ -313,9 +327,11 @@ const MapView = () => {
                         className="w-full bg-zinc-700 border border-zinc-600 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
                       >
                         <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="in-progress">In Progress</option>
-                        <option value="resolved">Resolved</option>
+                        <option value="Pending">Pending</option>
+                        <option value="In-Progress">In Progress</option>
+                        <option value="Working">Working</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Resolved">Resolved</option>
                         <option value="closed">Closed</option>
                       </select>
                     </div>
@@ -328,10 +344,10 @@ const MapView = () => {
                         className="w-full bg-zinc-700 border border-zinc-600 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
                       >
                         <option value="all">All Priority</option>
-                        <option value="critical">Critical</option>
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Low">Low</option>
                       </select>
                     </div>
                     
@@ -343,12 +359,19 @@ const MapView = () => {
                         className="w-full bg-zinc-700 border border-zinc-600 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
                       >
                         <option value="all">All Categories</option>
-                        <option value="road">Road</option>
-                        <option value="electricity">Electricity</option>
-                        <option value="water">Water</option>
-                        <option value="sanitation">Sanitation</option>
-                        <option value="traffic">Traffic</option>
-                        <option value="public-space">Public Space</option>
+                        <option value="Road & Traffic">Road & Traffic</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Water Supply">Water Supply</option>
+                        <option value="Sanitation">Sanitation</option>
+                        <option value="Public Safety">Public Safety</option>
+                        <option value="Parks & Recreation">Parks & Recreation</option>
+                        <option value="Building & Construction">Building & Construction</option>
+                        <option value="Streetlight">Streetlight</option>
+                        <option value="Pathhole">Pathhole</option>
+                        <option value="Water Leak">Water Leak</option>
+                        <option value="Garbage">Garbage</option>
+                        <option value="Footpath">Footpath</option>
+                        <option value="Others">Others</option>
                       </select>
                     </div>
                   </div>
@@ -407,7 +430,7 @@ const MapView = () => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <span className="text-gray-300 text-xs">Medium</span>
+                    <span className="text-gray-300 text-xs">Normal</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 rounded-full bg-blue-500"></div>
@@ -420,7 +443,8 @@ const MapView = () => {
               <MapContainer
                 center={mapCenter}
                 zoom={zoomLevel}
-                className="h-full w-full z-0"
+                className="h-600 w-full z-0"
+                ref={mapRef}
                 whenCreated={mapInstance => { mapRef.current = mapInstance; }}
               >
                 <TileLayer
@@ -429,25 +453,27 @@ const MapView = () => {
                 />
                 
                 {/* Markers for each issue */}
-                {filteredIssues.map((issue) => (
+                {filteredIssues
+                .filter(issue => issue?.locationAt?.lat && issue?.locationAt?.lng)
+                .map((issue) => (
                   <Marker
-                    key={issue.id}
-                    position={[issue.location.lat, issue.location.lng]}
-                    icon={getMarkerIcon(issue.priority)}
+                    key={issue?._id}
+                    position={[issue?.locationAt?.lat, issue?.locationAt?.lng]}
+                    icon={getMarkerIcon(issue?.priority)}
                     eventHandlers={{
                       click: () => setSelectedIssue(issue),
                     }}
                   >
                     <Popup>
                       <div className="p-2">
-                        <h3 className="font-bold text-gray-900 mb-1">{issue.title}</h3>
-                        <p className="text-gray-600 text-sm mb-2">{issue.description}</p>
+                        <h3 className="font-bold text-gray-900 mb-1">{issue?.title}</h3>
+                        <p className="text-gray-600 text-sm mb-2">{issue?.description}</p>
                         <div className="flex items-center space-x-2 mb-2">
-                          <span className={`px-2 py-1 rounded text-xs ${getStatusBadge(issue.status).color}`}>
-                            {getStatusBadge(issue.status).text}
+                          <span className={`px-2 py-1 rounded text-xs ${getStatusBadge(issue?.status).color}`}>
+                            {getStatusBadge(issue?.status).text}
                           </span>
-                          <span className={`px-2 py-1 rounded text-xs ${getPriorityBadge(issue.priority).color}`}>
-                            {getPriorityBadge(issue.priority).text}
+                          <span className={`px-2 py-1 rounded text-xs ${getPriorityBadge(issue?.priority).color}`}>
+                            {getPriorityBadge(issue?.priority).text}
                           </span>
                         </div>
                         <button
@@ -496,39 +522,57 @@ const MapView = () => {
                   </div>
                 ) : (
                   filteredIssues.map((issue) => (
-                    <div
-                      key={issue.id}
-                      className={`bg-zinc-800/50 backdrop-blur-sm rounded-2xl p-4 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-300 cursor-pointer ${
-                        selectedIssue?.id === issue.id ? 'border-emerald-500 bg-emerald-500/10' : ''
-                      }`}
-                      onClick={() => setSelectedIssue(issue)}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-bold text-white text-sm line-clamp-1">{issue.title}</h4>
-                        <span className={`px-2 py-1 rounded text-xs ${getPriorityBadge(issue.priority).color}`}>
-                          {getPriorityBadge(issue.priority).text}
-                        </span>
-                      </div>
-                      
-                      <p className="text-gray-400 text-xs mb-3 line-clamp-2">{issue.description}</p>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <span className={`px-2 py-1 rounded text-xs ${getStatusBadge(issue.status).color}`}>
-                            {getStatusBadge(issue.status).text}
+                    viewMode === 'normal' ? (
+                      <div
+                        key={issue?._id}
+                        className={`bg-zinc-800/50 backdrop-blur-sm rounded-2xl p-4 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-300 cursor-pointer ${
+                          selectedIssue?._id === issue?._id ? 'border-emerald-500 bg-emerald-500/10' : ''
+                        }`}
+                        onClick={() => setSelectedIssue(issue)}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-bold text-white text-sm line-clamp-1">{issue?.title}</h4>
+                          <span className={`px-2 py-1 rounded text-xs ${getPriorityBadge(issue?.priority).color}`}>
+                            {getPriorityBadge(issue?.priority).text}
                           </span>
-                          <div className="flex items-center text-gray-500 text-xs">
-                            <MapPin className="w-3 h-3 mr-1" />
-                            <span>{(issue.location.lat).toFixed(4)}, {(issue.location.lng).toFixed(4)}</span>
-                          </div>
                         </div>
                         
-                        <div className="flex items-center text-gray-400 text-xs">
-                          <Eye className="w-3 h-3 mr-1" />
-                          <span>{issue.upvotes}</span>
+                        <p className="text-gray-400 text-xs mb-3 line-clamp-2">{issue?.description}</p>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <span className={`px-2 py-1 rounded text-xs ${getStatusBadge(issue?.status).color}`}>
+                              {getStatusBadge(issue?.status).text}
+                            </span>
+                            <div className="flex items-center text-gray-500 text-xs">
+                              <MapPin className="w-3 h-3 mr-1" />
+                              <span>{issue?.locationAt?.lat.toFixed(2)}, {issue?.locationAt?.lng.toFixed(2)}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center text-gray-400 text-xs">
+                            <Eye className="w-3 h-3 mr-1" />
+                            <span>{issue?.upvoteCount}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      // Compact view
+                      <div
+                        key={issue?._id}
+                        className={`bg-zinc-800/40 rounded-xl p-2 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-300 cursor-pointer ${
+                          selectedIssue?._id === issue?._id ? 'border-emerald-500 bg-emerald-500/10' : ''
+                        }`}
+                        onClick={() => setSelectedIssue(issue)}
+                      >
+                        <div className="flex justify-between items-center">
+                          <h4 className="text-white text-sm font-semibold line-clamp-1">{issue?.title}</h4>
+                          <span className={`px-2 py-0.5 rounded text-xs ${getPriorityBadge(issue?.priority).color}`}>
+                            {getPriorityBadge(issue?.priority).text}
+                          </span>
+                        </div>
+                      </div>
+                    )
                   ))
                 )}
               </div>
@@ -544,7 +588,7 @@ const MapView = () => {
                 <h3 className="text-2xl font-black text-white">{selectedIssue.title}</h3>
                 <button
                   onClick={() => setSelectedIssue(null)}
-                  className="p-2 rounded-xl bg-zinc-700 text-gray-400 hover:text-white transition-colors"
+                  className="px-2 rounded-xl bg-zinc-700 text-red-400 hover:text-white transition-colors"
                 >
                   ✕
                 </button>
@@ -553,42 +597,37 @@ const MapView = () => {
               <div className="grid md:grid-cols-3 gap-6">
                 {/* Left Column - Details */}
                 <div className="md:col-span-2">
-                  <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="grid grid-cols-3 text-center gap-4 mb-6">
                     <div className="bg-zinc-800/50 rounded-2xl p-4 border border-zinc-700">
                       <p className="text-gray-400 text-sm mb-1">Status</p>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(selectedIssue.status).color}`}>
-                        {getStatusBadge(selectedIssue.status).text}
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(selectedIssue?.status).color}`}>
+                        {getStatusBadge(selectedIssue?.status).text}
                       </span>
                     </div>
                     
                     <div className="bg-zinc-800/50 rounded-2xl p-4 border border-zinc-700">
                       <p className="text-gray-400 text-sm mb-1">Priority</p>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getPriorityBadge(selectedIssue.priority).color}`}>
-                        {getPriorityBadge(selectedIssue.priority).text}
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getPriorityBadge(selectedIssue?.priority).color}`}>
+                        {getPriorityBadge(selectedIssue?.priority).text}
                       </span>
                     </div>
                     
                     <div className="bg-zinc-800/50 rounded-2xl p-4 border border-zinc-700">
                       <p className="text-gray-400 text-sm mb-1">Upvotes</p>
-                      <p className="text-white font-bold text-xl">{selectedIssue.upvotes}</p>
-                    </div>
-                    
-                    <div className="bg-zinc-800/50 rounded-2xl p-4 border border-zinc-700">
-                      <p className="text-gray-400 text-sm mb-1">Reported By</p>
-                      <p className="text-white font-medium">{selectedIssue.reportedBy}</p>
+                      <p className="text-white font-bold text-xl">{selectedIssue?.upvoteCount}</p>
                     </div>
                   </div>
                   
                   <div className="mb-6">
                     <h4 className="text-white font-bold mb-2">Description</h4>
-                    <p className="text-gray-300">{selectedIssue.description}</p>
+                    <p className="text-gray-300">{selectedIssue?.description}</p>
                   </div>
                   
                   <div className="mb-6">
                     <h4 className="text-white font-bold mb-2">Location Details</h4>
                     <div className="flex items-center text-gray-300">
                       <MapPin className="w-5 h-5 mr-2 text-emerald-500" />
-                      <span>Latitude: {selectedIssue.location.lat.toFixed(6)}, Longitude: {selectedIssue.location.lng.toFixed(6)}</span>
+                      <span>Latitude: {selectedIssue?.locationAt?.lat.toFixed(2)}, Longitude: {selectedIssue?.locationAt?.lng.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -598,37 +637,25 @@ const MapView = () => {
                   <div className="mb-6">
                     <div className="rounded-2xl overflow-hidden border border-zinc-700 mb-4">
                       <img 
-                        src={selectedIssue.image} 
-                        alt={selectedIssue.title}
+                        src={selectedIssue?.mainPhoto} 
+                        alt={selectedIssue?.title}
                         className="w-full h-48 object-cover"
                       />
                     </div>
                     
-                    <div className="flex items-center justify-between text-sm text-gray-400">
+                    <div className="flex items-center justify-center text-sm text-gray-400">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-2" />
-                        <span>{selectedIssue.date}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Info className="w-4 h-4 mr-2" />
-                        <span>ID: #{selectedIssue.id}</span>
+                        <span>{new Date(selectedIssue?.createdAt).toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
                   
                   <div className="space-y-3">
-                    <button className="w-full px-4 py-3 bg-emerald-600 rounded-2xl text-white font-bold hover:bg-emerald-700 transition-colors flex items-center justify-center space-x-2">
+                    <Link to={`/issues/${selectedIssue?._id}`} className="w-full px-4 py-3 bg-emerald-600 rounded-2xl text-white font-bold hover:bg-emerald-700 transition-colors flex items-center justify-center space-x-2">
                       <Eye className="w-5 h-5" />
                       <span>View Full Details</span>
-                    </button>
-                    
-                    <button className="w-full px-4 py-3 bg-zinc-700 rounded-2xl text-white font-medium hover:bg-zinc-600 transition-colors">
-                      Upvote Issue
-                    </button>
-                    
-                    <button className="w-full px-4 py-3 bg-blue-600/20 border border-blue-500/30 rounded-2xl text-blue-400 font-medium hover:bg-blue-600/30 transition-colors">
-                      Share Location
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>

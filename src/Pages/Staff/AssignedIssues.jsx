@@ -495,7 +495,7 @@ const AssignedIssues = () => {
                         <td className="py-3 px-4 sm:py-4 sm:px-6">
                           <div className="space-y-2">
                             {/* Status Change Button */}
-                            <div className="relative">
+                            <div className="relative overflow-x-visible">
                               <button
                                 onClick={() => canChangeStatus && toggleStatusDropdown(issue._id)}
                                 disabled={!canChangeStatus || updatingStatus === issue._id}

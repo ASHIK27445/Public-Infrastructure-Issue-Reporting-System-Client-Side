@@ -1,0 +1,45 @@
+/* Minimal Leaflet CSS */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  background: #ddd;
+}
+
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  position: absolute;
+  transform-origin: top left;
+  will-change: transform;
+}
+
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  display: block;
+}
+
+.leaflet-popup {
+  position: absolute;
+  text-align: center;
+  pointer-events: auto;
+}
+
+.leaflet-popup-content-wrapper {
+  padding: 5px 10px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  font-size: 14px;
+}
+
+.leaflet-popup-tip {
+  width: 0;
+  height: 0;
+  position: absolute;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-top-color: white;
+  bottom: -12px;
+  left: 50%;
+}
