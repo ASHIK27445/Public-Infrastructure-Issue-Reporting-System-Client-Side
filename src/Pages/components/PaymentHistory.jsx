@@ -303,8 +303,7 @@ const PaymentHistory = () => {
                             <button
                               onClick={() => handleDownloadReceipt(payment._id)}
                               className="p-2 bg-zinc-700 rounded-lg text-gray-300 hover:text-white hover:bg-zinc-600 transition-colors"
-                              title="Download Receipt"
-                            >
+                              title="Download Receipt">
                               <Download className="w-4 h-4" />
                             </button>
                             

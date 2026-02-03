@@ -389,7 +389,7 @@ const IssueDetailsPage = () => {
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
 
       {/* Header */}
-      {role === 'admin' &&
+      {user && role === 'admin' &&
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-4">
 
@@ -449,8 +449,8 @@ const IssueDetailsPage = () => {
                 </div>
                 <div>
                   {/* {console.log(issue?.status !== 'Rejected', issue?.boostType === 'high_boost')} */}
-                {(issue?.status !== 'Rejected' && issue?.boostType !== 'high_boost' ) &&(
-                  (isOwnIssue && count>10)? (
+                {(issue?.status !== 'Rejected' && issue?.boostType !== 'high_boost' && count>10 ) &&(
+                  (isOwnIssue)? (
                     <div 
                     onClick={handleBoostCritical}
                     disabled={paymentLoading}

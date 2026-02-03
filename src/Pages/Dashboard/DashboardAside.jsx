@@ -21,7 +21,8 @@ import {
   LayoutGrid,
   ShieldUser,
   NotepadText,
-  BadgePoundSterling
+  BadgePoundSterling,
+  BadgeDollarSign
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -151,6 +152,13 @@ const DashboardAside = () => {
       icon: <HelpCircle className="w-5 h-5" />,
       path: 'help-support',
       roles: ['admin', 'citizen']
+    },
+    {
+      id: 'payment-Analysis',
+      name: 'Payment Analysis',
+      icon: <BadgeDollarSign className='w-5 h-5'/>,
+      path: 'payment-history-admin',
+      roles: ['admin']
     }
   ]
 

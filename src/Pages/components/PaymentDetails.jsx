@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { 
   ArrowLeft,
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../AuthProvider/AuthContext';
 
 const PaymentDetails = () => {
   const { paymentId } = useParams();
@@ -23,6 +24,7 @@ const PaymentDetails = () => {
   const axiosSecure = useAxiosSecure();
   const [payment, setPayment] = useState(null);
   const [loading, setLoading] = useState(true);
+  const {role} = use(AuthContext)
 
   useEffect(() => {
     fetchPaymentDetails();
@@ -278,6 +280,7 @@ const PaymentDetails = () => {
           </div>
 
           {/* Actions */}
+          {role === 'citizen' && (
           <div className="flex flex-col sm:flex-row gap-4 pt-6">
             <button
               onClick={() => navigate(-1)}
@@ -301,7 +304,8 @@ const PaymentDetails = () => {
             >
               Contact Support
             </button>
-          </div>
+          </div>            
+          )}
         </div>
 
         {/* Footer Note */}

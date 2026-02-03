@@ -35,6 +35,7 @@ import PaymentDetails from "../Pages/components/PaymentDetails"
 import ReviewIssues from "../Pages/components/ReviewIssues"
 import HelpSupport from "../Pages/components/HelpSupport"
 import LifetimePremium from "../Pages/Others/LifetimePremium"
+import AdminPaymentHistory from "../Pages/Admin/AdminPaymentHistory"
 // import HowItWorks from "../Pages/Others/HowItWorks"
 export const router = createBrowserRouter([
     {
@@ -140,6 +141,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'review-issues', Component: ReviewIssues
+            },
+            {
+                path: 'payment-history-admin', Component: AdminPaymentHistory
             }
 
         ]
