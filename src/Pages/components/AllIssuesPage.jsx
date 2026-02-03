@@ -1,5 +1,5 @@
 import React, { useState, useEffect, use } from 'react';
-import { NavLink } from 'react-router';
+import { NavLink, useNavigate, useSearchParams } from 'react-router';
 import { 
   Search, 
   Filter, 
@@ -36,9 +36,28 @@ const AllIssuesPage = () => {
   const [upvoting, setUpvoting] = useState({});
   const axiosSecure = useAxiosSecure()
   const [hasUpvoted, setHasUpvoted] = useState({})
-  const [page, setPage] = useState(1)
   const [limit] = useState(8)
   const [hasMore, setHasMore] = useState(true)
+
+  //page relaod issue state manage
+  const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const currentPage = parseInt(searchParams.get('page')) || 1
+  const [page, setPage] = useState(currentPage)
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+
+    setSearchParams({ page: newPage });
+    // navigate(`?page=${newPage}`);
+  }
+
+  useEffect(() => {
+    const urlPage = parseInt(searchParams.get('page')) || 1
+    if (urlPage !== page) {
+      setPage(urlPage)
+    }
+  }, [searchParams])
 
   const allissuesFetch = () => {
     setLoading(true);
@@ -188,7 +207,7 @@ const AllIssuesPage = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'Critical': return 'from-red-800 to-orange-500';
+      case 'Critical': return 'from-red-800 to-rose-500';
       case 'High': return 'from-red-500 to-orange-500';
       case 'Normal': return 'from-emerald-500 to-teal-500';
       case 'Low': return 'from-blue-500 to-cyan-500';
@@ -496,7 +515,7 @@ const AllIssuesPage = () => {
         {Array.from({ length: hasMore ? page + 1 : page }, (_, i) => i + 1).map((num) => (
           <button
             key={num}
-            onClick={() => setPage(num)}
+            onClick={() => handlePageChange(num)}
             className={`px-4 py-2 rounded-xl border ${
               page === num ? 'bg-emerald-500 text-white' : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
             }`}

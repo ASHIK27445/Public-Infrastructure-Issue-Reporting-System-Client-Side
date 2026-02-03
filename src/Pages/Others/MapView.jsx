@@ -41,114 +41,6 @@ const MapView = () => {
   const [viewMode, setViewMode] = useState('normal'); // normal, heatmap, clusters
   const axiosInstance = useAxios()
 
-  // Sample data - replace with API call
-  const sampleIssues = [
-    {
-      id: 1,
-      title: 'Broken Streetlight',
-      description: 'Multiple streetlights not working in residential area',
-      location: { lat: 23.811, lng: 90.415 },
-      status: 'pending',
-      priority: 'high',
-      category: 'electricity',
-      reportedBy: 'John Doe',
-      date: '2024-12-18',
-      upvotes: 12,
-      image: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&h=400&fit=crop'
-    },
-    {
-      id: 2,
-      title: 'Large Pothole',
-      description: 'Deep pothole causing vehicle damage',
-      location: { lat: 23.808, lng: 90.410 },
-      status: 'in-progress',
-      priority: 'critical',
-      category: 'road',
-      reportedBy: 'Emily Chen',
-      date: '2024-12-17',
-      upvotes: 24,
-      image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop'
-    },
-    {
-      id: 3,
-      title: 'Water Leakage',
-      description: 'Continuous water leakage affecting homes',
-      location: { lat: 23.815, lng: 90.420 },
-      status: 'resolved',
-      priority: 'medium',
-      category: 'water',
-      reportedBy: 'Michael Brown',
-      date: '2024-12-16',
-      upvotes: 8,
-      image: 'https://images.unsplash.com/photo-1584467541268-b040f83be3fd?w=600&h=400&fit=crop'
-    },
-    {
-      id: 4,
-      title: 'Garbage Overflow',
-      description: 'Overflowing bins causing health issues',
-      location: { lat: 23.805, lng: 90.405 },
-      status: 'pending',
-      priority: 'medium',
-      category: 'sanitation',
-      reportedBy: 'Lisa Anderson',
-      date: '2024-12-15',
-      upvotes: 15,
-      image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&h=400&fit=crop'
-    },
-    {
-      id: 5,
-      title: 'Damaged Footpath',
-      description: 'Broken concrete tiles making footpath unusable',
-      location: { lat: 23.812, lng: 90.418 },
-      status: 'in-progress',
-      priority: 'low',
-      category: 'infrastructure',
-      reportedBy: 'David Wilson',
-      date: '2024-12-14',
-      upvotes: 6,
-      image: 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=600&h=400&fit=crop'
-    },
-    {
-      id: 6,
-      title: 'Non-functional Traffic Signal',
-      description: 'Traffic light malfunction at major intersection',
-      location: { lat: 23.807, lng: 90.413 },
-      status: 'pending',
-      priority: 'critical',
-      category: 'traffic',
-      reportedBy: 'Anna Martinez',
-      date: '2024-12-13',
-      upvotes: 32,
-      image: 'https://images.unsplash.com/photo-1502977249166-824b3a8a4d6d?w=600&h=400&fit=crop'
-    },
-    {
-      id: 7,
-      title: 'Broken Park Bench',
-      description: 'Public park bench damaged and unsafe',
-      location: { lat: 23.814, lng: 90.408 },
-      status: 'resolved',
-      priority: 'low',
-      category: 'Parks & Recreation',
-      reportedBy: 'Robert Johnson',
-      date: '2024-12-12',
-      upvotes: 4,
-      image: 'https://images.unsplash.com/photo-1519861531473-920034658307?w=600&h=400&fit=crop'
-    },
-    {
-      id: 8,
-      title: 'Blocked Drain',
-      description: 'Drain blockage causing waterlogging',
-      location: { lat: 23.809, lng: 90.422 },
-      status: 'in-progress',
-      priority: 'medium',
-      category: 'drainage',
-      reportedBy: 'Sarah Williams',
-      date: '2024-12-11',
-      upvotes: 11,
-      image: 'https://images.unsplash.com/photo-1584467541268-b040f83be3fd?w=600&h=400&fit=crop'
-    }
-  ];
-
   const fetchData = () => {
     axiosInstance.get('/map-view/issues')
       .then(res=>{
@@ -243,7 +135,7 @@ const MapView = () => {
 
   const getPriorityBadge = (priority) => {
     const priorityConfig = {
-      critical: { color: 'bg-red-500/20 text-red-400', text: 'Critical' },
+      Critical: { color: 'bg-red-500/20 text-red-400', text: 'Critical' },
       High: { color: 'bg-orange-500/20 text-orange-400', text: 'High' },
       Normal: { color: 'bg-yellow-500/20 text-yellow-400', text: 'Normal' },
       Low: { color: 'bg-blue-500/20 text-blue-400', text: 'Low' }

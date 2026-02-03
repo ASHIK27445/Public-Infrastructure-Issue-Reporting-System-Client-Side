@@ -592,7 +592,7 @@ const CitizenDashboard = () => {
                     <td className="py-2 px-2">
                       <div className="flex items-center space-x-2">
                         <NavLink
-                          to={`/issues/${issue.id}`}
+                          to={`/issues/${issue?._id}`}
                           className="p-2 bg-zinc-700 rounded-lg text-gray-400 hover:text-white hover:bg-zinc-600 transition-colors"
                           title="View Details"
                         >

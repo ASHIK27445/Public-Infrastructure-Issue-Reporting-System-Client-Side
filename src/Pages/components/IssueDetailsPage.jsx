@@ -140,10 +140,12 @@ const IssueDetailsPage = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'Critical': return 'from-red-500 to-orange-500';
+      case 'Critical': return 'from-red-700 to-red-400';
       case 'High': return 'from-orange-500 to-yellow-500';
       case 'Normal': return 'from-emerald-500 to-teal-500';
-      case 'Low': return 'from-blue-500 to-cyan-500';
+      case 'Low': return 'from-blue-300 to-cyan-300';
+      case 'Support': return 'from-blue-700 to-cyan-700';
+      case 'Boosted High': return 'from-rose-700 to-red-700'
       default: return 'from-gray-500 to-slate-500';
     }
   }
@@ -202,6 +204,27 @@ const IssueDetailsPage = () => {
     }
       setPaymentLoading(true)
       axiosSecure.post('/create-checkout-session', {type: 'normal_boost', issueId: issue?._id})
+      .then(res => {
+        console.log(res.data)
+        window.location.href = res.data.sessionURL
+      }).catch(err=> {
+        console.log(err)
+        toast.error(err)
+      })
+        .finally(()=> setPaymentLoading(false))
+  }
+
+    const handleBoostCritical = () => {
+    if(!isOwnIssue && !issue?.id){
+      toast.error("You can't boost other issues.")
+      return
+    }
+    if(issue?.boostType === 'high_boost'){
+      toast.error("Already Boosted!")
+      return
+    }
+      setPaymentLoading(true)
+      axiosSecure.post('/create-checkout-session', {type: 'high_boost', issueId: issue?._id})
       .then(res => {
         console.log(res.data)
         window.location.href = res.data.sessionURL
@@ -408,21 +431,50 @@ const IssueDetailsPage = () => {
           <div className="lg:col-span-2 space-y-8">
             {/* Issue Header */}
             <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div className={`px-4 py-2 bg-linear-to-r ${getPriorityColor(issue?.priority)} rounded-full font-bold text-white text-sm`}>
-                  {issue?.priority} Priority
-                </div>
-                <div className={`px-4 py-2 bg-linear-to-r ${getStatusColor(issue?.status)} rounded-full font-bold text-white text-sm flex items-center space-x-2`}>
-                  <CheckCircle className="w-4 h-4" />
-                  <span>{issue?.status}</span>
-                </div>
-                {issue?.isBoosted && (
-                  <div className="px-4 py-2 bg-linear-to-r from-purple-500 to-pink-500 rounded-full font-bold text-white text-sm flex items-center space-x-2">
-                    <TrendingUp className="w-4 h-4" />
-                    <span>Boosted</span>
+              <div className='flex justify-between'>
+                <div className="flex flex-wrap items-center gap-4 mb-6">
+                  <div className={`px-4 py-2 bg-linear-to-r ${getPriorityColor(issue?.priority)} rounded-full font-bold text-white text-sm`}>
+                    {issue?.priority} Priority
                   </div>
+                  <div className={`px-4 py-2 bg-linear-to-r ${getStatusColor(issue?.status)} rounded-full font-bold text-white text-sm flex items-center space-x-2`}>
+                    <CheckCircle className="w-4 h-4" />
+                    <span>{issue?.status}</span>
+                  </div>
+                  {issue?.isBoosted && (
+                    <div className="px-4 py-2 bg-linear-to-r from-purple-500 to-pink-500 rounded-full font-bold text-white text-sm flex items-center space-x-2">
+                      <TrendingUp className="w-4 h-4" />
+                      <span>Boosted</span>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  {/* {console.log(issue?.status !== 'Rejected', issue?.boostType === 'high_boost')} */}
+                {(issue?.status !== 'Rejected' && issue?.boostType !== 'high_boost' ) &&(
+                  (isOwnIssue && count>10)? (
+                    <div 
+                    onClick={handleBoostCritical}
+                    disabled={paymentLoading}
+                    className={`flex gap-1 cursor-pointer px-4 py-2 bg-linear-to-r ${getPriorityColor('Boosted High')} rounded-full font-bold text-white text-sm`}>
+                    {paymentLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>High Boost Priority</span>
+                      </>
+                    )}
+                    </div>) : (
+                    <div className={`cursor-pointer px-4 py-2 bg-linear-to-r ${getPriorityColor('Support')} rounded-full font-bold text-white text-sm`}>
+                      Support
+                    </div>)
                 )}
+
+                </div>
               </div>
+
+
 
               <h1 className="text-4xl font-black text-white mb-4">{issue?.title}</h1>
               
