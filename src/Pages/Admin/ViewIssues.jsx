@@ -31,12 +31,10 @@ const ViewAllIssues = () => {
   const axiosSecure = useAxiousSecure();
 
   const issueFetch = () => {
-    axiosSecure.get('/allissues')
+    axiosSecure.get('/admin/allissues')
       .then(res => setIssues(res.data))
       .catch(err => console.log(err))
   }
-
-  // console.log(issues)
 
   const fetchStaffList = () => {
     axiosSecure.get('/allstaff')

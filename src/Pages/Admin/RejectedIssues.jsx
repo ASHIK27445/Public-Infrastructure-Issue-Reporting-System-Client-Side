@@ -15,8 +15,9 @@ const RejectedIssues = () => {
 
   const issueFetch = () => {
     setLoading(true)
-    axiosSecure.get('/allissues')
+    axiosSecure.get('/admin/allissues')
       .then(res => {
+        // console.log(res.data)
         // Filter only rejected issues
         const rejectedIssues = res.data.filter(issue => issue.status === 'Rejected')
         setRejectedIssues(rejectedIssues);

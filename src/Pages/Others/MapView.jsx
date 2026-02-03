@@ -387,7 +387,7 @@ const handleResetView = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Map */}
           <div className="lg:col-span-2">
-            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden h-[600px] relative">
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden h-150 relative">
               {/* Map Controls */}
               <div className="absolute top-4 right-4 z-10 flex flex-col space-y-2">
                 <button
@@ -492,7 +492,7 @@ const handleResetView = () => {
 
           {/* Right Column - Issue List */}
           <div className="lg:col-span-1">
-            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden h-[600px] flex flex-col">
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden h-150 flex flex-col">
               {/* Header */}
               <div className="p-6 border-b border-zinc-700">
                 <div className="flex items-center justify-between">

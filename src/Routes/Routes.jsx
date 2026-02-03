@@ -19,7 +19,6 @@ import ViewIssues from "../Pages/Admin/ViewIssues"
 import RejectedIssues from "../Pages/Admin/RejectedIssues"
 import AssignedIssues from "../Pages/Staff/AssignedIssues"
 import MapView from "../Pages/Others/MapView"
-import PremiumMock from "../Pages/Others/PremiumMock"
 import TermsOfService from "../Pages/Others/TermsOfService"
 import PrivacyPolicy from "../Pages/Home/PrivacyPolicy"
 import CommunityGuidelines from "../Pages/Others/CommunityGuidelines"
@@ -35,6 +34,7 @@ import PaymentHistory from "../Pages/components/PaymentHistory"
 import PaymentDetails from "../Pages/components/PaymentDetails"
 import ReviewIssues from "../Pages/components/ReviewIssues"
 import HelpSupport from "../Pages/components/HelpSupport"
+import LifetimePremium from "../Pages/Others/LifetimePremium"
 // import HowItWorks from "../Pages/Others/HowItWorks"
 export const router = createBrowserRouter([
     {
@@ -62,7 +62,7 @@ export const router = createBrowserRouter([
                 path:'/map-view', Component: MapView
             },
             {
-                path:'/premium', Component: PremiumMock
+                path:'/premium', Component: LifetimePremium
             },
             {
                 path:'/Terms-of-services', Component: TermsOfService

@@ -115,7 +115,7 @@ const PaymentSuccess = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 flex items-center justify-center p-6 mt-10">
       <div className="max-w-md w-full bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-emerald-500/30 p-8 text-center">
         <div className="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle className="w-12 h-12 text-emerald-500" />
