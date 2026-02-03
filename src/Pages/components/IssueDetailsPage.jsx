@@ -66,6 +66,8 @@ const IssueDetailsPage = () => {
   const [commentLoading, setCommentLoading] = useState(false)
   const [replyLoading, setReplyLoading] = useState(false)
   const [commentDeleteLaoding, setCommentDeleteLaoding] = useState(false)
+  const [showAllComments, setShowAllComments] = useState(false)
+  const commentsToShow = showAllComments ? comments : comments.slice(0,3)
 
 
   const fetchAllData = async() =>{
@@ -722,27 +724,42 @@ const IssueDetailsPage = () => {
                     <p>No comments yet. Be the first to comment!</p>
                   </div>
                 ) : (
-                  comments.map((comment) => (
-                    <CommentSection
-                      key={comment._id}
-                      comment={comment}
-                      mUser={mUser}
-                      role={role}
-                      replyingTo={replyingTo}
-                      replyText={replyText}
-                      replyLoading={replyLoading}
-                      onDeleteComment={handleDeleteComment}
-                      onReplyClick={(commentId) => 
-                        setReplyingTo(replyingTo === commentId ? null : commentId)
-                      }
-                      onReplyTextChange={setReplyText}
-                      onReplySubmit={handleAddReply}
-                      formatDate={formatDate}
-                      commentDeleteLaoding = {commentDeleteLaoding}
-                    />
-                  ))
+                  <>
+                    {commentsToShow.map((comment) => (
+                      <CommentSection
+                        key={comment._id}
+                        comment={comment}
+                        mUser={mUser}
+                        role={role}
+                        replyingTo={replyingTo}
+                        replyText={replyText}
+                        replyLoading={replyLoading}
+                        onDeleteComment={handleDeleteComment}
+                        onReplyClick={(commentId) =>
+                          setReplyingTo(replyingTo === commentId ? null : commentId)
+                        }
+                        onReplyTextChange={setReplyText}
+                        onReplySubmit={handleAddReply}
+                        formatDate={formatDate}
+                        commentDeleteLaoding={commentDeleteLaoding}
+                      />
+                    ))}
+
+                    {/* Toggle Button */}
+                    {comments.length > 3 && (
+                      <button
+                        onClick={() => setShowAllComments(!showAllComments)}
+                        className="text-blue-400 text-sm mt-2 hover:underline"
+                      >
+                        {showAllComments
+                          ? 'Collapse comments'
+                          : `View all ${comments.length - 3} comments`}
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
+
             </div>
 
           </div>
