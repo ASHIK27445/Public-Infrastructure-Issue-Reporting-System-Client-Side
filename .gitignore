@@ -32,3 +32,4 @@ firebase.json
 dist
 
 .firebase
+.firebase/
