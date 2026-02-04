@@ -278,6 +278,7 @@ const CitizenDashboard = () => {
               <BarChart3 className="w-6 h-6 text-emerald-500" />
             </div>
             <div className="h-80">
+              {/* {console.log(issuesOverTimeData)} */}
             { loading ? <ChartLoading/> : 
                   !issuesOverTimeData || issuesOverTimeData.length === 0 ? 
                   (<div className="h-full flex flex-col items-center justify-center text-gray-500">
@@ -311,10 +312,8 @@ const CitizenDashboard = () => {
                           color: 'white'
                         }}
                         labelStyle={{ color: '#d1d5db' }}
-                        formatter={(value, name) => [value, name === 'reported' ? 'Reported' : 'Resolved']}
                       />
                       <Legend 
-                        formatter={(value) => value === 'reported' ? 'Reported Issues' : 'Resolved Issues'}
                       />
                       <Bar 
                         dataKey="reported" 

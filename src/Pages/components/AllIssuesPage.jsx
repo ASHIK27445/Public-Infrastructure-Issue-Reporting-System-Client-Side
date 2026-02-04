@@ -300,7 +300,7 @@ const AllIssuesPage = () => {
             {(searchTerm || Object.values(filters).filter(v => v).length > 0) && (
               <button
                 onClick={clearFilters}
-                className="px-6 py-3 bg-linear-to-r from-gray-700 to-slate-700 rounded-2xl text-white hover:from-gray-600 hover:to-slate-600 transition-all"
+                className="px-6 py-3 bg-linear-to-r from-gray-700 to-slate-700 rounded-2xl text-white hover:from-gray-600 hover:to-slate-600 transition-all clear-btn"
               >
                 Clear All
               </button>

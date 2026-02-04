@@ -991,7 +991,7 @@ console.log(getSmartAddress(selectedLocation.address))
                 
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400 textarea-md">Reports Remaining</span>
-                  <span className="text-white font-medium">{remainingIssues}</span>
+                  <span className="text-white font-medium">{isPremium ? 'Unlimited' : remainingIssues}</span>
                 </div>
                 
                 <div className="flex items-center justify-between">

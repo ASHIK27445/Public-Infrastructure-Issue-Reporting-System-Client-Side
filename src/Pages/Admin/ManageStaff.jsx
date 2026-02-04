@@ -52,7 +52,9 @@ const ManageStaff = () => {
     'Sanitation',
     'Public Safety',
     'Parks & Recreation',
-    'Building & Construction'
+    'Building & Construction',
+    'Streetlight',
+    'Other'
   ];
 
   const handleShowPassword = () => {
@@ -175,22 +177,44 @@ const ManageStaff = () => {
     }
 
   if(loading){
-      return (
-        <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 flex justify-center items-center">
-          <div className="text-center">
-            <RotatingTriangles
-              visible={true}
-              height="80"
-              width="80"
-              color="#10b981"
-              ariaLabel="rotating-triangles-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-            />
-            <p className="mt-6 text-lg text-emerald-400 font-semibold">Creating your account...</p>
+    return (
+      <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 flex justify-center items-center">
+        <div className="text-center">
+          <div className="relative w-20 h-20">
+            {/* Center orb */}
+            <div className="absolute inset-0 bg-linear-to-r from-emerald-500 to-cyan-500 rounded-full animate-pulse"></div>
+            
+            {/* Orbiting particles */}
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-2 h-2 bg-emerald-400 rounded-full"
+                style={{
+                  top: `${Math.sin(i * Math.PI / 4) * 30 + 35}px`,
+                  left: `${Math.cos(i * Math.PI / 4) * 30 + 35}px`,
+                  animation: `orbit 2s linear infinite`,
+                  animationDelay: `${i * 0.25}s`
+                }}
+              ></div>
+            ))}
           </div>
+          <p className="mt-6 text-lg bg-linear-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent font-semibold">
+            Finalizing registration...
+          </p>
+          
+          <style jsx>{`
+            @keyframes orbit {
+              0% {
+                transform: rotate(0deg) translateX(35px) rotate(0deg);
+              }
+              100% {
+                transform: rotate(360deg) translateX(35px) rotate(-360deg);
+              }
+            }
+          `}</style>
         </div>
-      )
+      </div>
+    )
   }
 
   const handleDelete = async (staff) => {

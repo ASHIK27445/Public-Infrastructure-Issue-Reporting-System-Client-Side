@@ -122,11 +122,10 @@ const Login = () => {
 
             <div className='flex justify-center mb-5'>
               <button
-  type="button"
-  onClick={handleDemoLogin}
-  className="mt-3 px-4 py-2 bg-zinc-700/60 hover:bg-zinc-700 text-emerald-400 text-sm font-semibold rounded-xl transition-all duration-300 border border-zinc-600"
->
-  Demo Login
+                type="button"
+                onClick={handleDemoLogin}
+                className="clear-btn mt-3 px-4 py-2 bg-zinc-700/60 hover:bg-zinc-700 text-emerald-400 text-sm font-semibold rounded-xl transition-all duration-300 border border-zinc-600">
+                Demo Login
               </button>
             </div>
 

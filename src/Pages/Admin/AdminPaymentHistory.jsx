@@ -13,6 +13,7 @@ import {
   Eye
 } from 'lucide-react'
 import useAxiosSecure from '../../Hooks/useAxiosSecure'
+import { toast } from 'react-toastify'
 
 const AdminPaymentHistory = () => {
   const axiosSecure = useAxiosSecure()
@@ -207,6 +208,7 @@ const AdminPaymentHistory = () => {
                         <td className="py-4 px-6">
                           <div className="flex items-center space-x-3">
                             <button
+                              onClick={()=> toast.info("Payment Reciept implementation will be soon.")}
                               title="Download Receipt"
                               className="p-2 bg-zinc-700 rounded-xl text-gray-300 hover:text-white hover:bg-zinc-600 transition-colors"
                             >

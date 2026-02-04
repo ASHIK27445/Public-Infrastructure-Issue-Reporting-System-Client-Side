@@ -134,9 +134,9 @@ const LifetimePremium = () => {
           </div>
 
           {/* Features */}
-          <div className="space-y-3 mb-6">
+          <div className="space-y-3 mb-6 ">
             {features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-3 p-3 bg-zinc-800/30 rounded-lg">
+              <div key={index} className="flex items-center gap-3 p-3 bg-zinc-800/30 rounded-lg custom-color">
                 <div className="text-emerald-500">
                   {feature.icon}
                 </div>
@@ -202,7 +202,7 @@ const LifetimePremium = () => {
           
           <div className="space-y-4">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-zinc-800/30 border border-zinc-700 rounded-xl p-4">
+              <div key={index} className="bg-zinc-800/30 border border-zinc-700 rounded-xl p-4 custom-color">
                 <div className="flex items-center gap-2 mb-3">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500" />

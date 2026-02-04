@@ -359,3 +359,13 @@ body {
   background-color: #f4f4f5 !important; /* zinc-100 */
   color: #18181b !important;
 }
+
+[data-theme="light"] button.clear-btn {
+  background: linear-gradient(to right, #d1d5db, #d5d9e0) !important; /* gray-300 → gray-400 */
+  color: #18181b !important;
+}
+
+[data-theme='light'] .custom-color{
+  background-color: whitesmoke !important;
+  color: #18181b !important;
+}

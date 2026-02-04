@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { NavLink, useNavigate } from 'react-router';
 import { RotatingTriangles } from 'react-loader-spinner';
 import { GoEye, GoEyeClosed } from "react-icons/go";
-import { ArrowRight, CheckCircle, Shield, UserPlus, Mail, Lock, User, MapPin, Image } from 'lucide-react';
+import { ArrowRight, CheckCircle, Shield, UserPlus, Mail, Lock, User, MapPin, Image, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { auth } from '../../Firebase/firebase.init';
 
@@ -44,7 +44,7 @@ const Register = () => {
     
     const handleRegister = async(e) =>{
         e.preventDefault()
-        
+        setLoading(true)
         const name = e.target.name.value
         const photoURL = e.target.photoURL
         const file = photoURL.files[0]
@@ -69,7 +69,6 @@ const Register = () => {
           }
 
           if(imgbb.data.success == true){
-            setLoading(true)
             createUserEP(email, password)
               .then(res=> {
                 console.log(res.user)
@@ -103,24 +102,33 @@ const Register = () => {
     }
     
     if(loading){
-      return (
-        <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 flex justify-center items-center">
-          <div className="text-center">
-            <RotatingTriangles
-              visible={true}
-              height="80"
-              width="80"
-              color="#10b981"
-              ariaLabel="rotating-triangles-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-            />
-            <p className="mt-6 text-lg text-emerald-400 font-semibold">Creating your account...</p>
+      return(
+      <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 flex justify-center items-center">
+        <div className="text-center">
+          <div className="flex items-end justify-center h-16 space-x-1">
+            {['A', 'C', 'C', 'O', 'U', 'N', 'T'].map((letter, i) => (
+              <div key={i} className="relative">
+                <div
+                  className="w-3 bg-linear-to-t from-emerald-600 to-emerald-300 rounded-t-lg animate-bounce"
+                  style={{
+                    height: `${20 + Math.sin(i) * 15}px`,
+                    animationDelay: `${i * 0.1}s`,
+                    animationDuration: '0.8s'
+                  }}
+                ></div>
+                <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-emerald-400 font-mono">
+                  {letter}
+                </span>
+              </div>
+            ))}
           </div>
+          <p className="mt-10 text-lg text-emerald-400 font-semibold">
+            Initializing settings...
+          </p>
         </div>
+      </div>
       )
     }
-    
     const handleShowPassword = () =>{
       setShowPassword(!showPassword)
     }
@@ -265,14 +273,20 @@ const Register = () => {
                   </NavLink>
                 </div>
               </div>
-
-              <button 
+              
+              {loading ? 
+                <button 
+                  className="group w-full px-8 py-4 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Creating......</span>
+                </button> :
+                <button 
                 type="submit"
-                className="group w-full px-8 py-4 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3"
-              >
+                className="group w-full px-8 py-4 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3">
                 <span>Create Account</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
+              }
             </form>
 
             <div className="mt-8 pt-8 border-t border-zinc-700">
