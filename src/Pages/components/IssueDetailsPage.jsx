@@ -34,6 +34,7 @@ import { AuthContext } from '../AuthProvider/AuthContext';
 import { toast} from "react-toastify"
 import axios from 'axios';
 import CommentSection from './CommentSection';
+import useAxios from '../../Hooks/useAxios';
 
 const IssueDetailsPage = () => {
   const {role, user, mUser, mLoading} = use(AuthContext)
@@ -42,6 +43,7 @@ const IssueDetailsPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [issue, setIssue] = useState([])
   const axiosSecure = useAxiosSecure()
+  const axiosInstance = useAxios()
   const {id} = useParams()
   const [count, setCount] = useState(0)
   const [viewCount, setViewCount] = useState(issue?.viewsCount)
@@ -112,7 +114,7 @@ const IssueDetailsPage = () => {
     if(viewedIssues.includes(id)) return
 
     const timer = setTimeout(() => {
-      axios.post(`http://localhost:3000/view-count/${id}`)
+      axiosInstance.post(`/view-count/${id}`)
         .then(res => {
           console.log('View counted', res.data, res.data.viewsCount)
           setViewCount(res.data.viewsCount)

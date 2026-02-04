@@ -7,6 +7,7 @@ import { GoEye, GoEyeClosed } from "react-icons/go";
 import { ArrowRight, CheckCircle, Shield, UserPlus, Mail, Lock, User, MapPin, Image, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { auth } from '../../Firebase/firebase.init';
+import useAxios from '../../Hooks/useAxios';
 
 const Register = () => {
     const {user, logoutUser, createUserEP, profileUpdate, setUser} = use(AuthContext)
@@ -15,6 +16,7 @@ const Register = () => {
     const [loading, setLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
+    const axiosInstance = useAxios()
     
     const passwordVerification = (passWD)=>{
         const newPassWordError = []
@@ -75,7 +77,7 @@ const Register = () => {
                   return profileUpdate(name, mainPhoto)
                             .then(()=>{
                               setUser({...auth.currentUser})
-                              axios.post('http://localhost:3000/users', formData)
+                              axiosInstance.post('/users', formData)
                                 .then(res=>console.log(res.data))
                                 .catch(err=>console.log(err))
                             })

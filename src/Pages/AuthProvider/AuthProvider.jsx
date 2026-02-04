@@ -40,7 +40,7 @@ const AuthProvider = ({children}) => {
     useEffect(()=>{
         if(!user){return}
         setMLoading(true)
-        axios.get(`http://localhost:3000/user/role/${user?.email}`)
+        axiosInstance.get(`/user/role/${user?.email}`)
             .then((res)=>{
             //     console.log('Full response:', res.data)  // Check this
             // console.log('Role value:', res.data.role)

@@ -20,8 +20,10 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import useAxiosSecure from '../../Hooks/useAxiosSecure'
 import { AuthContext } from '../AuthProvider/AuthContext';
+import useAxios from '../../Hooks/useAxios';
 const AllIssuesPage = () => {
   const {mUser, user, role} = use(AuthContext)
+  const axiosInstance = useAxios()
   const [issues, setIssues] = useState([]);
   const [filteredIssues, setFilteredIssues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +63,7 @@ const AllIssuesPage = () => {
 
   const allissuesFetch = () => {
     setLoading(true);
-    axios.get(`http://localhost:3000/allissues?page=${page}&limit=${limit}`)
+    axiosInstance.get(`/allissues?page=${page}&limit=${limit}`)
       .then(res => {
         setIssues(res.data);
         setFilteredIssues(res.data);
@@ -77,7 +79,7 @@ const AllIssuesPage = () => {
   const upvotesFetch = () => {
     if(!mUser?._id) return;
 
-    axios.get('http://localhost:3000/all-upvotes')
+    axiosInstance.get('/all-upvotes')
      .then(res => {
       // console.log(res.data);
       const upvoteMap = {}

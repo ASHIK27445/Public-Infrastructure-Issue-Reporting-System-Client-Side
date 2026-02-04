@@ -2,9 +2,8 @@ import axios from "axios";
 import { AuthContext } from '../Pages/AuthProvider/AuthContext';
 import { use, useEffect } from "react";
 const axiosSecure = axios.create({
-    baseURL: 'http://localhost:3000'
+    baseURL: process.env.REACT_APP_FIREBASE_HOSTING_URL
 })
-//http://localhost:3000 https://piirms.vercel.app
 const useAxiosSecure = () => {
     const {user} = use(AuthContext)
 
