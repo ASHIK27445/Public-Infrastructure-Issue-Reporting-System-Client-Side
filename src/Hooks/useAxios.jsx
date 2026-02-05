@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-    baseURL: process.env.REACT_APP_FIREBASE_HOSTING_URL
+    baseURL: import.meta.env.VITE_API_URL
 })
 //http://localhost:3000
 const useAxios = () => {

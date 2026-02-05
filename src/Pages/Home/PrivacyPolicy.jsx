@@ -176,18 +176,18 @@ We encourage parents and guardians to observe, participate in, and/or monitor an
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 py-12 px-4">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 py-12 px-4">
       <title>CommunityFix - Privacy Policy</title>
       
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-3xl border border-blue-500/30 mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-linear-to-br from-blue-500/20 to-indigo-500/20 rounded-3xl border border-blue-500/30 mb-6">
             <Lock className="w-10 h-10 text-blue-400" />
           </div>
           
           <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-            Privacy <span className="bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">Policy</span>
+            Privacy <span className="bg-linear-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">Policy</span>
           </h1>
           
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
@@ -197,7 +197,7 @@ We encourage parents and guardians to observe, participate in, and/or monitor an
 
         {/* Quick Overview */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-gradient-to-br from-blue-900/30 to-indigo-900/30 rounded-3xl border border-blue-500/30 p-6">
+          <div className="bg-linear-to-br from-blue-900/30 to-indigo-900/30 rounded-3xl border border-blue-500/30 p-6">
             <div className="flex items-center space-x-3 mb-4">
               <ShieldCheck className="w-8 h-8 text-blue-400" />
               <h3 className="text-xl font-bold text-white">Your Privacy Matters</h3>
@@ -207,7 +207,7 @@ We encourage parents and guardians to observe, participate in, and/or monitor an
             </p>
           </div>
           
-          <div className="bg-gradient-to-br from-emerald-900/30 to-teal-900/30 rounded-3xl border border-emerald-500/30 p-6">
+          <div className="bg-linear-to-br from-emerald-900/30 to-teal-900/30 rounded-3xl border border-emerald-500/30 p-6">
             <div className="flex items-center space-x-3 mb-4">
               <CheckCircle className="w-8 h-8 text-emerald-400" />
               <h3 className="text-xl font-bold text-white">Transparent Practices</h3>
@@ -217,7 +217,7 @@ We encourage parents and guardians to observe, participate in, and/or monitor an
             </p>
           </div>
           
-          <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-3xl border border-purple-500/30 p-6">
+          <div className="bg-linear-to-br from-purple-900/30 to-pink-900/30 rounded-3xl border border-purple-500/30 p-6">
             <div className="flex items-center space-x-3 mb-4">
               <Key className="w-8 h-8 text-purple-400" />
               <h3 className="text-xl font-bold text-white">Your Control</h3>
@@ -232,7 +232,7 @@ We encourage parents and guardians to observe, participate in, and/or monitor an
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2">
-            <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
               {/* Introduction */}
               <div className="mb-10">
                 <h2 className="text-2xl font-bold text-white mb-4">Introduction</h2>
@@ -305,7 +305,7 @@ We encourage parents and guardians to observe, participate in, and/or monitor an
           <div className="lg:col-span-1">
             {/* Contact Card */}
             <div className="sticky top-8">
-              <div className="bg-gradient-to-br from-blue-900/30 to-indigo-900/30 rounded-3xl border border-blue-500/30 p-6 mb-6">
+              <div className="bg-linear-to-br from-blue-900/30 to-indigo-900/30 rounded-3xl border border-blue-500/30 p-6 mb-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <Mail className="w-6 h-6 text-blue-400" />
                   <h3 className="text-xl font-bold text-white">Contact Our DPO</h3>
@@ -326,7 +326,7 @@ We encourage parents and guardians to observe, participate in, and/or monitor an
               </div>
 
               {/* Your Rights */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
                 <h3 className="text-xl font-bold text-white mb-4">Your Rights</h3>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -364,7 +364,7 @@ We encourage parents and guardians to observe, participate in, and/or monitor an
               </div>
 
               {/* Related Links */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
                 <h3 className="text-xl font-bold text-white mb-4">Related Documents</h3>
                 <div className="space-y-3">
                   <NavLink
@@ -407,7 +407,7 @@ We encourage parents and guardians to observe, participate in, and/or monitor an
 
         {/* Policy Updates */}
         <div className="mt-12">
-          <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8 max-w-3xl mx-auto">
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8 max-w-3xl mx-auto">
             <div className="flex items-center justify-center space-x-3 mb-6">
               <AlertTriangle className="w-8 h-8 text-amber-500" />
               <h3 className="text-2xl font-bold text-white">Policy Updates</h3>

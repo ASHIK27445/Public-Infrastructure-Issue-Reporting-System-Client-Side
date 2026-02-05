@@ -30,19 +30,19 @@ const Testimonials = () => {
     <section className="py-32 px-6 bg-zinc-900">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <div className="inline-block px-6 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 mb-6">
+          <div className="inline-block px-6 py-2 rounded-full bg-linear-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 mb-6">
             <span className="text-emerald-400 font-semibold text-sm uppercase tracking-wider">Testimonials</span>
           </div>
           <h2 className="text-5xl md:text-7xl font-black text-white mb-6">
-            What Citizens <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Say</span>
+            What Citizens <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Say</span>
           </h2>
           <p className="text-xl text-gray-400">Real feedback from real people making real change</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="group relative bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105">
-              <div className="absolute -top-5 left-8 w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center shadow-xl">
+            <div key={index} className="group relative bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105">
+              <div className="absolute -top-5 left-8 w-16 h-16 bg-linear-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center shadow-xl">
                 <img 
                   src={testimonial.avatar} 
                   alt={testimonial.name}

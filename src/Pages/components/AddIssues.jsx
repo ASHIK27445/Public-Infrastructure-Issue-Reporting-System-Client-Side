@@ -499,8 +499,6 @@ const AddIssue = () => {
   };
 
 
-console.log(getSmartAddress(selectedLocation.address))
-
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       {/* Top Header - Minimal */}

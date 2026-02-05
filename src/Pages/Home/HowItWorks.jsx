@@ -30,14 +30,15 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section className="py-32 px-6 bg-gradient-to-b from-zinc-950 to-zinc-900">
+    <section className="py-32 px-6 bg-linear-to-b from-zinc-950 to-zinc-900">
+      <title>CommunityFix - How It Works</title>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <div className="inline-block px-6 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 mb-6">
+          <div className="inline-block px-6 py-2 rounded-full bg-linear-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 mb-6">
             <span className="text-emerald-400 font-semibold text-sm uppercase tracking-wider">Simple Process</span>
           </div>
           <h2 className="text-5xl md:text-7xl font-black text-white mb-6">
-            How It <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Works</span>
+            How It <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Works</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             From report to resolution in four seamless steps. Simple, transparent, and incredibly effective.
@@ -47,13 +48,13 @@ const HowItWorks = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
             <div key={index} className="relative group">
-              <div className="relative bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 h-full">
+              <div className="relative bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 h-full">
                 
-                <div className="absolute -top-6 -left-6 w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-2xl rotate-12 group-hover:rotate-0 transition-transform duration-500">
+                <div className="absolute -top-6 -left-6 w-16 h-16 bg-linear-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-2xl rotate-12 group-hover:rotate-0 transition-transform duration-500">
                   <span className="text-white font-black text-2xl">{step.number}</span>
                 </div>
 
-                <div className="w-16 h-16 bg-gradient-to-br from-zinc-700 to-zinc-800 rounded-2xl flex items-center justify-center text-emerald-400 mb-6 mt-8 group-hover:scale-110 transition-transform duration-500">
+                <div className="w-16 h-16 bg-linear-to-br from-zinc-700 to-zinc-800 rounded-2xl flex items-center justify-center text-emerald-400 mb-6 mt-8 group-hover:scale-110 transition-transform duration-500">
                   {step.icon}
                 </div>
 

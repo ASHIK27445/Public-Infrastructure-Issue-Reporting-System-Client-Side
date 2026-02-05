@@ -43,6 +43,7 @@ const Features = () => {
 
   return (
     <section className="py-32 px-6 relative overflow-hidden">
+      <title>CommunityFix - Why Choose Us</title>
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
           backgroundImage: 'radial-gradient(circle, #10b981 1px, transparent 1px)',

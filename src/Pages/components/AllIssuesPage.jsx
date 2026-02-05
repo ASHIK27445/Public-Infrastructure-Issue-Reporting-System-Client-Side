@@ -183,7 +183,9 @@ const AllIssuesPage = () => {
             )
           setUpvoting(prev => ({ ...prev, [issue._id]: false }))
         }
-      }).catch(err => console.log(err))
+      }).catch(err => {
+        // console.log(err)
+      })
   }
 
   const handleFilterChange = (key, value) => {
@@ -227,6 +229,7 @@ const AllIssuesPage = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
+      <title>CommunityFix - All Issues</title>
       {/* Header */}
       <div className="bg-linear-to-r from-emerald-900/30 to-teal-900/30 border-b border-emerald-500/20">
         <div className="max-w-7xl mx-auto px-6 py-12">

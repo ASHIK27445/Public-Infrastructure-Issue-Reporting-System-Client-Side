@@ -82,12 +82,15 @@ const LifetimePremium = () => {
     axiosSecure.post('/create-checkout-session', {type: 'premium'})
       .then(res => {
         window.location.href = res.data.sessionURL
-      }).catch(err=> console.log(err))
+      }).catch(err=> {
+        toast.error(err)
+      })
         .finally(()=> setPaymentLoading(false))
   }
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
+      <title>CommunityFix - Life Time Premium</title>
       {/* Header */}
       <div className="max-w-2xl mx-auto px-6 py-12">
         <div className="text-center mb-10">

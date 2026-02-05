@@ -90,14 +90,17 @@ const MyProfile = () => {
     setPaymentLoading(true)
     axiosSecure.post('/create-checkout-session', {type: 'premium'})
       .then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         window.location.href = res.data.sessionURL
-      }).catch(err=> console.log(err))
+      }).catch(err=> {
+        // console.log(err)
+      })
         .finally(()=> setPaymentLoading(false))
   }
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 p-6">
+      <title>CommunityFix - Profile</title>
       <div className="max-w-5xl mx-auto">
         {/* Blocked User Warning */}
         {citizen?.isBlocked && (

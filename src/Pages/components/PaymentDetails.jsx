@@ -34,10 +34,12 @@ const PaymentDetails = () => {
       setLoading(true)
       axiosSecure.get(`/payment-details/${paymentId}`)
         .then(res=> {
-          console.log(res.data)
+          // console.log(res.data)
           setPayment(res.data)
           setLoading(false)
-        }).catch(err=> console.log(err))
+        }).catch(err=> {
+          // console.log(err)
+        })
   }
 
   const formatDateTime = (dateString) => {
@@ -103,6 +105,7 @@ const PaymentDetails = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 p-4 md:p-6">
+      <title>CommunityFix - Payment Details</title>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">

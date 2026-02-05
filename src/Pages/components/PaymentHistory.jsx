@@ -44,7 +44,9 @@ const PaymentHistory = () => {
         .then(res => {
             // console.log(res.data)
             setPayments(res.data)
-        }).catch(err=> console.log(err))
+        }).catch(err=> {
+          // console.log(err)
+        })
         .finally(()=> {setLoading(false)})
   }
 
@@ -149,6 +151,7 @@ const PaymentHistory = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 p-6">
+      <title>CommunityFix - Payment History</title>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">

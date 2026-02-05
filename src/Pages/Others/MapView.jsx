@@ -44,10 +44,12 @@ const MapView = () => {
   const fetchData = () => {
     axiosInstance.get('/map-view/issues')
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         setIssues(res.data)
         setFilteredIssues(res.data)
-      }).catch(err=> console.log(err))
+      }).catch(err=> {
+        // console.log(err)
+      })
   }
 
   useEffect(() => {
@@ -56,7 +58,7 @@ const MapView = () => {
   }, [axiosInstance]);
 
 
-  console.log(issues, filteredIssues)
+  // console.log(issues, filteredIssues)
   // Filter and search issues
   useEffect(() => {
     let result = [...issues];
@@ -178,6 +180,7 @@ const handleResetView = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
+      <title>CommunityFix - Map View</title>
       {/* Header */}
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-6">

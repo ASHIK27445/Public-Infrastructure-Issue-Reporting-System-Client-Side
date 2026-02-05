@@ -39,12 +39,14 @@ const ReviewIssues = () => {
     setLoading(true)
     axiosSecure.get( `/review-issues?page=${currentPage}&isReviewed=${isReviewedFilter}&search=${search}&month=${monthFilter}&year=${yearFilter}`)
         .then(res=> {
-            console.log(res.data)
+            // console.log(res.data)
             setReviewIssues(res.data.result)
             setTotalItems(res.data.total)
             setTotalPages(Math.ceil(res.data.total/8))
             setLoading(false)
-        }).catch(err=> console.log(err))
+        }).catch(err=> {
+          // console.log(err)
+        })
   }, [axiosSecure, currentPage, isReviewedFilter, search, monthFilter, yearFilter])
   
   const openApproveModal = (issueId) => {
@@ -67,7 +69,7 @@ const ReviewIssues = () => {
 
     axiosSecure.patch(`/update-review/${selectedIssueId}`, {isReviewed: newReviewValue})
         .then(res => {
-            console.log(res.data)
+            // console.log(res.data)
             if(res.data.modifiedCount > 0){
               setReviewIssues(prev=> prev.map(i=> 
                 i._id === selectedIssueId ? {...i, isReviewed: newReviewValue} : i))
@@ -80,6 +82,7 @@ const ReviewIssues = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
+      <title>CommunityFix - Review Issues</title>
       {/* Header */}
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-6">

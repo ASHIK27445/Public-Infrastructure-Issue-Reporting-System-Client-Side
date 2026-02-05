@@ -14,7 +14,9 @@ const DashboardLayout = () => {
     const refreshCitizen = async() => {
       return await axiosSecure.get('/user/citizen')
         .then(res=> setCitizen(res.data) )
-        .catch(err=> console.log(err))
+        .catch(err=> {
+          // console.log(err)
+        })
     }
 
     useEffect(()=>{

@@ -85,7 +85,7 @@ const CommentSection= ({
             </div>
           </div>
         ) : (
-          <p className="text-white bg-gray-800/50 rounded-lg p-3">
+          <p className="text-white bg-gray-800/50 rounded-lg p-3 custom-color">
             {comment.commentText}
           </p>
         )}
@@ -145,7 +145,7 @@ const CommentSection= ({
                     </div>
                   </div>
                 ) : (
-                  <p className="text-gray-300 text-sm bg-gray-800/30 rounded-lg p-2">
+                  <p className="text-gray-300 text-sm bg-gray-800/30 rounded-lg p-2 custom-color">
                     {reply.repliedText}
                   </p>
                 )}
@@ -174,14 +174,12 @@ const CommentSection= ({
               value={replyText}
               onChange={(e) => onReplyTextChange(e.target.value)}
               placeholder="Write a reply..."
-              className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
-              onKeyPress={(e) => e.key === 'Enter' && onReplySubmit(comment._id)}
-            />
+              className="custom-color flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+              onKeyPress={(e) => e.key === 'Enter' && onReplySubmit(comment._id)}/>
             <button
               onClick={() => onReplySubmit(comment._id)}
               disabled={!replyText.trim() || replyLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm disabled:opacity-50"
-            >
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm disabled:opacity-50 clear-btn hover:cursor-pointer border border-gray-600">
               {replyLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (

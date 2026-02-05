@@ -179,10 +179,16 @@ const DashboardAside = () => {
 
       {/* Sidebar for Desktop and Mobile */}
       <aside className={`
-        fixed top-0 left-0 h-screen bg-linear-to-b from-zinc-900 to-zinc-950 border-r border-zinc-800
+        fixed top-0 left-0 h-[133vh] bg-linear-to-b from-zinc-900 to-zinc-950 border-r border-zinc-800
         w-64 z-40 transform transition-transform duration-300 ease-in-out
         lg:translate-x-0 lg:relative lg:h-auto
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+
+        overflow-y-auto lg:overflow-y-visible
+        [&::-webkit-scrollbar]:hidden 
+        [-ms-overflow-style:none] 
+        [scrollbar-width:none]
+        touch-pan-y overscroll-contain
       `}>
         {/* Sidebar Header */}
         <div className="p-6 border-b border-zinc-800">

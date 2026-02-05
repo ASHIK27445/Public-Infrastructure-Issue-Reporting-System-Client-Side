@@ -24,7 +24,7 @@ const ManageUsers = () => {
   useEffect(()=> {
     axiosSecure.get('/allusers')
       .then(res => setUsers(res.data))
-      .catch(err=> console.log(err))
+      // .catch(err=> console.log(err))
   }, [axiosSecure])
 
   const handleUserStatus = async (email, isBlocked) => {
@@ -70,7 +70,6 @@ const ManageUsers = () => {
         });
       }
     } catch (err) {
-      console.log(err);
       Swal.fire({
         title: "Error",
         text: "Something went wrong",

@@ -47,7 +47,9 @@ const AuthProvider = ({children}) => {
                 setMUser(res.data)
                 setRole(res.data.role)
             })
-            .catch(err=> console.log(err))
+            .catch(err=> {
+                // console.log(err)
+            })
             .finally(()=> {setMLoading(false)})
     },[user])
 

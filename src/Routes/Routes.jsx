@@ -36,6 +36,7 @@ import ReviewIssues from "../Pages/components/ReviewIssues"
 import HelpSupport from "../Pages/components/HelpSupport"
 import LifetimePremium from "../Pages/Others/LifetimePremium"
 import AdminPaymentHistory from "../Pages/Admin/AdminPaymentHistory"
+import ErrorPage from "../Pages/Error/ErrorPage"
 // import HowItWorks from "../Pages/Others/HowItWorks"
 export const router = createBrowserRouter([
     {
@@ -147,5 +148,8 @@ export const router = createBrowserRouter([
             }
 
         ]
+    },
+    {
+        path: '*', Component: ErrorPage
     }
 ])

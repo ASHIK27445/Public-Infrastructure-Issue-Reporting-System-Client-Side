@@ -106,6 +106,7 @@ const PaymentBoostSuccess = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-900">
+      <title>CommunityFix - Payment Boost Success</title>
       <div className="bg-zinc-800 rounded-xl p-8 text-center">
         <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
         <h1 className="text-2xl text-white font-bold mb-2">Payment Successful!</h1>

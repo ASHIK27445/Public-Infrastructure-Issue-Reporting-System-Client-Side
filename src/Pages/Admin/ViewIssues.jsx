@@ -33,7 +33,7 @@ const ViewAllIssues = () => {
   const issueFetch = () => {
     axiosSecure.get('/admin/allissues')
       .then(res => setIssues(res.data))
-      .catch(err => console.log(err))
+      // .catch(err => console.log(err))
   }
 
   const fetchStaffList = () => {
@@ -41,7 +41,8 @@ const ViewAllIssues = () => {
       .then(res => {
         const activeStaff = res.data.filter(staff => !staff.isBlocked)
         setStaffList(activeStaff)
-      }).catch(err => console.log(err))
+      })
+      // .catch(err => console.log(err))
   }
 
   useEffect(()=> {

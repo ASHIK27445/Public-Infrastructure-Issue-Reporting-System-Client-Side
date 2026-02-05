@@ -84,8 +84,8 @@ const IssueDetailsPage = () => {
         setCount(upvotesRes.data.count || 0);
         setTimeline(timelineResponse.data)
     }catch (err){
-      console.log(err)
-      toast('Failed to load the data.')
+      // console.log(err)
+      toast.error('Failed to load the data.')
     }finally{
       setLoading(false)
     }
@@ -116,12 +116,14 @@ const IssueDetailsPage = () => {
     const timer = setTimeout(() => {
       axiosInstance.post(`/view-count/${id}`)
         .then(res => {
-          console.log('View counted', res.data, res.data.viewsCount)
+          // console.log('View counted', res.data, res.data.viewsCount)
           setViewCount(res.data.viewsCount)
           viewedIssues.push(id);
           sessionStorage.setItem("viewedIssues", JSON.stringify(viewedIssues))
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+          // console.log(err)
+        });
     }, 5000);
 
     // cleanup if user leaves early
@@ -207,10 +209,10 @@ const IssueDetailsPage = () => {
       setPaymentLoading(true)
       axiosSecure.post('/create-checkout-session', {type: 'normal_boost', issueId: issue?._id})
       .then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         window.location.href = res.data.sessionURL
       }).catch(err=> {
-        console.log(err)
+        // console.log(err)
         toast.error(err)
       })
         .finally(()=> setPaymentLoading(false))
@@ -228,10 +230,10 @@ const IssueDetailsPage = () => {
       setPaymentLoading(true)
       axiosSecure.post('/create-checkout-session', {type: 'high_boost', issueId: issue?._id})
       .then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         window.location.href = res.data.sessionURL
       }).catch(err=> {
-        console.log(err)
+        // console.log(err)
         toast.error(err)
       })
         .finally(()=> setPaymentLoading(false))
@@ -274,11 +276,11 @@ const IssueDetailsPage = () => {
       reporterId: mUser?._id,
       reporterName: isAnonymous ? 'Anonymous' : mUser?.name,
     }
-    console.log(reportData)
+    // console.log(reportData)
     setReportLoading(true)
     axiosSecure.post(`/report-issue/${issue._id}`, reportData)
       .then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         setReportLoading(false)
         if(res.data.success){
           setShowReportModal(false)
@@ -321,7 +323,7 @@ const IssueDetailsPage = () => {
     axiosSecure.post(`/comments/${id}`,{
       commentText: commentText.trim()
     }).then(res => {
-      console.log(res.data)
+      // console.log(res.data)
       if(res.data.success){
         setCommentText('')
         fetchComment()
@@ -337,7 +339,7 @@ const IssueDetailsPage = () => {
     axiosSecure.post(`/comments/reply/${commentId}`, {
       replyText: replyText.trim()
     }).then(res=>{
-      console.log(res.data)
+      // console.log(res.data)
       if(res.data.success){
         setReplyText('')
         setReplyingTo(null)
@@ -389,7 +391,8 @@ const IssueDetailsPage = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
-
+      <title>{`CommunityFix - ${issue?.title}`}</title>
+      {console.log(issue?.title)}
       {/* Header */}
       {user && role === 'admin' &&
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
@@ -397,13 +400,13 @@ const IssueDetailsPage = () => {
 
           <div className="flex items-center justify-between">
             <NavLink
-              to="/all-issues"
+              to="/allissues"
               className="inline-flex items-center space-x-3 text-gray-400 hover:text-white transition-colors group">
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Issues</span>
             </NavLink>
             
-            <div className="flex items-center space-x-4">
+            {/* <div className="flex items-center space-x-4">
               <button
                 onClick={handleEdit}
                 className="flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-blue-500 to-cyan-500 rounded-xl text-white font-bold hover:shadow-blue-500/50 transition-all"
@@ -419,7 +422,7 @@ const IssueDetailsPage = () => {
                 <Trash2 className="w-4 h-4" />
                 <span>Delete</span>
               </button>
-            </div>
+            </div> */}
           </div>
 
         </div>
@@ -835,9 +838,6 @@ const IssueDetailsPage = () => {
                     loading='lazy'
                   />
                 </div>
-                {/* {
-                  console.log(issue)
-                } */}
                 <div>
                   <div className="font-bold text-white">{issue?.reporterName}</div>
                   <div className="text-sm text-emerald-400">Verified Citizen</div>
@@ -1002,7 +1002,7 @@ const IssueDetailsPage = () => {
           <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8 max-w-lg w-full">
             <h3 className="text-2xl font-bold text-white mb-6 flex items-center space-x-3">
               <Flag className="w-6 h-6 text-amber-500" />
-              <span>Report This Issue</span>
+              <span>Flag This Issue</span>
             </h3>
             
             {/* Report Form */}

@@ -42,9 +42,9 @@ const MyIssuePage = () => {
         };
 
         fetchMyIssues();
-    }, [citizen?._id, axiosSecure]); // FIX 5: Correct dependency
+    }, [citizen?._id, axiosSecure])
 
-    console.log(citizen)
+    // console.log(citizen)
     
     // Filter issues
     const filteredIssues = issues.filter(issue => {

@@ -80,18 +80,18 @@ const TermsOfService = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 py-12 px-4">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 py-12 px-4">
       <title>CommunityFix - Terms of Service</title>
       
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-3xl border border-emerald-500/30 mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-linear-to-br from-emerald-500/20 to-teal-500/20 rounded-3xl border border-emerald-500/30 mb-6">
             <Shield className="w-10 h-10 text-emerald-400" />
           </div>
           
           <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-            Terms of <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Service</span>
+            Terms of <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Service</span>
           </h1>
           
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
@@ -103,7 +103,7 @@ const TermsOfService = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2">
-            <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
               {/* Introduction */}
               <div className="mb-10">
                 <h2 className="text-2xl font-bold text-white mb-4">Welcome to CommunityFix</h2>
@@ -176,7 +176,7 @@ const TermsOfService = () => {
           <div className="lg:col-span-1">
             {/* Quick Summary Card */}
             <div className="sticky top-8">
-              <div className="bg-gradient-to-br from-emerald-900/30 to-teal-900/30 rounded-3xl border border-emerald-500/30 p-6 mb-6">
+              <div className="bg-linear-to-br from-emerald-900/30 to-teal-900/30 rounded-3xl border border-emerald-500/30 p-6 mb-6">
                 <h3 className="text-xl font-bold text-white mb-4">Quick Summary</h3>
                 <ul className="space-y-3">
                   <li className="flex items-center space-x-3 text-gray-300">
@@ -199,7 +199,7 @@ const TermsOfService = () => {
               </div>
 
               {/* Important Notes */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
                 <h3 className="text-xl font-bold text-white mb-4">Important Notes</h3>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -229,7 +229,7 @@ const TermsOfService = () => {
               </div>
 
               {/* Related Links */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
                 <h3 className="text-xl font-bold text-white mb-4">Related Documents</h3>
                 <div className="space-y-3">
                   <NavLink
@@ -272,7 +272,7 @@ const TermsOfService = () => {
 
         {/* Acceptance Section */}
         <div className="mt-12 text-center">
-          <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8 max-w-3xl mx-auto">
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8 max-w-3xl mx-auto">
             <div className="flex items-center justify-center space-x-3 mb-6">
               <CheckCircle className="w-8 h-8 text-emerald-500" />
               <h3 className="text-2xl font-bold text-white">Acceptance Acknowledgement</h3>
@@ -287,7 +287,7 @@ const TermsOfService = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <NavLink
                 to="/"
-                className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105"
+                className="px-8 py-4 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105"
               >
                 Return to Home
               </NavLink>

@@ -103,7 +103,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 py-12 px-4 flex items-center justify-center">
-      <title>CityInfra - Login</title>
+      <title>CommunityFix - Login</title>
       
       <div className="w-full max-w-md">
         <div className="relative group">

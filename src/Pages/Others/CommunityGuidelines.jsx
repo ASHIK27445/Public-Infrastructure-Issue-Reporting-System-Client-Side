@@ -128,18 +128,18 @@ const CommunityGuidelines = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 py-12 px-4">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 py-12 px-4">
       <title>CommunityFix - Community Guidelines</title>
       
       <div className="max-w-6xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-3xl border border-purple-500/30 mb-6">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-linear-to-br from-purple-500/20 to-pink-500/20 rounded-3xl border border-purple-500/30 mb-6">
             <Users className="w-12 h-12 text-purple-400" />
           </div>
           
           <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-            Community <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Guidelines</span>
+            Community <span className="bg-linear-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Guidelines</span>
           </h1>
           
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
@@ -149,7 +149,7 @@ const CommunityGuidelines = () => {
 
         {/* Core Principles */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-3xl border border-purple-500/30 p-6">
+          <div className="bg-linear-to-br from-purple-900/30 to-pink-900/30 rounded-3xl border border-purple-500/30 p-6">
             <div className="flex items-center space-x-3 mb-4">
               <Heart className="w-8 h-8 text-purple-400" />
               <h3 className="text-xl font-bold text-white">Respect First</h3>
@@ -159,7 +159,7 @@ const CommunityGuidelines = () => {
             </p>
           </div>
           
-          <div className="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-3xl border border-blue-500/30 p-6">
+          <div className="bg-linear-to-br from-blue-900/30 to-cyan-900/30 rounded-3xl border border-blue-500/30 p-6">
             <div className="flex items-center space-x-3 mb-4">
               <Shield className="w-8 h-8 text-blue-400" />
               <h3 className="text-xl font-bold text-white">Safety & Trust</h3>
@@ -169,7 +169,7 @@ const CommunityGuidelines = () => {
             </p>
           </div>
           
-          <div className="bg-gradient-to-br from-emerald-900/30 to-teal-900/30 rounded-3xl border border-emerald-500/30 p-6">
+          <div className="bg-linear-to-br from-emerald-900/30 to-teal-900/30 rounded-3xl border border-emerald-500/30 p-6">
             <div className="flex items-center space-x-3 mb-4">
               <Target className="w-8 h-8 text-emerald-400" />
               <h3 className="text-xl font-bold text-white">Positive Impact</h3>
@@ -184,7 +184,7 @@ const CommunityGuidelines = () => {
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
           {/* Left Column - Guidelines */}
           <div className="lg:col-span-2">
-            <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
+            <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-white mb-4">Our Community Standards</h2>
                 <p className="text-gray-300 leading-relaxed">
@@ -200,7 +200,7 @@ const CommunityGuidelines = () => {
                       className="w-full flex items-center justify-between p-6 bg-zinc-800/50 hover:bg-zinc-800 transition-colors text-left"
                     >
                       <div className="flex items-center space-x-4">
-                        <div className={`bg-gradient-to-r ${guideline.color} w-12 h-12 rounded-2xl flex items-center justify-center`}>
+                        <div className={`bg-linear-to-r ${guideline.color} w-12 h-12 rounded-2xl flex items-center justify-center`}>
                           {guideline.icon}
                         </div>
                         <h3 className="text-xl font-bold text-white">{guideline.title}</h3>
@@ -250,7 +250,7 @@ const CommunityGuidelines = () => {
           <div className="lg:col-span-1">
             {/* Community Stats */}
             <div className="sticky top-8">
-              <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-3xl border border-purple-500/30 p-6 mb-6">
+              <div className="bg-linear-to-br from-purple-900/30 to-pink-900/30 rounded-3xl border border-purple-500/30 p-6 mb-6">
                 <h3 className="text-xl font-bold text-white mb-4">Community Impact</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -273,7 +273,7 @@ const CommunityGuidelines = () => {
               </div>
 
               {/* Positive Behaviors */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
                 <h3 className="text-xl font-bold text-white mb-4">Positive Behaviors</h3>
                 <div className="space-y-4">
                   {positiveBehaviors.map((item, index) => (
@@ -289,7 +289,7 @@ const CommunityGuidelines = () => {
               </div>
 
               {/* Recognition System */}
-              <div className="bg-gradient-to-br from-amber-900/30 to-orange-900/30 rounded-3xl border border-amber-500/30 p-6 mb-6">
+              <div className="bg-linear-to-br from-amber-900/30 to-orange-900/30 rounded-3xl border border-amber-500/30 p-6 mb-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <Award className="w-6 h-6 text-amber-400" />
                   <h3 className="text-xl font-bold text-white">Recognition System</h3>
@@ -315,7 +315,7 @@ const CommunityGuidelines = () => {
               </div>
 
               {/* Reporting & Support */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
                 <h3 className="text-xl font-bold text-white mb-4">Need Help?</h3>
                 <div className="space-y-4">
                   <button className="w-full flex items-center justify-between p-3 bg-zinc-700/50 rounded-xl hover:bg-zinc-600/50 transition-colors group">
@@ -352,7 +352,7 @@ const CommunityGuidelines = () => {
 
         {/* Enforcement & Consequences */}
         <div className="mb-12">
-          <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-8">
             <div className="flex items-center space-x-3 mb-6">
               <AlertTriangle className="w-8 h-8 text-amber-500" />
               <h2 className="text-2xl font-bold text-white">Enforcement & Consequences</h2>
@@ -420,7 +420,7 @@ const CommunityGuidelines = () => {
 
         {/* Commitment Card */}
         <div className="mb-12">
-          <div className="bg-gradient-to-br from-emerald-900/30 to-teal-900/30 rounded-3xl border border-emerald-500/30 p-8 max-w-3xl mx-auto">
+          <div className="bg-linear-to-br from-emerald-900/30 to-teal-900/30 rounded-3xl border border-emerald-500/30 p-8 max-w-3xl mx-auto">
             <div className="flex items-center justify-center space-x-3 mb-6">
               <HandHeart className="w-8 h-8 text-emerald-400" />
               <h2 className="text-2xl font-bold text-white">Our Commitment to You</h2>
@@ -433,7 +433,7 @@ const CommunityGuidelines = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <NavLink
                 to="/"
-                className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105"
+                className="px-8 py-4 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105"
               >
                 Return to Community
               </NavLink>

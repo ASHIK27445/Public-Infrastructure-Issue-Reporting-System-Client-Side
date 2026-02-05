@@ -178,22 +178,23 @@ const HelpCenter = () => {
     : popularArticles.filter(article => article.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
+      <title>CommunityFix - Help Center</title>
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-indigo-900/20 to-purple-900/20" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.15),transparent_50%)]" />
+          <div className="absolute inset-0 bg-linear-to-r from-blue-900/20 via-indigo-900/20 to-purple-900/20" />
+          <div className="absolute inset-0 bg-[radial-linear(circle_at_30%_20%,rgba(59,130,246,0.15),transparent_50%)]" />
         </div>
         
         <div className="max-w-7xl mx-auto px-6 py-20 relative z-10">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-3xl border border-blue-500/30 mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-linear-to-br from-blue-500/20 to-indigo-500/20 rounded-3xl border border-blue-500/30 mb-6">
               <HelpCircle className="w-10 h-10 text-blue-400" />
             </div>
             
             <h1 className="text-5xl md:text-7xl font-black text-white mb-6">
-              Help <span className="bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">Center</span>
+              Help <span className="bg-linear-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">Center</span>
             </h1>
             
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
@@ -211,7 +212,7 @@ const HelpCenter = () => {
                   placeholder="What can we help you with? Search for answers..."
                   className="w-full pl-16 pr-6 py-5 bg-zinc-800/50 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 backdrop-blur-sm text-lg"
                 />
-                <button className="absolute right-3 top-1/2 transform -translate-y-1/2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl text-white font-medium hover:shadow-blue-500/50 transition-all">
+                <button className="absolute right-3 top-1/2 transform -translate-y-1/2 px-6 py-3 bg-linear-to-r from-blue-500 to-indigo-500 rounded-xl text-white font-medium hover:shadow-blue-500/50 transition-all">
                   Search
                 </button>
               </div>
@@ -246,13 +247,13 @@ const HelpCenter = () => {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`group flex flex-col items-center p-4 rounded-2xl transition-all duration-300 ${
                   selectedCategory === category.id
-                    ? 'bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border-2 border-blue-500/50'
+                    ? 'bg-linear-to-br from-blue-500/20 to-indigo-500/20 border-2 border-blue-500/50'
                     : 'bg-zinc-800 border border-zinc-700 hover:bg-zinc-700'
                 }`}
               >
                 <div className={`mb-3 p-3 rounded-xl ${
                   selectedCategory === category.id
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white'
+                    ? 'bg-linear-to-r from-blue-500 to-indigo-500 text-white'
                     : 'bg-zinc-700 text-gray-400 group-hover:text-white'
                 }`}>
                   {category.icon}
@@ -276,7 +277,7 @@ const HelpCenter = () => {
       </section>
 
       {/* Main Content */}
-      <section className="py-12 px-6 bg-gradient-to-b from-zinc-900 to-zinc-950">
+      <section className="py-12 px-6 bg-linear-to-b from-zinc-900 to-zinc-950">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Left Column - FAQ & Articles */}
@@ -300,7 +301,7 @@ const HelpCenter = () => {
                     {tab.icon}
                     <span>{tab.name}</span>
                     {activeTab === tab.id && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500" />
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-linear-to-r from-blue-500 to-indigo-500" />
                     )}
                   </button>
                 ))}
@@ -365,7 +366,7 @@ const HelpCenter = () => {
               {activeTab === 'articles' && (
                 <div className="grid md:grid-cols-2 gap-6">
                   {filteredArticles.map((article) => (
-                    <div key={article.id} className="group bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-700 p-6 hover:border-blue-500/50 transition-all duration-300">
+                    <div key={article.id} className="group bg-linear-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-700 p-6 hover:border-blue-500/50 transition-all duration-300">
                       <div className="flex items-center space-x-3 mb-4">
                         <FileText className="w-6 h-6 text-blue-400" />
                         <div>
@@ -398,7 +399,7 @@ const HelpCenter = () => {
               {activeTab === 'tutorials' && (
                 <div className="grid md:grid-cols-2 gap-6">
                   {tutorials.map((tutorial, index) => (
-                    <div key={index} className="group bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-700 p-6 hover:border-purple-500/50 transition-all duration-300">
+                    <div key={index} className="group bg-linear-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-700 p-6 hover:border-purple-500/50 transition-all duration-300">
                       <div className="flex items-center justify-between mb-4">
                         <div className={`p-3 rounded-xl ${
                           tutorial.type === 'Video' 
@@ -442,7 +443,7 @@ const HelpCenter = () => {
             {/* Right Column - Support & Resources */}
             <div className="lg:col-span-1">
               {/* Support Channels */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
                 <div className="flex items-center space-x-3 mb-6">
                   <MessageSquare className="w-6 h-6 text-blue-400" />
                   <h3 className="text-xl font-bold text-white">Contact Support</h3>
@@ -455,7 +456,7 @@ const HelpCenter = () => {
                       className="group w-full flex items-center justify-between p-4 bg-zinc-800/50 hover:bg-zinc-800 rounded-xl border border-zinc-700 transition-all duration-300"
                     >
                       <div className="flex items-center space-x-4">
-                        <div className={`bg-gradient-to-r ${channel.color} w-12 h-12 rounded-xl flex items-center justify-center text-white`}>
+                        <div className={`bg-linear-to-r ${channel.color} w-12 h-12 rounded-xl flex items-center justify-center text-white`}>
                           {channel.icon}
                         </div>
                         <div className="text-left">
@@ -470,7 +471,7 @@ const HelpCenter = () => {
               </div>
 
               {/* Quick Stats */}
-              <div className="bg-gradient-to-br from-blue-900/30 to-indigo-900/30 rounded-3xl border border-blue-500/30 p-6 mb-6">
+              <div className="bg-linear-to-br from-blue-900/30 to-indigo-900/30 rounded-3xl border border-blue-500/30 p-6 mb-6">
                 <div className="flex items-center space-x-3 mb-6">
                   <Target className="w-6 h-6 text-blue-400" />
                   <h3 className="text-xl font-bold text-white">Support Stats</h3>
@@ -512,7 +513,7 @@ const HelpCenter = () => {
               </div>
 
               {/* Useful Links */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
                 <div className="flex items-center space-x-3 mb-6">
                   <Lightbulb className="w-6 h-6 text-amber-400" />
                   <h3 className="text-xl font-bold text-white">Useful Resources</h3>
@@ -569,8 +570,8 @@ const HelpCenter = () => {
       {/* CTA Section */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl p-12 border border-zinc-700 text-center">
-            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-12 border border-zinc-700 text-center">
+            <div className="w-20 h-20 bg-linear-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <MessageSquare className="w-10 h-10 text-white" />
             </div>
             
@@ -583,7 +584,7 @@ const HelpCenter = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="group px-10 py-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3">
+              <button className="group px-10 py-5 bg-linear-to-r from-blue-500 to-indigo-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3">
                 <Mail className="w-5 h-5" />
                 <span>Email Support</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

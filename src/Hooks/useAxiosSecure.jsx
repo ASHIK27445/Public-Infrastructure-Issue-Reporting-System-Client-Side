@@ -2,7 +2,7 @@ import axios from "axios";
 import { AuthContext } from '../Pages/AuthProvider/AuthContext';
 import { use, useEffect } from "react";
 const axiosSecure = axios.create({
-    baseURL: process.env.REACT_APP_FIREBASE_HOSTING_URL
+    baseURL: import.meta.env.VITE_API_URL
 })
 const useAxiosSecure = () => {
     const {user} = use(AuthContext)
@@ -18,7 +18,7 @@ const useAxiosSecure = () => {
                 return response;
             },
             (error) => {
-                console.log(error);
+                // console.log(error);
                 return Promise.reject(error);
             }
             );

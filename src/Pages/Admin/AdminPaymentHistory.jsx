@@ -45,7 +45,7 @@ const AdminPaymentHistory = () => {
         setPagination(res.data.pagination)
         setAnalytics(res.data.analytics)
       })
-      .catch(err => console.log(err))
+      .catch(err => toast.error(err))
       .finally(() => setLoading(false))
   }
 

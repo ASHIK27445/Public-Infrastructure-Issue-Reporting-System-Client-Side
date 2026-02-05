@@ -63,7 +63,7 @@ const Register = () => {
             }
           })
 
-          console.log(imgbb.data)
+          // console.log(imgbb.data)
 
           const mainPhoto = imgbb.data.data.display_url
           const formData = {
@@ -73,7 +73,7 @@ const Register = () => {
           if(imgbb.data.success == true){
             createUserEP(email, password)
               .then(res=> {
-                console.log(res.user)
+                // console.log(res.user)
                   return profileUpdate(name, mainPhoto)
                             .then(()=>{
                               setUser({...auth.currentUser})
@@ -137,7 +137,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-zinc-950 to-zinc-900 py-12 px-4 flex items-center justify-center">
-      <title>CityInfra - Register</title>
+      <title>CommunityFix - Register</title>
       
       <div className="w-full max-w-2xl">
         <div className="relative group">

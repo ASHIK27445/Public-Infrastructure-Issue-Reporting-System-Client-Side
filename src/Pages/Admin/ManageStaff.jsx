@@ -38,7 +38,7 @@ const ManageStaff = () => {
   const fetchDemo = () => {
         axiosSecure.get('/allstaff')
         .then(res => setStaffMembers(res.data))
-        .catch(err=> console.log(err))
+        .catch(()=>{})
   }
   useEffect(()=> {
     fetchDemo()
@@ -128,12 +128,12 @@ const ManageStaff = () => {
         dept: selectDept
     }
 
-    console.log(formData, "photo", photo)
+    // console.log(formData, "photo", photo)
 
     setLoading(true)
     axiosSecure.post('/addstaff', formData)
         .then(res => {
-                    console.log(res.data)
+                    // console.log(res.data)
                     setStaffMembers(prev=> [...prev, res.data])
                     toast.success("Success!")
                     e.target.reset()
@@ -158,17 +158,17 @@ const ManageStaff = () => {
         uid: selectedStaff?.uid
     }
 
-    console.log(updateData)
+    // console.log(updateData)
 
     setLoading(true)
     axiosSecure.patch('/update/staff/info', updateData)
         .then(res => {
-          console.log(res.data)
+          // console.log(res.data)
         })
         .then(()=> {
             fetchDemo()
         })
-        .catch(err=> console.log(err))
+        .catch(err=> toast.error(err))
         .finally(()=> {
           setLoading(false)
           toast.success("User Updated!")
@@ -302,7 +302,7 @@ const ManageStaff = () => {
           iconColor: "#dc2626"
         });
       }).catch(err=>{
-        console.log(err)
+        // console.log(err)
         Swal.fire({
         title: "Error",
         text: error.response?.data?.message || "Failed to delete staff",

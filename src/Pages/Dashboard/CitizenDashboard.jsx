@@ -68,7 +68,7 @@ const CitizenDashboard = () => {
     setLoading(true)
     axiosSecure.get(`/user/stats?range=${range}`)
       .then(res=> {
-        console.log(res.data)
+        // console.log(res.data)
         setLoading(false)
         setStats(res.data)
         setCategoryDistribution(res.data.categoryDistribution)
@@ -133,8 +133,10 @@ const CitizenDashboard = () => {
     {
       title: 'Resolved',
       value: stats?.resolvedIssues || 0,
-      change: '+24%',
-      trend: 'up',
+      change: stats?.resolvedIssuePercentage ? 
+      `${stats?.resolvedIssuePercentage > 0 ? '+' : ''}${stats?.resolvedIssuePercentage}%`
+      : '0%',
+      trend: stats?.resolvedIssuePercentage > 0 ? 'up' : 'down',
       icon: <CheckCircle className="w-6 h-6" />,
       color: 'from-emerald-500 to-teal-500',
       linear: 'bg-linear-to-br'
@@ -142,8 +144,10 @@ const CitizenDashboard = () => {
     {
       title: 'Total Payments',
       value: `৳${(stats?.totalPayments || 0).toLocaleString()}`,
-      change: '+18%',
-      trend: 'up',
+      change: stats?.paymentPercentage
+      ? `${stats?.paymentPercentage > 0 ? '+' : ''}${stats?.paymentPercentage}%`
+      : '0%',
+      trend: stats?.paymentPercentage >= 0 ? 'up' : 'down',
       icon: <DollarSign className="w-6 h-6" />,
       color: 'from-green-500 to-emerald-500',
       linear: 'bg-linear-to-br'
@@ -151,8 +155,10 @@ const CitizenDashboard = () => {
     {
       title: 'Success Rate',
       value: `${stats?.successRate || 0}%`,
-      change: '+3.2%',
-      trend: 'up',
+      change: stats?.successRatePercentage ? 
+      `${stats?.successRatePercentage > 0 ? '+' : ''}${stats?.successRatePercentage}%`
+      : '0%',
+      trend: stats?.successRatePercentage > 0 ? 'up' : 'down',
       icon: <TrendingUp className="w-6 h-6" />,
       color: 'from-cyan-500 to-blue-500',
       linear: 'bg-linear-to-br'
@@ -189,6 +195,7 @@ const CitizenDashboard = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
+      <title>CommunityFix - Dashboard</title>
       {/* Header */}
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-6">
@@ -632,7 +639,7 @@ const CitizenDashboard = () => {
                 { title: 'First Report', earned: citizen?.issueCount > 0, icon: <Star className="w-5 h-5" /> },
                 { title: '5 Issues Reported', earned: citizen?.issueCount >= 5 , icon: <Target className="w-5 h-5" /> },
                 { title: 'Community Hero', earned: citizen?.solvedIssue >= 5 && citizen?.issueCount >= 6, icon: <Shield className="w-5 h-5" /> },
-                { title: 'Fast Resolver',earned: userAchievementStates?.smallAvgResolutionDay > 10 , icon: <Zap className="w-5 h-5" /> },
+                { title: 'Fast Resolver',earned: userAchievementStates?.smallAvgResolutionDay <= 10 , icon: <Zap className="w-5 h-5" /> },
                 { title: 'Top Contributor', earned: userAchievementStates.mostUpvotes> 100, icon: <Users className="w-5 h-5" /> },
                 { title: 'Perfect Record', 
                   earned: citizen?.solvedIssue >= 10 && citizen.issueCount >= 10 && userAchievementStates.mostViewsIssue>49 && userAchievementStates.mostUpvotes> 49, 

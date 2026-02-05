@@ -56,7 +56,7 @@ const AssignedIssues = () => {
         setAssignedIssues(res.data);
       })
       .catch(err => {
-        console.log(err);
+        // console.log(err);
         showNotification('Failed to load issues', 'error');
       })
       .finally(() => setLoading(false));
@@ -202,6 +202,7 @@ const AssignedIssues = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
+      <title>CommunityFix - Assign Issues</title>
       {/* Notification */}
       {notification && (
         <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl border shadow-2xl ${
@@ -526,7 +527,7 @@ const AssignedIssues = () => {
                                     onClick={() => setStatusDropdownOpen(null)}
                                   />
                                   
-                                  <div className="fixed z-50 mt-1 sm:mt-2 w-40 sm:w-48 bg-zinc-800 border border-zinc-700 rounded-xl shadow-2xl">
+                                  <div className="absolute z-50 mt-1 sm:mt-2 w-40 sm:w-48 bg-zinc-800 border border-zinc-700 rounded-xl shadow-2xl">
                                     <div className="py-1">
                                       <div className="px-3 sm:px-4 py-2 border-b border-zinc-700">
                                         <p className="text-xs text-gray-400">Current: <span className="font-bold text-white">{issue.status}</span></p>
