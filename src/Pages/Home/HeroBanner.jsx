@@ -13,7 +13,7 @@ const HeroBanner = () => {
       title: "Transform Your City",
       subtitle: "Report infrastructure issues instantly. Track progress in real-time. Build better communities together.",
       image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&h=1080&fit=crop",
-      accent: "from-emerald-500 to-teal-500"
+      accent: "from-emerald-500 to-blue-500"
     },
     {
       title: "Your Voice, Our Action",
@@ -86,13 +86,13 @@ const HeroBanner = () => {
                   {slide.subtitle}
                 </p>
                 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 items-center">
                   <Link onClick={handleStaffReportIsse} className={`group px-8 py-5 bg-linear-to-r ${slide.accent} rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3`}>
                     <span>Report an Issue</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                   
-                  <Link to="/allissues" className="px-8 py-5 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl font-bold text-lg text-white hover:bg-white/20 transition-all duration-300">
+                  <Link to="/allissues" className="px-8 py-5 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl font-bold text-lg text-white hover:bg-white/20 transition-all duration-300 flex items-center justify-center">
                     View All Issues
                   </Link>
                 </div>

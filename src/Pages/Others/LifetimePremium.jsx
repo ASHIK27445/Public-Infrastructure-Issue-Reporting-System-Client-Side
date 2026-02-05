@@ -108,13 +108,13 @@ const LifetimePremium = () => {
         </div>
 
         {/* Discount Banner */}
-        <div className="bg-linear-to-r from-emerald-900/30 to-teal-900/30 border border-emerald-500/30 rounded-xl p-4 mb-8">
-          <div className="flex items-center justify-between">
+        <div className="custom-bg bg-linear-to-r from-emerald-900/30 to-teal-900/30 border border-emerald-500/30 rounded-xl p-4 mb-8">
+          <div className="flex items-center justify-between ">
             <div className="flex items-center gap-3">
               <Gift className="w-5 h-5 text-emerald-400" />
               <div>
                 <div className="text-white font-medium">50% OFF</div>
-                <div className="text-emerald-300 text-sm">From last year's price</div>
+                <div className="text-emerald-300 text-sm custom-text">From last year's price</div>
               </div>
             </div>
             
