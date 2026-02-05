@@ -376,7 +376,7 @@ const CitizenDashboard = () => {
                     <Tooltip 
                       formatter={(value) => [value, 'Issues']}
                       contentStyle={{ 
-                        backgroundColor: '#1f2937',
+                        backgroundColor: 'white',
                         borderColor: '#374151',
                         borderRadius: '12px'
                       }}
@@ -416,9 +416,10 @@ const CitizenDashboard = () => {
                   <YAxis stroke="#9ca3af" />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: '#1f2937',
+                      backgroundColor: '#F5F5F5',
                       borderColor: '#374151',
-                      borderRadius: '12px'
+                      borderRadius: '12px',
+                      color: 'black'
                     }}
                   />
                   <Bar 

@@ -176,17 +176,17 @@ const Blog = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/20 via-teal-900/20 to-cyan-900/20" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(16,185,129,0.15),transparent_50%)]" />
+          <div className="absolute inset-0 bg-linear-to-r from-emerald-900/20 via-teal-900/20 to-cyan-900/20" />
+          <div className="absolute inset-0 bg-[radial-linear(circle_at_70%_20%,rgba(16,185,129,0.15),transparent_50%)]" />
         </div>
         
         <div className="max-w-7xl mx-auto px-6 py-20 relative z-10">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center px-6 py-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-full mb-6">
+            <div className="inline-flex items-center px-6 py-2 bg-linear-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-full mb-6">
               <BookOpen className="w-5 h-5 text-emerald-400 mr-2" />
               <span className="text-emerald-400 font-semibold text-sm uppercase tracking-wider">
                 Community Insights
@@ -194,7 +194,7 @@ const Blog = () => {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-black text-white mb-6">
-              Community<span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Blog</span>
+              Community<span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Blog</span>
             </h1>
             
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
@@ -212,7 +212,7 @@ const Blog = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-12 pr-4 py-4 bg-zinc-800/50 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 backdrop-blur-sm"
                 />
-                <button className="absolute right-3 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-medium hover:shadow-emerald-500/50 transition-all">
+                <button className="absolute right-3 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-medium hover:shadow-emerald-500/50 transition-all">
                   Search
                 </button>
               </div>
@@ -231,7 +231,7 @@ const Blog = () => {
                 onClick={() => setActiveCategory(category.id)}
                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 ${
                   activeCategory === category.id
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
+                    ? 'bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
                     : 'bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700'
                 }`}
               >
@@ -254,7 +254,7 @@ const Blog = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl md:text-4xl font-black text-white">
-              Featured <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Stories</span>
+              Featured <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Stories</span>
             </h2>
             <div className="flex items-center text-emerald-400 font-medium hover:text-emerald-300 transition-colors cursor-pointer">
               <span>View All Featured</span>
@@ -264,10 +264,10 @@ const Blog = () => {
           
           <div className="grid lg:grid-cols-2 gap-8 mb-16">
             {featuredArticles.map((article) => (
-              <div key={article.id} className="group relative bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden hover:border-emerald-500/50 transition-all duration-500 hover:scale-[1.02]">
+              <div key={article.id} className="group relative bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden hover:border-emerald-500/50 transition-all duration-500 hover:scale-[1.02]">
                 {/* Featured Badge */}
                 <div className="absolute top-4 left-4 z-10">
-                  <div className="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center space-x-1 shadow-lg">
+                  <div className="px-3 py-1 bg-linear-to-r from-amber-500 to-orange-500 rounded-full flex items-center space-x-1 shadow-lg">
                     <Sparkles className="w-3 h-3 text-white" />
                     <span className="text-white text-xs font-bold">FEATURED</span>
                   </div>
@@ -280,13 +280,13 @@ const Blog = () => {
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/40 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-zinc-900/40 to-transparent" />
                 </div>
                 
                 {/* Content */}
                 <div className="p-8">
                   <div className="flex items-center space-x-3 mb-4">
-                    <span className={`px-3 py-1 bg-gradient-to-r ${getCategoryColor(article.category)} rounded-full text-white text-xs font-bold`}>
+                    <span className={`px-3 py-1 bg-linear-to-r ${getCategoryColor(article.category)} rounded-full text-white text-xs font-bold`}>
                       {getCategoryName(article.category)}
                     </span>
                     <div className="flex items-center text-gray-400 text-sm">
@@ -334,7 +334,7 @@ const Blog = () => {
       </section>
 
       {/* Main Content */}
-      <section className="py-12 px-6 bg-gradient-to-b from-zinc-900 to-zinc-950">
+      <section className="py-12 px-6 bg-linear-to-b from-zinc-900 to-zinc-950">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Articles Grid */}
@@ -352,7 +352,7 @@ const Blog = () => {
                 ) : (
                   <div className="grid md:grid-cols-2 gap-6">
                     {filteredArticles.map((article) => (
-                      <div key={article.id} className="group bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden hover:border-emerald-500/50 transition-all duration-500">
+                      <div key={article.id} className="group bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden hover:border-emerald-500/50 transition-all duration-500">
                         <div className="relative h-48 overflow-hidden">
                           <img
                             src={article.image}
@@ -360,7 +360,7 @@ const Blog = () => {
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                           />
                           <div className="absolute top-4 left-4">
-                            <span className={`px-3 py-1 bg-gradient-to-r ${getCategoryColor(article.category)} rounded-full text-white text-xs font-bold`}>
+                            <span className={`px-3 py-1 bg-linear-to-r ${getCategoryColor(article.category)} rounded-full text-white text-xs font-bold`}>
                               {getCategoryName(article.category)}
                             </span>
                           </div>
@@ -410,7 +410,7 @@ const Blog = () => {
                       key={num}
                       className={`w-10 h-10 rounded-xl font-medium transition-colors ${
                         num === 1
-                          ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white'
+                          ? 'bg-linear-to-r from-emerald-500 to-teal-500 text-white'
                           : 'bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700'
                       }`}
                     >
@@ -422,7 +422,7 @@ const Blog = () => {
                     12
                   </button>
                 </div>
-                <button className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-medium hover:shadow-emerald-500/50 transition-all">
+                <button className="px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-medium hover:shadow-emerald-500/50 transition-all">
                   Next
                 </button>
               </div>
@@ -431,7 +431,7 @@ const Blog = () => {
             {/* Sidebar */}
             <div className="lg:col-span-1">
               {/* Popular Tags */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <Tag className="w-6 h-6 text-emerald-500" />
                   <h4 className="text-xl font-bold text-white">Popular Topics</h4>
@@ -449,7 +449,7 @@ const Blog = () => {
               </div>
 
               {/* Newsletter */}
-              <div className="bg-gradient-to-br from-emerald-900/30 to-teal-900/30 rounded-3xl border border-emerald-500/30 p-6 mb-6">
+              <div className="bg-linear-to-br from-emerald-900/30 to-teal-900/30 rounded-3xl border border-emerald-500/30 p-6 mb-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <Sparkles className="w-6 h-6 text-emerald-400" />
                   <h4 className="text-xl font-bold text-white">Weekly Digest</h4>
@@ -463,14 +463,14 @@ const Blog = () => {
                     placeholder="Your email address"
                     className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"
                   />
-                  <button className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-medium hover:shadow-emerald-500/50 transition-all">
+                  <button className="w-full py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-medium hover:shadow-emerald-500/50 transition-all">
                     Subscribe
                   </button>
                 </div>
               </div>
 
               {/* Top Contributors */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <Award className="w-6 h-6 text-amber-500" />
                   <h4 className="text-xl font-bold text-white">Top Contributors</h4>
@@ -482,7 +482,7 @@ const Blog = () => {
                     { name: 'Sarah Johnson', articles: 6, role: 'Guide Writer' }
                   ].map((contributor, index) => (
                     <div key={index} className="flex items-center space-x-3 p-3 bg-zinc-800/50 rounded-xl">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
+                      <div className="w-12 h-12 rounded-full bg-linear-to-r from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
                         {contributor.name.charAt(0)}
                       </div>
                       <div className="flex-1">
@@ -499,7 +499,7 @@ const Blog = () => {
               </div>
 
               {/* Stats */}
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+              <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <TrendingUp className="w-6 h-6 text-blue-500" />
                   <h4 className="text-xl font-bold text-white">Blog Stats</h4>
@@ -531,8 +531,8 @@ const Blog = () => {
       {/* CTA Section */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl p-12 border border-zinc-700">
-            <div className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-12 border border-zinc-700">
+            <div className="w-20 h-20 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <BookOpen className="w-10 h-10 text-white" />
             </div>
             
@@ -545,7 +545,7 @@ const Blog = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="group px-10 py-5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3">
+              <button className="group px-10 py-5 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3">
                 <span>Submit an Article</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>

@@ -158,17 +158,17 @@ const Features = () => {
     : features.filter(feature => feature.category === activeCategory || feature.category === 'all');
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-pink-900/20 to-rose-900/20" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(168,85,247,0.15),transparent_50%)]" />
+          <div className="absolute inset-0 bg-linear-to-r from-purple-900/20 via-pink-900/20 to-rose-900/20" />
+          <div className="absolute inset-0 bg-[radial-linear(circle_at_30%_20%,rgba(168,85,247,0.15),transparent_50%)]" />
         </div>
         
         <div className="max-w-7xl mx-auto px-6 py-20 relative z-10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-6 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-full mb-6">
+            <div className="inline-flex items-center px-6 py-2 bg-linear-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-full mb-6">
               <Sparkles className="w-5 h-5 text-purple-400 mr-2" />
               <span className="text-purple-400 font-semibold text-sm uppercase tracking-wider">
                 Powerful Features
@@ -176,7 +176,7 @@ const Features = () => {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-black text-white mb-6">
-              Everything You Need for <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Community Impact</span>
+              Everything You Need for <span className="bg-linear-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Community Impact</span>
             </h1>
             
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
@@ -208,7 +208,7 @@ const Features = () => {
                 onClick={() => setActiveCategory(category.id)}
                 className={`px-5 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 ${
                   activeCategory === category.id
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                    ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg'
                     : 'bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700'
                 }`}
               >
@@ -233,15 +233,15 @@ const Features = () => {
             {filteredFeatures.map((feature) => (
               <div 
                 key={feature.id} 
-                className="group relative bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-purple-500/50 transition-all duration-500 hover:scale-105"
+                className="group relative bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-purple-500/50 transition-all duration-500 hover:scale-105"
               >
                 <div className="absolute -top-3 -right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white text-xs font-bold shadow-lg">
+                  <div className="px-3 py-1 bg-linear-to-r from-purple-500 to-pink-500 rounded-full text-white text-xs font-bold shadow-lg">
                     {feature.category.charAt(0).toUpperCase() + feature.category.slice(1)}
                   </div>
                 </div>
                 
-                <div className={`relative w-20 h-20 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+                <div className={`relative w-20 h-20 bg-linear-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
                   {feature.icon}
                 </div>
                 
@@ -262,7 +262,7 @@ const Features = () => {
                   ))}
                 </div>
                 
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-purple-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
             ))}
           </div>
@@ -278,23 +278,23 @@ const Features = () => {
       </section>
 
       {/* Feature Comparison */}
-      <section className="py-20 px-6 bg-gradient-to-b from-zinc-900 to-zinc-950">
+      <section className="py-20 px-6 bg-linear-to-b from-zinc-900 to-zinc-950">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
-              Why Choose <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">CommunityFix</span>
+              Why Choose <span className="bg-linear-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">CommunityFix</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
               Compare how we stack up against traditional reporting methods and other platforms.
             </p>
           </div>
           
-          <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden">
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-3">
               {/* Traditional Methods */}
               <div className="p-8 border-b md:border-b-0 md:border-r border-zinc-700">
                 <div className="text-center mb-8">
-                  <div className="w-16 h-16 bg-gradient-to-br from-gray-500 to-slate-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-linear-to-br from-gray-500 to-slate-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <FileText className="w-8 h-8 text-gray-300" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-2">Traditional Methods</h3>
@@ -323,7 +323,7 @@ const Features = () => {
               {/* Other Platforms */}
               <div className="p-8 border-b md:border-b-0 md:border-r border-zinc-700">
                 <div className="text-center mb-8">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Globe className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-2">Other Platforms</h3>
@@ -351,10 +351,10 @@ const Features = () => {
               
               {/* CommunityFix */}
               <div className="p-8 relative overflow-hidden">
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full" />
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-linear-to-r from-purple-500/10 to-pink-500/10 rounded-full" />
                 
                 <div className="text-center mb-8 relative z-10">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-linear-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Star className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-2">CommunityFix</h3>
@@ -375,7 +375,7 @@ const Features = () => {
                   ))}
                 </div>
                 
-                <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full" />
+                <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-linear-to-r from-purple-500/10 to-pink-500/10 rounded-full" />
               </div>
             </div>
           </div>
@@ -387,7 +387,7 @@ const Features = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
-              Technical <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Excellence</span>
+              Technical <span className="bg-linear-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Excellence</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
               Built with cutting-edge technology to ensure reliability, security, and performance.
@@ -421,8 +421,8 @@ const Features = () => {
                 tech: ['WebSockets', 'Redis Pub/Sub', 'Firebase', 'APNS']
               }
             ].map((tech, index) => (
-              <div key={index} className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center text-purple-400 mb-4">
+              <div key={index} className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6">
+                <div className="w-16 h-16 bg-linear-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center text-purple-400 mb-4">
                   {tech.icon}
                 </div>
                 
@@ -445,8 +445,8 @@ const Features = () => {
       {/* CTA */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl p-12 border border-zinc-700 text-center">
-            <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-12 border border-zinc-700 text-center">
+            <div className="w-20 h-20 bg-linear-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Heart className="w-10 h-10 text-white" />
             </div>
             
@@ -459,7 +459,7 @@ const Features = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="group px-10 py-5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3">
+              <button className="group px-10 py-5 bg-linear-to-r from-purple-500 to-pink-500 rounded-2xl font-bold text-lg text-white shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3">
                 <span>Start Free Trial</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>

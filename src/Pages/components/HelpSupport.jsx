@@ -237,7 +237,7 @@ const HelpSupport = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 custom-bg">
       <title>CommunityFix - Help Support</title>
       {/* Header - Same Theme */}
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
@@ -566,35 +566,6 @@ const HelpSupport = () => {
                     ))}
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Banner */}
-        <div className="mt-12 bg-linear-to-r from-zinc-900 to-black border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="p-8 md:p-12">
-            <div className="max-w-3xl">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Need enterprise support or custom solutions?
-              </h2>
-              <p className="text-gray-400 mb-6">
-                Our enterprise team provides dedicated support, custom integrations, and advanced analytics for government agencies and large organizations.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <a
-                  href="#enterprise"
-                  className="px-6 py-3 bg-emerald-500 text-white font-medium rounded-xl hover:bg-emerald-600 transition-colors flex items-center gap-2"
-                >
-                  Enterprise Solutions
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-                <a
-                  href="#demo"
-                  className="px-6 py-3 bg-transparent text-white font-medium rounded-xl border border-white/30 hover:bg-white/10 transition-colors"
-                >
-                  Schedule a Demo
-                </a>
               </div>
             </div>
           </div>
