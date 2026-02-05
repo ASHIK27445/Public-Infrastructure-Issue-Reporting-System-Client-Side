@@ -61,7 +61,7 @@ CommunityFix is a comprehensive civic engagement platform that bridges the gap b
     <br>Leaflet
   </td>
   <td align="center" width="96">
-    <img src="https://cdn.worldvectorlogo.com/logos/react-router.svg" width="48" height="48" alt="React Router" />
+    <img src="https://logo.svgcdn.com/logos/react-router.svg" width="48" height="48" alt="React Router" />
     <br>React Router
   </td>
   <td align="center" width="96">
