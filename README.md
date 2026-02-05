@@ -38,8 +38,57 @@ CommunityFix is a comprehensive civic engagement platform that bridges the gap b
     <img src="https://skillicons.dev/icons?i=express" width="48" height="48" alt="Express" />
     <br>Express
   </td>
+  <td align="center" width="96">
+    <img src="https://skillicons.dev/icons?i=js" width="48" height="48" alt="JavaScript" />
+    <br>JavaScript
+  </td>
+</tr>
+<tr>
+  <td align="center" width="96">
+    <img src="https://techstack-generator.vercel.app/restapi-icon.svg" width="48" height="48" alt="REST API" />
+    <br>REST API
+  </td>
+  <td align="center" width="96">
+    <img src="https://cdn.worldvectorlogo.com/logos/jwt-3.svg" width="48" height="48" alt="JWT" />
+    <br>JWT
+  </td>
+  <td align="center" width="96">
+    <img src="https://cdn.worldvectorlogo.com/logos/stripe-4.svg" width="48" height="48" alt="Stripe" />
+    <br>Stripe
+  </td>
+  <td align="center" width="96">
+    <img src="https://cdn.worldvectorlogo.com/logos/leaflet-1.svg" width="48" height="48" alt="Leaflet" />
+    <br>Leaflet
+  </td>
+  <td align="center" width="96">
+    <img src="https://cdn.worldvectorlogo.com/logos/react-router.svg" width="48" height="48" alt="React Router" />
+    <br>React Router
+  </td>
+  <td align="center" width="96">
+    <img src="https://www.vectorlogo.zone/logos/axios/axios-icon.svg" width="48" height="48" alt="Axios" />
+    <br>Axios
+  </td>
+  <td align="center" width="96">
+    <img src="https://cdn.worldvectorlogo.com/logos/eslint-1.svg" width="48" height="48" alt="ESLint" />
+    <br>ESLint
+  </td>
+  <td align="center" width="96">
+    <img src="https://cdn.worldvectorlogo.com/logos/git-icon.svg" width="48" height="48" alt="Git" />
+    <br>Git
+  </td>
 </tr>
 </table>
+
+### Additional Libraries & Tools
+
+- **React Leaflet** - React components for Leaflet maps
+- **Recharts** - Composable charting library for data visualization
+- **SweetAlert2** - Beautiful, responsive alert & modal library
+- **React Toastify** - Notification library for React
+- **Swiper** - Modern mobile touch slider
+- **Lucide React** - Beautiful & consistent icon library
+- **date-fns** - Modern JavaScript date utility library
+- **PostCSS & Autoprefixer** - CSS processing tools
 
 ## Key Features
 
@@ -218,9 +267,23 @@ This project is licensed under the MIT License.
 ## Contact
 
 - **Email**: mdashikulislam27889@gmail.com
+
 ## Acknowledgments
 
 - OpenStreetMap for map data
 - Stripe for payment processing
 - Firebase for authentication
 - Tailwind CSS for styling framework
+
+## Future Enhancements
+
+- Push notifications
+- Mobile application (React Native)
+- Advanced analytics and reporting
+- Multi-language support
+- AI-powered issue categorization
+- Integration with municipal databases
+- Public API for third-party integrations
+- Real-time chat support
+- Community forums
+- Gamification features
