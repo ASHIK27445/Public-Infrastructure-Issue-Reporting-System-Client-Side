@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Sparkles, Loader2, ChevronDown, ChevronUp, MessageSquare, ThumbsUp, AlertTriangle } from "lucide-react";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
-import axios from "axios";
 
 export default function AICommentSummary({ comments = [], issueTitle = "" }) {
   const [summary, setSummary] = useState(null);
@@ -191,7 +190,7 @@ export default function AICommentSummary({ comments = [], issueTitle = "" }) {
               { num: summary.sentiment_breakdown.negative, label: "Negative", icon: AlertTriangle, color: "text-red-400" },
               { num: summary.sentiment_breakdown.positive, label: "Positive", icon: ThumbsUp, color: "text-emerald-400" },
             ].map((s) => (
-              <div key={s.label} className="bg-zinc-900/60 rounded-2xl p-4 border border-zinc-700">
+              <div key={s.label} className="bg-zinc-900/50 rounded-2xl p-4 border border-zinc-700">
                 <div className="flex items-center gap-2 mb-2">
                   <s.icon className={`w-4 h-4 ${s.color}`} />
                   <span className="text-xs text-gray-500">{s.label}</span>
@@ -260,7 +259,7 @@ export default function AICommentSummary({ comments = [], issueTitle = "" }) {
           </div>
 
           {/* Recommendation */}
-          <div className="bg-amber-900/20 rounded-2xl p-5 border border-amber-500/30">
+          <div className="bg-zinc-900/50 rounded-2xl p-5 border border-amber-500/30">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="w-4 h-4 text-amber-400" />
               <h4 className="text-xs font-medium text-amber-400 uppercase tracking-wide">Recommendation</h4>
