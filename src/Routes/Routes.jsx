@@ -37,7 +37,10 @@ import HelpSupport from "../Pages/components/HelpSupport"
 import LifetimePremium from "../Pages/Others/LifetimePremium"
 import AdminPaymentHistory from "../Pages/Admin/AdminPaymentHistory"
 import ErrorPage from "../Pages/Error/ErrorPage"
+import StaffPerformanceInsights from "../Pages/Admin/StaffPerformanceInsights"
 // import HowItWorks from "../Pages/Others/HowItWorks"
+import CreateEvent from "../Pages/Events/CreateEvent"
+
 export const router = createBrowserRouter([
     {
         path: '/' , element:<Root></Root>,
@@ -89,6 +92,9 @@ export const router = createBrowserRouter([
             },
             {
                 path:'/payment-boost-success', Component: PaymentBoostSuccess
+            },
+            {
+                path: '/create-events', Component: CreateEvent
             }
         ]
     },
@@ -145,6 +151,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'payment-history-admin', Component: AdminPaymentHistory
+            },
+            {
+                path: 'admin/staff-insights', Component: StaffPerformanceInsights
             }
 
         ]

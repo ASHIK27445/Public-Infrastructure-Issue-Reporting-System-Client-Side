@@ -22,7 +22,8 @@ import {
   ShieldUser,
   NotepadText,
   BadgePoundSterling,
-  BadgeDollarSign
+  BadgeDollarSign,
+  InspectIcon
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -97,6 +98,13 @@ const navItems = [
       name: 'Manage Staff',
       icon: <UserRoundCog className='w-5 h-5'></UserRoundCog>,
       path: 'manageStaff',
+      roles: ['admin']
+    },
+    {
+      id: 'staffPerformanceInsights',
+      name: 'Staff Performance',
+      icon: <InspectIcon className='w-5 h-5'></InspectIcon>,
+      path: 'admin/staff-insights',
       roles: ['admin']
     },
     {
