@@ -468,7 +468,7 @@ const ManageIssues = () => {
                                 <div className="font-bold text-white mb-1">
                                   {issue.title || 'Untitled Issue'}
                                 </div>
-                                <div className="text-sm text-gray-400 flex items-center">
+                                <div className="text-sm text-gray-400 hidden md:flex items-center">
                                   <MapPin className="w-3 h-3 mr-1" />
                                   {issue.location || 'No location specified'}
                                 </div>

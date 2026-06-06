@@ -21,6 +21,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false)
   const [logoutLoading, setLogoutLoading] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const handleLogout = () => {
@@ -152,7 +153,12 @@ const Navbar = () => {
             {/* User Menu */}
             {user ? (
               <div className="relative group">
-                <button className="flex items-center space-x-2 sm:space-x-3 p-1 sm:p-2 rounded-2xl hover:bg-zinc-800 transition-all duration-300">
+                <button 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsProfileOpen(prev => !prev)}
+                }
+                className="flex items-center space-x-2 sm:space-x-3 p-1 sm:p-2 rounded-2xl hover:bg-zinc-800 transition-all duration-300">
                   <div className="relative">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-emerald-500/50">
                       <img
@@ -176,7 +182,10 @@ const Navbar = () => {
                 </button>
 
                 {/* Dropdown Menu */}
-                <div className="absolute right-0 top-full mt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                <div className={`absolute right-0 top-full mt-2 w-64 opacity-0 invisible md:group-hover:opacity-100 md:group-hover:visible transition-all duration-300 z-50
+                ${isProfileOpen ? 'opacity-100 visible' : ''}
+                `}>
+
                   <div className="bg-zinc-800/95 backdrop-blur-xl rounded-2xl border border-zinc-700 shadow-2xl p-4 mt-4">
                     
                     {/* User Info */}
@@ -299,9 +308,21 @@ const Navbar = () => {
             ))}
             
             <NavLink
+            to= '/dashboard'
+            className={({ isActive }) =>
+                  `flex items-center space-x-3 px-4 py-3 rounded-2xl font-medium transition-all duration-300 ${
+                    isActive
+                      ? 'bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400'
+                      : 'text-gray-300 hover:text-white hover:bg-zinc-700/50'
+                  }`
+                }>
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Dashboard</span>  
+            </NavLink>
+
+            <NavLink
               onClick={handleStaffReportIsse}
-              className="flex items-center justify-center space-x-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg mt-4"
-            >
+              className="flex items-center justify-center space-x-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg mt-4">
               <AlertTriangle className="w-5 h-5" />
               <span>Report Issue</span>
             </NavLink>

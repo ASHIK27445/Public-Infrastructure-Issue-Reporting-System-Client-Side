@@ -530,16 +530,17 @@ const CitizenDashboard = () => {
                   <tr key={issue._id} className="border-b border-zinc-700 hover:bg-zinc-800/50 transition-colors">
                     <td className="py-2 px-2">
                       <div className="flex items-center space-x-1">
-                        <div className="w-10 h-10 rounded-xl overflow-hidden">
+                        <div className="shrink-0 w-10 h-10 rounded-xl overflow-hidden">
                           <img 
                             src={issue.mainPhoto} 
                             alt={issue.title}
-                            className="w-full h-full object-cover"
+                            className="w-10 h-10 object-cover"
+                            loading='lazy'
                           />
                         </div>
                         <div>
-                          <div className="font-medium text-white">{issue.title}</div>
-                          <div className="text-xs text-gray-400 flex items-center">
+                          <div className="font-medium text-white text-sm md:text-base">{issue.title}</div>
+                          <div className="text-xs text-gray-400 hidden md:flex items-center">
                             <MapPin className="w-3 h-3 mr-1" />
                             {issue.location}
                           </div>

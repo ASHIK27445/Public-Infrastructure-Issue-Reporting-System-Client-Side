@@ -296,7 +296,7 @@ const AllIssuesPage = () => {
               <Filter className="w-5 h-5" />
               <span>Filters</span>
               {Object.values(filters).filter(v => v).length > 0 && (
-                <span className="px-2 py-1 bg-emerald-500 text-xs rounded-full">
+                <span className="px-3 py-1 bg-emerald-500 text-xs rounded-full">
                   {Object.values(filters).filter(v => v).length}
                 </span>
               )}
@@ -326,8 +326,7 @@ const AllIssuesPage = () => {
                         onClick={() => handleFilterChange('category', cat)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                           filters.category === cat ? 'bg-linear-to-r from-emerald-500 to-teal-500 text-white' : 'bg-zinc-700 text-gray-300 hover:bg-zinc-600'
-                        }`}
-                      >
+                        }`}>
                         {cat}
                       </button>
                     ))}
@@ -437,11 +436,11 @@ const AllIssuesPage = () => {
                   <div className="relative h-48 overflow-hidden shrink-0">
                     <img src={issue.mainPhoto} alt={issue.title} loading='lazy' className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-zinc-900/40 to-transparent" />
-                    <div className={`absolute top-4 right-4 px-4 py-2 bg-linear-to-r ${getStatusColor(issue.status)} rounded-full flex items-center space-x-2 shadow-lg`}>
+                    <div className={`absolute top-2 md:top-4 right-4 px-2 md:px-4 py-2 bg-linear-to-r ${getStatusColor(issue.status)} rounded-full flex items-center space-x-2 shadow-lg`}>
                       {getStatusIcon(issue.status)}
                       <span className="text-white font-bold text-xs">{issue.status}</span>
                     </div>
-                    <div className={`absolute top-4 left-4 px-4 py-2 bg-linear-to-r ${getPriorityColor(issue.priority)} rounded-full flex items-center shadow-lg`}>
+                    <div className={`absolute top-2 md:top-4 left-4  px-2 md:px-4 py-2 bg-linear-to-r ${getPriorityColor(issue.priority)} rounded-full flex items-center shadow-lg`}>
                       <span className="text-white font-bold text-xs">{issue.priority}</span>
                     </div>
                   </div>
@@ -478,7 +477,7 @@ const AllIssuesPage = () => {
                         disabled={
                           upvoting[issue._id] || issue.reportBy === mUser?._id || issue.status === 'Rejected'
                         }
-                        className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all ${
+                        className={`flex items-center text-[10px] md:text-sm space-x-2 px-3 md:px-4 py-2 rounded-xl transition-all ${
                       issue.status === 'Rejected'
                         ? 'bg-linear-to-r from-red-500 to-rose-500 text-red-300 border border-red-500/30 cursor-not-allowed'
                         : issue.reportBy === mUser?._id
@@ -503,9 +502,9 @@ const AllIssuesPage = () => {
                         <span className="font-bold">{issue.upvoteCount}</span>
                     </button>
 
-                      <NavLink to={`/issues/${issue._id}`} className="group/btn flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-bold text-sm hover:shadow-emerald-500/50 transition-all">
+                      <NavLink to={`/issues/${issue._id}`} className="group/btn flex items-center space-x-2 px-3 md:px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-600 rounded-xl text-white font-bold text-[10px] md:text-sm hover:shadow-emerald-500/50 transition-all">
                         <span>View Details</span>
-                        <Eye className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
+                        <Eye className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform hidden md:flex" />
                       </NavLink>
                     </div>
                   </div>

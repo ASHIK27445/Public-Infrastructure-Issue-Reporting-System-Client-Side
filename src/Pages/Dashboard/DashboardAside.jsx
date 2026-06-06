@@ -27,18 +27,8 @@ import {
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
 
-const DashboardAside = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState('dashboard');
-  const {user, logoutUser, mUser, role} = use(AuthContext)
-  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logoutUser()
-      .then(() => toast.success("Logout Successful"))
-      .catch((error) => toast.error(error.message));
-  };
-  const navItems = [
+const navItems = [
     {
       id:'home',
       name: 'Home',
@@ -160,7 +150,18 @@ const DashboardAside = () => {
       path: 'payment-history-admin',
       roles: ['admin']
     }
-  ]
+]
+
+const DashboardAside = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState('dashboard');
+  const {user, logoutUser, mUser, role} = use(AuthContext)
+
+  const handleLogout = () => {
+    logoutUser()
+      .then(() => toast.success("Logout Successful"))
+      .catch((error) => toast.error(error.message));
+  };
 
 
 
@@ -215,6 +216,7 @@ const DashboardAside = () => {
                 src={user?.photoURL}
                 alt="User Avatar"
                 className="w-full h-full object-cover"
+                loading='lazy'
               />
             </div>
             <div className="flex-1">
@@ -335,4 +337,4 @@ const DashboardAside = () => {
   );
 };
 
-export default DashboardAside;
+export default React.memo(DashboardAside);

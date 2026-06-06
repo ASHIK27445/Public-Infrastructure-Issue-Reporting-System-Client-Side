@@ -313,7 +313,7 @@ const handleResetView = () => {
 
               {/* Map Legend */}
               <div className="absolute bottom-4 left-4 z-10 bg-zinc-800/95 backdrop-blur-md rounded-2xl border border-zinc-700 p-4 shadow-lg">
-                <h4 className="text-white font-bold mb-2 text-sm">Legend</h4>
+                <h4 className="text-amber-50 font-bold mb-2 text-sm">Legend</h4>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 rounded-full bg-red-500"></div>

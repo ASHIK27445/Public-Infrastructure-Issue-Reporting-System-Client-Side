@@ -756,7 +756,7 @@ const IssueDetailsPage = () => {
                         <button
                           type="submit"
                           disabled={!commentText.trim() || commentLoading}
-                          className="flex items-center space-x-2 px-6 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50"
+                          className="flex items-center space-x-2 px-6 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50 text-sm md:text-base"
                         >
                           {commentLoading ? (
                             <Loader2 className="w-4 h-4 animate-spin" />

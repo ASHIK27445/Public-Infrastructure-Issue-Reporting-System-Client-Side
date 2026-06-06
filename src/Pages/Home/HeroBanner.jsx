@@ -59,6 +59,7 @@ const HeroBanner = () => {
             src={slide.image} 
             alt={slide.title} 
             className="w-full h-full object-cover"
+            loading='lazy'
           />
           
           <div className="absolute inset-0 z-20 flex items-center">

@@ -2,7 +2,6 @@ import { use, useState } from 'react';
 import { AuthContext } from '../AuthProvider/AuthContext';
 import { toast } from 'react-toastify';
 import { NavLink, useNavigate } from 'react-router';
-import { RotatingTriangles } from 'react-loader-spinner';
 import { GoEye, GoEyeClosed } from "react-icons/go";
 import { ArrowRight, CheckCircle, Shield, UserPlus, Mail, Lock, User, MapPin, Image, Loader2 } from 'lucide-react';
 import axios from 'axios';

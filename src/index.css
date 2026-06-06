@@ -116,6 +116,11 @@ body {
   color: #10b981;
 }
 
+[data-theme="light"] .bg-linear-to-r.from-emerald-500.to-teal-600 {
+  background: #d3d3d3 !important;
+  color: black !important;
+}
+
 [data-theme="light"] .text-emerald-400 {
   color: #10b981 !important;
 }

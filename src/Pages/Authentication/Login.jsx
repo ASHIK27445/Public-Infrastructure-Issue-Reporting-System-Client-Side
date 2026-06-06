@@ -2,9 +2,8 @@ import { use, useState } from 'react';
 import { AuthContext } from '../AuthProvider/AuthContext';
 import { toast } from 'react-toastify';
 import { NavLink, useLocation, useNavigate } from 'react-router';
-import { RotatingTriangles } from 'react-loader-spinner';
 import { GoEye, GoEyeClosed } from "react-icons/go";
-import { ArrowRight, CheckCircle, Shield, LogIn, Mail, Lock, User, Key, Check } from 'lucide-react';
+import { ArrowRight, CheckCircle, Shield, LogIn, Mail, Lock, Key, Check } from 'lucide-react';
 
 const Login = () => {
     const {loginUser, user, signInWithGoogle} = use(AuthContext)
