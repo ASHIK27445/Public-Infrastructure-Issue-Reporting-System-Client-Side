@@ -1,33 +1,68 @@
 import { useState } from "react";
 import { Sparkles, Loader2, ChevronDown, ChevronUp } from "lucide-react";
-import useAxiosSecure from "../../Hooks/useAxiosSecure"; // তোমার existing hook
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import axios from "axios";
 
 export default function AICommentSummary({ comments = [], issueTitle = "" }) {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [requested, setRequested] = useState(false);
+  const [requestCooldown, setRequestCooldown] = useState(false);
   const axiosSecure = useAxiosSecure();
 
   const validComments = comments.filter((c) => !c.isToxic && c.commentText?.trim());
 
   async function generateSummary() {
+    if (requested || requestCooldown) return;
+    
     if (validComments.length < 2) return;
+    
+    setRequested(true);
     setLoading(true);
     setError(null);
     setSummary(null);
 
     try {
-      const res = await axiosSecure.post("/api/ai/comment-summary", {
+      const res = await axios.post("http://localhost:3000/comment-summary", {
         issueTitle,
         comments: validComments.map((c) => ({
           name: c.commenterName || "User",
           text: c.commentText,
         })),
       });
+      
+      // Check if request was queued
+      if (res.data.queued) {
+        setError("Request queued. Please wait a moment...");
+        // Retry after 2 seconds
+        setTimeout(() => {
+          setRequested(false);
+          setLoading(false);
+          generateSummary();
+        }, 2000);
+        return;
+      }
+      
       setSummary(res.data);
-    } catch {
-      setError("বিশ্লেষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+      
+      // Set cooldown to prevent spam (30 seconds)
+      setRequestCooldown(true);
+      setTimeout(() => setRequestCooldown(false), 30000);
+      
+    } catch (error) {
+      if (error.response?.status === 429) {
+        setError("AI service is busy. Please wait 1 minute and try again.");
+        // Auto retry after 60 seconds
+        setTimeout(() => {
+          setRequested(false);
+          setRequestCooldown(false);
+        }, 60000);
+      } else {
+        setError("বিশ্লেষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+        setRequested(false);
+      }
     } finally {
       setLoading(false);
     }
@@ -82,25 +117,29 @@ export default function AICommentSummary({ comments = [], issueTitle = "" }) {
           {!summary && (
             <button
               onClick={generateSummary}
-              disabled={loading}
-              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-60 rounded-xl text-white text-xs font-bold transition-all"
+              disabled={loading || requestCooldown}
+              className={`flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 
+                hover:from-emerald-500 hover:to-teal-500 disabled:opacity-60 rounded-xl text-white text-xs 
+                font-bold transition-all ${requestCooldown ? 'cursor-not-allowed' : ''}`}
             >
               {loading ? (
                 <><Loader2 className="w-3.5 h-3.5 animate-spin" /><span>বিশ্লেষণ হচ্ছে...</span></>
+              ) : requestCooldown ? (
+                <><span>⏳ দয়া করে অপেক্ষা করুন...</span></>
               ) : (
                 <><Sparkles className="w-3.5 h-3.5" /><span>AI Summary</span></>
               )}
             </button>
           )}
           {summary && (
-            <button onClick={() => { setSummary(null); setCollapsed(false); }} className="text-xs text-gray-500 hover:text-gray-300 px-2 py-1">
+            <button onClick={() => { setSummary(null); setCollapsed(false); setRequested(false); }} className="text-xs text-gray-500 hover:text-gray-300 px-2 py-1">
               বন্ধ
             </button>
           )}
         </div>
       </div>
 
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
 
       {summary && !collapsed && (
         <div className="space-y-4 mt-2">

@@ -308,11 +308,12 @@ const IssueDetailsPage = () => {
   useEffect(()=> {
     if(!id) return
 
-    const pollingInterval = setInterval(()=> {
-      fetchComment()
-    }, 1200)
+    // const pollingInterval = setInterval(()=> {
+    //   fetchComment()
+    // }, 1200)
 
-    return () => clearInterval(pollingInterval)
+    // return () => clearInterval(pollingInterval)
+    fetchComment()
   }, [id])
 
   const handleAddComment = (e) => {
