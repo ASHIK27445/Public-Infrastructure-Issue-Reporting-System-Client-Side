@@ -1,17 +1,13 @@
 import { useState } from "react";
 import { Sparkles, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import useAxiosSecure from "../../Hooks/useAxiosSecure"; // তোমার existing hook
 
-/**
- * AICommentSummary — CommunityFix dark theme compatible
- * Props:
- *   comments: Array<{ commentText: string, commenterName: string, isToxic: boolean }>
- *   issueTitle: string
- */
 export default function AICommentSummary({ comments = [], issueTitle = "" }) {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [collapsed, setCollapsed] = useState(false);
+  const axiosSecure = useAxiosSecure();
 
   const validComments = comments.filter((c) => !c.isToxic && c.commentText?.trim());
 
@@ -21,42 +17,15 @@ export default function AICommentSummary({ comments = [], issueTitle = "" }) {
     setError(null);
     setSummary(null);
 
-    const prompt = `You are an AI analyst for CommunityFix, a civic issue reporting platform in Bangladesh.
-Analyze these ${validComments.length} citizen comments about the issue: "${issueTitle || "Community Issue"}"
-
-Comments:
-${validComments.map((c, i) => `${i + 1}. [${c.commenterName || "User"}]: ${c.commentText}`).join("\n")}
-
-Respond ONLY with a JSON object (no markdown, no backticks):
-{
-  "overall_sentiment": "positive" or "negative" or "mixed",
-  "sentiment_breakdown": { "positive": number, "negative": number, "neutral": number },
-  "summary": "2-3 sentence overall summary in Bengali",
-  "key_points": [
-    { "type": "complaint", "text": "Bengali text" },
-    { "type": "complaint", "text": "Bengali text" },
-    { "type": "request", "text": "Bengali text" },
-    { "type": "impact", "text": "Bengali text" }
-  ],
-  "urgency_level": "Low" or "Medium" or "High" or "Critical",
-  "top_concern": "The single most mentioned concern in Bengali (1 sentence)",
-  "authority_recommendation": "What authority should do, in Bengali (1 sentence)"
-}`;
-
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          messages: [{ role: "user", content: prompt }],
-        }),
+      const res = await axiosSecure.post("/api/ai/comment-summary", {
+        issueTitle,
+        comments: validComments.map((c) => ({
+          name: c.commenterName || "User",
+          text: c.commentText,
+        })),
       });
-      const data = await res.json();
-      const raw = data.content.map((i) => i.text || "").join("");
-      const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-      setSummary(parsed);
+      setSummary(res.data);
     } catch {
       setError("বিশ্লেষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
     } finally {
@@ -91,15 +60,11 @@ Respond ONLY with a JSON object (no markdown, no backticks):
   };
   const sentimentBn = { positive: "ইতিবাচক", negative: "নেতিবাচক", mixed: "মিশ্র" };
 
-  const dotColor = {
-    complaint: "bg-red-500",
-    request: "bg-blue-500",
-    impact: "bg-emerald-500",
-  };
+  const dotColor = { complaint: "bg-red-500", request: "bg-blue-500", impact: "bg-emerald-500" };
 
   return (
     <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
-      {/* Header row */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <Sparkles className="w-5 h-5 text-emerald-400" />
@@ -108,13 +73,9 @@ Respond ONLY with a JSON object (no markdown, no backticks):
             <p className="text-xs text-gray-400">{validComments.length}টি কমেন্টের স্বয়ংক্রিয় বিশ্লেষণ</p>
           </div>
         </div>
-
         <div className="flex items-center gap-2">
           {summary && (
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              className="text-gray-400 hover:text-white p-1 transition-colors"
-            >
+            <button onClick={() => setCollapsed(!collapsed)} className="text-gray-400 hover:text-white p-1">
               {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
             </button>
           )}
@@ -125,23 +86,14 @@ Respond ONLY with a JSON object (no markdown, no backticks):
               className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-60 rounded-xl text-white text-xs font-bold transition-all"
             >
               {loading ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>বিশ্লেষণ হচ্ছে...</span>
-                </>
+                <><Loader2 className="w-3.5 h-3.5 animate-spin" /><span>বিশ্লেষণ হচ্ছে...</span></>
               ) : (
-                <>
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>AI Summary</span>
-                </>
+                <><Sparkles className="w-3.5 h-3.5" /><span>AI Summary</span></>
               )}
             </button>
           )}
           {summary && (
-            <button
-              onClick={() => { setSummary(null); setCollapsed(false); }}
-              className="text-xs text-gray-500 hover:text-gray-300 px-2 py-1 transition-colors"
-            >
+            <button onClick={() => { setSummary(null); setCollapsed(false); }} className="text-xs text-gray-500 hover:text-gray-300 px-2 py-1">
               বন্ধ
             </button>
           )}
@@ -152,7 +104,7 @@ Respond ONLY with a JSON object (no markdown, no backticks):
 
       {summary && !collapsed && (
         <div className="space-y-4 mt-2">
-          {/* Stat cards */}
+          {/* Stats */}
           <div className="grid grid-cols-3 gap-3">
             {[
               { num: validComments.length, label: "মোট কমেন্ট", color: "text-white" },
@@ -166,7 +118,7 @@ Respond ONLY with a JSON object (no markdown, no backticks):
             ))}
           </div>
 
-          {/* Summary + sentiment badges */}
+          {/* Summary + bar */}
           <div className="bg-zinc-900/50 rounded-2xl p-4 border border-zinc-700">
             <div className="flex flex-wrap gap-2 mb-3">
               <span className={`text-xs font-bold px-3 py-1 rounded-full ${sentimentStyle[summary.overall_sentiment]}`}>
@@ -178,9 +130,9 @@ Respond ONLY with a JSON object (no markdown, no backticks):
             </div>
             <p className="text-gray-300 text-sm leading-relaxed mb-3">{summary.summary}</p>
             <div className="h-2 rounded-full overflow-hidden flex bg-zinc-700">
-              <div className="h-full bg-emerald-500 transition-all" style={{ width: `${posW}%` }} />
-              <div className="h-full bg-zinc-500 transition-all" style={{ width: `${neuW}%` }} />
-              <div className="h-full bg-red-500 transition-all" style={{ width: `${negW}%` }} />
+              <div className="h-full bg-emerald-500" style={{ width: `${posW}%` }} />
+              <div className="h-full bg-zinc-500" style={{ width: `${neuW}%` }} />
+              <div className="h-full bg-red-500" style={{ width: `${negW}%` }} />
             </div>
             <div className="flex gap-4 mt-1.5 text-xs text-gray-500">
               <span><span className="text-emerald-500">■</span> ইতিবাচক {posW}%</span>
@@ -206,7 +158,7 @@ Respond ONLY with a JSON object (no markdown, no backticks):
             </div>
           </div>
 
-          {/* Authority recommendation */}
+          {/* Recommendation */}
           <div className="bg-amber-900/20 rounded-2xl p-4 border border-amber-500/30">
             <div className="flex items-center gap-2 mb-1.5">
               <span className="text-amber-400">⚠</span>
@@ -225,7 +177,6 @@ Respond ONLY with a JSON object (no markdown, no backticks):
           <span className={`text-xs font-bold px-3 py-1 rounded-full ${urgencyStyle[summary.urgency_level]}`}>
             {urgencyBn[summary.urgency_level]}
           </span>
-          <span className="text-xs text-gray-500 px-2 py-1 truncate max-w-xs">— {summary.top_concern}</span>
         </div>
       )}
     </div>
