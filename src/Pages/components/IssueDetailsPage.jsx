@@ -725,8 +725,12 @@ const IssueDetailsPage = () => {
                 <MessageSquare className="w-6 h-6 text-emerald-500" />
                 <span>Comments ({comments.length})</span>
               </h3>
-
-              <AICommentSummary comments={comments} issueTitle={issue?.title} />  
+              {
+                user && (role === 'admin' || role === 'staff') && (
+                  <AICommentSummary comments={comments} issueTitle={issue?.title} />
+                )
+              }
+                
               {/* Comment Form*/}
               {user && (
                 <form onSubmit={handleAddComment} className="mb-8">
