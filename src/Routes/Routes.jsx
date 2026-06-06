@@ -40,6 +40,7 @@ import ErrorPage from "../Pages/Error/ErrorPage"
 import StaffPerformanceInsights from "../Pages/Admin/StaffPerformanceInsights"
 // import HowItWorks from "../Pages/Others/HowItWorks"
 import CreateEvent from "../Pages/Events/CreateEvent"
+import EventCardDemo from "../Pages/Events/EventCard"
 
 export const router = createBrowserRouter([
     {
@@ -95,6 +96,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/create-events', Component: CreateEvent
+            },
+            {
+                path: '/event-card', Component: EventCardDemo
             }
         ]
     },
