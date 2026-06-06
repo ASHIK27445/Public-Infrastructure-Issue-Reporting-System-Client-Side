@@ -59,7 +59,7 @@ export default function AICommentSummary({ comments = [], issueTitle = "" }) {
     setSummary(null);
 
     try {
-      const res = await axios.post("http://localhost:3000/comment-summary", {
+      const res = await axiosSecure.post("/comment-summary", {
         issueTitle,
         comments: allInteractions,
         totalComments: mainCommentCount,
@@ -122,7 +122,7 @@ export default function AICommentSummary({ comments = [], issueTitle = "" }) {
   const dotColor = { complaint: "bg-red-500", request: "bg-blue-500", impact: "bg-emerald-500" };
 
   return (
-    <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
+    <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl border border-zinc-700 p-6 mb-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
@@ -147,7 +147,7 @@ export default function AICommentSummary({ comments = [], issueTitle = "" }) {
             <button
               onClick={generateSummary}
               disabled={loading || requestCooldown}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 
+              className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-emerald-600 to-teal-600 
                 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-60 rounded-xl text-white text-sm 
                 font-medium transition-all"
             >
@@ -239,7 +239,7 @@ export default function AICommentSummary({ comments = [], issueTitle = "" }) {
               <div className="space-y-3">
                 {(summary.key_points || []).map((p, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${dotColor[p.type] || "bg-blue-500"}`} />
+                    <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${dotColor[p.type] || "bg-blue-500"}`} />
                     <div>
                       <p className="text-sm text-gray-300 leading-relaxed">{p.text}</p>
                       <p className="text-[10px] text-gray-600 uppercase mt-0.5">{p.type}</p>
@@ -253,7 +253,7 @@ export default function AICommentSummary({ comments = [], issueTitle = "" }) {
             <div className="bg-zinc-900/50 rounded-2xl p-5 border border-zinc-700 flex flex-col justify-center">
               <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Top Concern</h4>
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
                 <p className="text-white font-medium leading-relaxed">{summary.top_concern}</p>
               </div>
             </div>
