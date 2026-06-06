@@ -35,6 +35,7 @@ import { toast} from "react-toastify"
 import axios from 'axios';
 import CommentSection from './CommentSection';
 import useAxios from '../../Hooks/useAxios';
+import AICommentSummary from './AICommentSummary';
 
 const IssueDetailsPage = () => {
   const {role, user, mUser, mLoading} = use(AuthContext)
@@ -392,7 +393,7 @@ const IssueDetailsPage = () => {
   return (
     <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       <title>{`CommunityFix - ${issue?.title}`}</title>
-      {console.log(issue?.title)}
+      {/* {console.log(issue?.title)} */}
       {/* Header */}
       {user && role === 'admin' &&
       <div className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
@@ -724,6 +725,7 @@ const IssueDetailsPage = () => {
                 <span>Comments ({comments.length})</span>
               </h3>
 
+              <AICommentSummary comments={comments} issueTitle={issue?.title} />  
               {/* Comment Form*/}
               {user && (
                 <form onSubmit={handleAddComment} className="mb-8">
