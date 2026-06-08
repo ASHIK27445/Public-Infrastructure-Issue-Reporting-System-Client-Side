@@ -41,6 +41,7 @@ import StaffPerformanceInsights from "../Pages/Admin/StaffPerformanceInsights"
 // import HowItWorks from "../Pages/Others/HowItWorks"
 import CreateEvent from "../Pages/Events/CreateEvent"
 import EventCardDemo from "../Pages/Events/EventCard"
+import VolunteerRegistrationPage from "../Pages/Events/VolenteerRegistrationpage"
 
 export const router = createBrowserRouter([
     {
@@ -99,6 +100,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/event-card', Component: EventCardDemo
+            },
+            {
+                path: '/test', Component: VolunteerRegistrationPage
             }
         ]
     },
