@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import { Brush, Cog, GraduationCap, Handshake, Ribbon, TreeDeciduous } from "lucide-react";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 const EVENT_TYPES = [
-  { value: "cleanup", label: "🧹 Cleanup Drive", desc: "পরিষ্কার অভিযান" },
-  { value: "plantation", label: "🌳 Tree Plantation", desc: "বৃক্ষরোপণ" },
-  { value: "repair", label: "🏗️ Repair Work", desc: "মেরামত কাজ" },
-  { value: "awareness", label: "📢 Awareness Campaign", desc: "সচেতনতা অভিযান" },
-  { value: "student", label: "🎓 Student Volunteer Day", desc: "ছাত্রবন্ধু দিবস" },
-  { value: "meetup", label: "🤝 Community Meetup", desc: "সামাজিক সমাবেশ" },
+  { value: "cleanup", icon: <Brush size={20} color="black" />,label: "Cleanup Drive", desc: "পরিষ্কার অভিযান" },
+  { value: "plantation", icon: <TreeDeciduous size={20} color="green" fill="green" />,label: "Tree Plantation", desc: "বৃক্ষরোপণ" },
+  { value: "repair", icon: <Cog size={20} color="red"/>,label: "Repair Work", desc: "মেরামত কাজ" },
+  { value: "awareness", icon: <Ribbon size={20} color="blue"/>,label: "Awareness Campaign", desc: "সচেতনতা অভিযান" },
+  { value: "student", icon: <GraduationCap size={20} color="black" fill="black"/>,label: "Student Volunteer Day", desc: "ছাত্রবন্ধু দিবস" },
+  { value: "meetup", icon: <Handshake size={20} color="black" fill="yellow"/>,label: "Community Meetup", desc: "সামাজিক সমাবেশ" },
 ];
 
 const SKILL_OPTIONS = [
@@ -44,17 +46,15 @@ export default function CreateEvent() {
 
   const [equipInput, setEquipInput] = useState("");
   const [errors, setErrors] = useState({});
+  const axiosSecure = useAxiosSecure()
 
   // Fetch admin's issues to link
   useEffect(() => {
     const fetchIssues = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/admin/allissues`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setIssues(res.data?.issues || []);
+        const res = await axiosSecure.get('/allissues');
+        setIssues(res.data || []);
+        console.log(res.data)
       } catch {
         // silently fail — linking is optional
       }
@@ -144,10 +144,9 @@ export default function CreateEvent() {
         linkedIssueId: form.linkedIssueId || undefined,
       };
 
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/create`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+      console.log(payload)
+
+      await axiosSecure.post('/events/create', payload
       );
 
       toast.success("Event created successfully! 🎉");
@@ -167,15 +166,6 @@ export default function CreateEvent() {
 
         {/* Header */}
         <div className="mb-8">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-500 hover:text-gray-800 text-sm mb-4 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back
-          </button>
           <h1 className="text-2xl font-semibold text-gray-900">Create Community Event</h1>
           <p className="text-gray-500 text-sm mt-1">
             Organize a volunteer-driven event to fix community issues together
@@ -188,7 +178,7 @@ export default function CreateEvent() {
             {STEP_LABELS.map((label, i) => (
               <span
                 key={i}
-                className={`text-xs font-medium transition-colors ${
+                className={`text-sm font-medium transition-colors ${
                   i <= step ? "text-green-600" : "text-gray-400"
                 }`}
               >
@@ -210,7 +200,7 @@ export default function CreateEvent() {
 
             {/* ── STEP 0: Basic Info ── */}
             {step === 0 && (
-              <div className="space-y-6">
+              <div className="space-y-6 text-black">
                 <SectionTitle icon="📋" title="Basic Information" />
 
                 <Field label="Event Title" error={errors.title} required>
@@ -234,14 +224,13 @@ export default function CreateEvent() {
                           form.eventType === type.value
                             ? "border-green-500 bg-green-50 ring-1 ring-green-500"
                             : "border-gray-200 hover:border-gray-300 bg-white"
-                        }`}
-                      >
-                        <div className="text-base">{type.label}</div>
-                        <div className="text-xs text-gray-500 mt-0.5">{type.desc}</div>
+                        }`}>
+                        <div className="flex gap-1 text-base text-black justify-center items-center">{type.icon}{type.label}</div>
+                        <div className="text-sm text-gray-500 mt-0.5 text-center">{type.desc}</div>
                       </button>
                     ))}
                   </div>
-                  {errors.eventType && <p className="text-red-500 text-xs mt-1">{errors.eventType}</p>}
+                  {errors.eventType && <p className="text-red-500 text-sm mt-1">{errors.eventType}</p>}
                 </Field>
 
                 <Field label="Description" error={errors.description} required>
@@ -252,7 +241,7 @@ export default function CreateEvent() {
                     rows={4}
                     className={inputClass(errors.description)}
                   />
-                  <p className="text-xs text-gray-400 mt-1">{form.description.length}/1000 characters</p>
+                  <p className="text-sm text-gray-400 mt-1">{form.description.length}/1000 characters</p>
                 </Field>
 
                 <Field label="Link to Existing Issue (optional)">
@@ -292,7 +281,7 @@ export default function CreateEvent() {
 
             {/* ── STEP 1: Location & Date ── */}
             {step === 1 && (
-              <div className="space-y-6">
+              <div className="space-y-6 text-black">
                 <SectionTitle icon="📍" title="Location & Date" />
 
                 <div className="grid grid-cols-2 gap-4">
@@ -375,7 +364,7 @@ export default function CreateEvent() {
 
             {/* ── STEP 2: Volunteer Settings ── */}
             {step === 2 && (
-              <div className="space-y-6">
+              <div className="space-y-6 text-black">
                 <SectionTitle icon="👥" title="Volunteer Settings" />
 
                 <div className="grid grid-cols-2 gap-4">
@@ -387,7 +376,7 @@ export default function CreateEvent() {
                       onChange={(e) => set("maxVolunteers", e.target.value)}
                       className={inputClass(errors.maxVolunteers)}
                     />
-                    <p className="text-xs text-gray-400 mt-1">After this, volunteers go to waitlist</p>
+                    <p className="text-sm text-gray-400 mt-1">After this, volunteers go to waitlist</p>
                   </Field>
 
                   <Field label="Registration Fee (৳)">
@@ -399,7 +388,7 @@ export default function CreateEvent() {
                       placeholder="0 = Free"
                       className={inputClass()}
                     />
-                    <p className="text-xs text-gray-400 mt-1">0 for free registration</p>
+                    <p className="text-sm text-gray-400 mt-1">0 for free registration</p>
                   </Field>
                 </div>
 
@@ -463,7 +452,7 @@ export default function CreateEvent() {
 
             {/* ── STEP 3: Funding ── */}
             {step === 3 && (
-              <div className="space-y-6">
+              <div className="space-y-6 text-black">
                 <SectionTitle icon="💰" title="Funding Goal (optional)" />
 
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-green-800">
@@ -480,7 +469,7 @@ export default function CreateEvent() {
                     placeholder="0 = No donation target"
                     className={inputClass()}
                   />
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-sm text-gray-400 mt-1">
                     Leave 0 if you don&apos;t need donations. A progress bar will show on the event page.
                   </p>
                 </Field>
@@ -488,14 +477,14 @@ export default function CreateEvent() {
                 {form.fundGoal > 0 && (
                   <div className="bg-white border border-gray-200 rounded-xl p-4">
                     <p className="text-sm font-medium text-gray-700 mb-2">Preview fundraiser bar</p>
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <div className="flex justify-between text-sm text-gray-500 mb-1">
                       <span>৳ 0 raised</span>
                       <span>Goal: ৳ {Number(form.fundGoal).toLocaleString()}</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div className="h-full bg-green-400 rounded-full w-0" />
                     </div>
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-sm text-gray-400 mt-2">
                       Donors will see this progress bar and get notified when the event completes.
                     </p>
                   </div>
@@ -554,7 +543,7 @@ export default function CreateEvent() {
               ← Previous
             </button>
 
-            <span className="text-xs text-gray-400">
+            <span className="text-sm text-gray-400">
               Step {step + 1} of {STEP_LABELS.length}
             </span>
 
@@ -614,7 +603,7 @@ function Field({ label, error, required, children }) {
         {required && <span className="text-red-400 ml-1">*</span>}
       </label>
       {children}
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );
 }
