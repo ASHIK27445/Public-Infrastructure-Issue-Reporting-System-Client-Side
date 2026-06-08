@@ -45,6 +45,7 @@ import VolunteerRegistrationPage from "../Pages/Events/VolenteerRegistrationpage
 import VolunteerRegistration from "../Pages/Events/VolunteerRegistration"
 import WaitlistManagementPanel from "../Pages/Events/WaitListManagementPanel"
 import WaitlistPanelDemo from "../Pages/Events/WaitListDemo"
+import VideoScupping from "../Pages/Home/VideoScupping"
 
 export const router = createBrowserRouter([
     {
@@ -174,5 +175,8 @@ export const router = createBrowserRouter([
     },
     {
         path: '*', Component: ErrorPage
+    },
+    {
+        path: '/onlytest', Component:VideoScupping
     }
 ])
