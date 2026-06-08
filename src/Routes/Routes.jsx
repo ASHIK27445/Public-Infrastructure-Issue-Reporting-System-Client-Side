@@ -42,6 +42,9 @@ import StaffPerformanceInsights from "../Pages/Admin/StaffPerformanceInsights"
 import CreateEvent from "../Pages/Events/CreateEvent"
 import EventCardDemo from "../Pages/Events/EventCard"
 import VolunteerRegistrationPage from "../Pages/Events/VolenteerRegistrationpage"
+import VolunteerRegistration from "../Pages/Events/VolunteerRegistration"
+import WaitlistManagementPanel from "../Pages/Events/WaitListManagementPanel"
+import WaitlistPanelDemo from "../Pages/Events/WaitListDemo"
 
 export const router = createBrowserRouter([
     {
@@ -102,7 +105,10 @@ export const router = createBrowserRouter([
                 path: '/event-card', Component: EventCardDemo
             },
             {
-                path: '/test', Component: VolunteerRegistrationPage
+                path: '/test', Component: VolunteerRegistration
+            },
+            {
+                path: '/waitlist', Component: WaitlistPanelDemo
             }
         ]
     },
