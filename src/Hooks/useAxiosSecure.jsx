@@ -2,7 +2,7 @@ import axios from "axios";
 import { AuthContext } from '../Pages/AuthProvider/AuthContext';
 import { use, useEffect } from "react";
 const axiosSecure = axios.create({
-    baseURL: import.meta.env.VITE_API_URL
+    baseURL: import.meta.env.VITE_API_MANUAL
 })
 const useAxiosSecure = () => {
     const {user} = use(AuthContext)

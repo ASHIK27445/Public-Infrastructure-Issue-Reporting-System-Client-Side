@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import { Brush, Cog, GraduationCap, Handshake, Ribbon, TreeDeciduous } from "lucide-react";
+import { BookCheck, Brush, Cog, FileText, GraduationCap, HandCoins, Handshake, MapPin, Ribbon, Settings2, TreeDeciduous } from "lucide-react";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import { use } from "react";
+import { AuthContext } from "../AuthProvider/AuthContext";
+import './event.css'
 
 const EVENT_TYPES = [
   { value: "cleanup", icon: <Brush size={20} color="black" />,label: "Cleanup Drive", desc: "পরিষ্কার অভিযান" },
@@ -47,6 +50,7 @@ export default function CreateEvent() {
   const [equipInput, setEquipInput] = useState("");
   const [errors, setErrors] = useState({});
   const axiosSecure = useAxiosSecure()
+  const {user, mUser, role} = use(AuthContext)
 
   // Fetch admin's issues to link
   useEffect(() => {
@@ -128,6 +132,15 @@ export default function CreateEvent() {
   const prevStep = () => setStep((s) => Math.max(s - 1, 0));
 
   const handleSubmit = async () => {
+    if(!user) return;
+    if (!(role === 'admin' || (role === 'staff' && mUser?.position === 'super'))) {
+      toast.error('You are not authorized.');
+      return;
+    }
+    if(role === 'admin'){
+      toast.success('ok')
+      return
+    }
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -161,12 +174,14 @@ export default function CreateEvent() {
   const progress = ((step + 1) / STEP_LABELS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 py-8 px-4">
+      <div className="max-w-2xl mx-auto mt-10 mb-20">
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">Create Community Event</h1>
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2">
+            Create <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Community Event</span>
+          </h1>
           <p className="text-gray-500 text-sm mt-1">
             Organize a volunteer-driven event to fix community issues together
           </p>
@@ -195,13 +210,13 @@ export default function CreateEvent() {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-700 shadow-sm overflow-hidden">
           <div className="p-6 md:p-8">
 
             {/* ── STEP 0: Basic Info ── */}
             {step === 0 && (
               <div className="space-y-6 text-black">
-                <SectionTitle icon="📋" title="Basic Information" />
+                <SectionTitle icon={FileText} title="Basic Information" />
 
                 <Field label="Event Title" error={errors.title} required>
                   <input
@@ -282,7 +297,7 @@ export default function CreateEvent() {
             {/* ── STEP 1: Location & Date ── */}
             {step === 1 && (
               <div className="space-y-6 text-black">
-                <SectionTitle icon="📍" title="Location & Date" />
+                <SectionTitle icon={MapPin} title="Location & Date" />
 
                 <div className="grid grid-cols-2 gap-4">
                   <Field label="Start Date & Time" error={errors.date} required>
@@ -365,7 +380,7 @@ export default function CreateEvent() {
             {/* ── STEP 2: Volunteer Settings ── */}
             {step === 2 && (
               <div className="space-y-6 text-black">
-                <SectionTitle icon="👥" title="Volunteer Settings" />
+                <SectionTitle icon={Settings2} title="Volunteer Settings" />
 
                 <div className="grid grid-cols-2 gap-4">
                   <Field label="Max Volunteers" error={errors.maxVolunteers} required>
@@ -453,7 +468,7 @@ export default function CreateEvent() {
             {/* ── STEP 3: Funding ── */}
             {step === 3 && (
               <div className="space-y-6 text-black">
-                <SectionTitle icon="💰" title="Funding Goal (optional)" />
+                <SectionTitle icon={HandCoins} title="Funding Goal (optional)" />
 
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-green-800">
                   🤝 Allow community members who cannot attend to donate toward this event.
@@ -495,7 +510,7 @@ export default function CreateEvent() {
             {/* ── STEP 4: Review ── */}
             {step === 4 && (
               <div className="space-y-5">
-                <SectionTitle icon="✅" title="Review & Create" />
+                <SectionTitle icon={BookCheck} title="Review & Create" />
 
                 <div className="space-y-3">
                   <ReviewRow label="Title" value={form.title} />
@@ -532,13 +547,12 @@ export default function CreateEvent() {
           </div>
 
           {/* Footer buttons */}
-          <div className="px-6 md:px-8 py-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
+          <div className="px-6 md:px-8 py-4 border-t border-zinc-700 bg-zinc-900 flex justify-between items-center">
             <button
               type="button"
               onClick={prevStep}
               disabled={step === 0}
-              className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700
-                         hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 rounded-xl bg-white text-sm font-medium text-gray-700 hover:bg-green-500 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               ← Previous
             </button>
@@ -573,7 +587,7 @@ export default function CreateEvent() {
                     Creating...
                   </>
                 ) : (
-                  "🚀 Create Event"
+                  "Create Event"
                 )}
               </button>
             )}
@@ -586,11 +600,13 @@ export default function CreateEvent() {
 
 // ── Helper components ──────────────────────────────────────
 
-function SectionTitle({ icon, title }) {
+function SectionTitle({ icon: Icon, title }) {
   return (
     <div className="flex items-center gap-2 mb-2">
-      <span className="text-xl">{icon}</span>
-      <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+      <Icon className="w-5 h-5 text-green-500" />
+      <h2 className="text-lg font-semibold text-gray-200">
+        {title}
+      </h2>
     </div>
   );
 }
@@ -598,7 +614,7 @@ function SectionTitle({ icon, title }) {
 function Field({ label, error, required, children }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+      <label className="block text-sm font-medium text-gray-100 mb-1.5">
         {label}
         {required && <span className="text-red-400 ml-1">*</span>}
       </label>
@@ -610,9 +626,9 @@ function Field({ label, error, required, children }) {
 
 function ReviewRow({ label, value }) {
   return (
-    <div className="flex justify-between py-2 border-b border-gray-100 last:border-0">
-      <span className="text-sm text-gray-500 w-36 shrink-0">{label}</span>
-      <span className="text-sm text-gray-800 text-right">{value || "—"}</span>
+    <div className="review-row flex justify-between py-2 border-b border-gray-700 last:border-0">
+      <span className="text-sm text-gray-400 w-36 shrink-0">{label}</span>
+      <span className="text-sm text-gray-100 text-right">{value || "—"}</span>
     </div>
   );
 }
