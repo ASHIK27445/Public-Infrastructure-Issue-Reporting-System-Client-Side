@@ -53,134 +53,132 @@ export default function EventDetailPage() {
   }, [searchParams]);
 
   /* ── fetch ── */
-const fetchDetail = async () => {
-  setLoading(true);
-  try {
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const res = await axios.get(
-      `${import.meta.env.VITE_API_URL}/events/${id}/detail`,
-      { headers }
-    );
-    setData(res.data);
-  } catch (err) {
-    console.warn("API failed, using demo data:", err.message);
-    
-    // Default/Demo data structure
-    const demoData = {
-      event: {
-        _id: id || "demo-event-001",
-        title: "🌿 Community Cleanup Drive",
-        description: "Join us for a community cleanup event! We'll be cleaning the local park and surrounding areas. All equipment will be provided. Let's work together to keep our neighborhood clean and beautiful! 🌱\n\nWe'll meet at the main entrance of Central Park at 9 AM. The event will include:\n- Gloves and trash bags provided\n- Free refreshments for volunteers\n- Certificate of participation\n- Great networking opportunity",
-        eventType: "cleanup",
-        date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000 + 4 * 60 * 60 * 1000).toISOString(),
-        status: "upcoming",
-        location: {
-          address: "Central Park, Main Street, Dhaka",
-          lat: 23.8103,
-          lng: 90.4125
-        },
-        maxVolunteers: 50,
-        registrationFee: 0,
-        fundGoal: 10000,
-        fundRaised: 4500,
-        interestedCount: 23,
-        goingCount: 15,
-        coverImage: null,
-        linkedIssueId: {
-          _id: "issue-001",
-          title: "Park Maintenance Needed"
-        },
-        organizerContact: "organizer@example.com",
-        pinnedAnnouncement: "Bring water bottles and wear comfortable shoes!",
-        equipmentList: ["Gloves", "Trash bags", "First aid kit", "Water bottles"],
-        createdBy: {
-          name: "Community Action Team",
-          _id: "admin-001"
-        },
-        spendingBreakdown: [
-          { label: "Equipment", amount: 3000 },
-          { label: "Refreshments", amount: 1000 },
-          { label: "Promotion", amount: 500 }
-        ]
-      },
-      donations: [
-        {
-          _id: "don-1",
-          amount: 1000,
-          donorName: "John Doe",
-          anonymous: false,
-          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          _id: "don-2",
-          amount: 500,
-          donorName: "Jane Smith",
-          anonymous: false,
-          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          _id: "don-3",
-          amount: 250,
-          donorName: "Anonymous",
-          anonymous: true,
-          createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
-        }
-      ],
-      comments: [
-        {
-          _id: "cmt-1",
-          text: "Looking forward to this event! 🌟",
-          userId: { name: "Sarah Johnson", _id: "user-1" },
-          createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          likes: ["user-2", "user-3"],
-          pinned: false,
-          replies: [
-            {
-              _id: "reply-1",
-              text: "Me too! Bringing my whole family!",
-              userId: { name: "Mike Brown", _id: "user-2" },
-              createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-            }
-          ]
-        },
-        {
-          _id: "cmt-2",
-          text: "Will there be parking available?",
-          userId: { name: "Emily Chen", _id: "user-4" },
-          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          likes: [],
-          pinned: false,
-          replies: []
-        }
-      ],
-      volunteerStats: {
-        confirmedCount: 32,
-        waitlistCount: 8
-      },
-      userReaction: null,
-      userRegistration: null
-    };
+  const fetchDetail = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_MANUAL}/events/${id}`,
+      );
+      setData(res.data);
+    } catch (err) {
+      console.warn("API failed, using demo data:", err.message);
+      
+      // // Default/Demo data structure
+      // const demoData = {
+      //   event: {
+      //     _id: id || "demo-event-001",
+      //     title: "🌿 Community Cleanup Drive",
+      //     description: "Join us for a community cleanup event! We'll be cleaning the local park and surrounding areas. All equipment will be provided. Let's work together to keep our neighborhood clean and beautiful! 🌱\n\nWe'll meet at the main entrance of Central Park at 9 AM. The event will include:\n- Gloves and trash bags provided\n- Free refreshments for volunteers\n- Certificate of participation\n- Great networking opportunity",
+      //     eventType: "cleanup",
+      //     date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+      //     endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000 + 4 * 60 * 60 * 1000).toISOString(),
+      //     status: "upcoming",
+      //     location: {
+      //       address: "Central Park, Main Street, Dhaka",
+      //       lat: 23.8103,
+      //       lng: 90.4125
+      //     },
+      //     maxVolunteers: 50,
+      //     registrationFee: 0,
+      //     fundGoal: 10000,
+      //     fundRaised: 4500,
+      //     interestedCount: 23,
+      //     goingCount: 15,
+      //     coverImage: null,
+      //     linkedIssueId: {
+      //       _id: "issue-001",
+      //       title: "Park Maintenance Needed"
+      //     },
+      //     organizerContact: "organizer@example.com",
+      //     pinnedAnnouncement: "Bring water bottles and wear comfortable shoes!",
+      //     equipmentList: ["Gloves", "Trash bags", "First aid kit", "Water bottles"],
+      //     createdBy: {
+      //       name: "Community Action Team",
+      //       _id: "admin-001"
+      //     },
+      //     spendingBreakdown: [
+      //       { label: "Equipment", amount: 3000 },
+      //       { label: "Refreshments", amount: 1000 },
+      //       { label: "Promotion", amount: 500 }
+      //     ]
+      //   },
+      //   donations: [
+      //     {
+      //       _id: "don-1",
+      //       amount: 1000,
+      //       donorName: "John Doe",
+      //       anonymous: false,
+      //       createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+      //     },
+      //     {
+      //       _id: "don-2",
+      //       amount: 500,
+      //       donorName: "Jane Smith",
+      //       anonymous: false,
+      //       createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+      //     },
+      //     {
+      //       _id: "don-3",
+      //       amount: 250,
+      //       donorName: "Anonymous",
+      //       anonymous: true,
+      //       createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
+      //     }
+      //   ],
+      //   comments: [
+      //     {
+      //       _id: "cmt-1",
+      //       text: "Looking forward to this event! 🌟",
+      //       userId: { name: "Sarah Johnson", _id: "user-1" },
+      //       createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      //       likes: ["user-2", "user-3"],
+      //       pinned: false,
+      //       replies: [
+      //         {
+      //           _id: "reply-1",
+      //           text: "Me too! Bringing my whole family!",
+      //           userId: { name: "Mike Brown", _id: "user-2" },
+      //           createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       _id: "cmt-2",
+      //       text: "Will there be parking available?",
+      //       userId: { name: "Emily Chen", _id: "user-4" },
+      //       createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      //       likes: [],
+      //       pinned: false,
+      //       replies: []
+      //     }
+      //   ],
+      //   volunteerStats: {
+      //     confirmedCount: 32,
+      //     waitlistCount: 8
+      //   },
+      //   userReaction: null,
+      //   userRegistration: null
+      // };
 
-    // If the user is logged in, add a demo registration for them
-    if (currentUserId) {
-      demoData.userRegistration = {
-        _id: "reg-demo-001",
-        waitlisted: false,
-        paymentStatus: "completed",
-        role: "volunteer",
-        attended: false,
-        qrToken: "demo-qr-token-12345",
-        waitlistPosition: null
-      };
+      // // If the user is logged in, add a demo registration for them
+      // if (currentUserId) {
+      //   demoData.userRegistration = {
+      //     _id: "reg-demo-001",
+      //     waitlisted: false,
+      //     paymentStatus: "completed",
+      //     role: "volunteer",
+      //     attended: false,
+      //     qrToken: "demo-qr-token-12345",
+      //     waitlistPosition: null
+      //   };
+      // }
+
+      // setData(demoData);
+      toast.info("Showing demo data (API unavailable)");
+    } finally {
+      setLoading(false);
     }
-
-    setData(demoData);
-    toast.info("Showing demo data (API unavailable)");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
   useEffect(() => { fetchDetail(); }, [id]);
 
   /* ────────────── LOADING ────────────── */

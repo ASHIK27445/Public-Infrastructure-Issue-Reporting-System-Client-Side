@@ -179,5 +179,8 @@ export const router = createBrowserRouter([
     },
     {
         path: '/onlytest', Component: EventsFeed
+    },
+    {
+        path: '/events/:id', Component: EventDetailPage
     }
 ])
