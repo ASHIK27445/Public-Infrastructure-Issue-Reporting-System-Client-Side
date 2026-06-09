@@ -46,6 +46,7 @@ import WaitlistManagementPanel from "../Pages/Events/WaitListManagementPanel"
 import WaitlistPanelDemo from "../Pages/Events/WaitListDemo"
 import VideoScupping from "../Pages/Others/VideoScupping"
 import EventDetailPage from "../Pages/Events/EventDetailsPage"
+import EventsFeed from "../Pages/Events/Eventfeeds"
 
 export const router = createBrowserRouter([
     {
@@ -177,6 +178,6 @@ export const router = createBrowserRouter([
         path: '*', Component: ErrorPage
     },
     {
-        path: '/onlytest', Component: EventDetailPage
+        path: '/onlytest', Component: EventsFeed
     }
 ])
