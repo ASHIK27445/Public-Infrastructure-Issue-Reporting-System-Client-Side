@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { format, formatDistanceToNow, isPast, differenceInDays, differenceInHours } from "date-fns";
 import { QRCodeCanvas } from "qrcode.react";
+import { Shirt } from "lucide-react";
 
 /* ─── Constants ─── */
 const TYPE_META = {
@@ -563,6 +564,16 @@ export default function EventDetailPage() {
             <AdminQuickActions event={event} onRefresh={fetchDetail} token={token} />
           )}
 
+          {/* ── Guest List ── */}
+          {data?.registrationInfo?.filter(r => r.role === "guest").length > 0 && (
+            <GuestSection guests={data.registrationInfo.filter(r => r.role === "guest")} />
+          )}
+
+          {/* ── Volunteer List ── */}
+          {data?.registrationInfo?.filter(r => r.role === "volunteer").length > 0 && (
+            <VolunteerSection volunteers={data.registrationInfo.filter(r => r.role === "volunteer")} />
+          )}
+
           {/* ── Share card ── */}
           <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
             <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Share Event</h3>
@@ -690,6 +701,108 @@ function VolunteersTab({ confirmedCount, waitlistCount, maxVolunteers, spotsPerc
           className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium transition-colors">
           ⚙️ Manage Volunteers →
         </Link>
+      )}
+    </div>
+  );
+}
+
+function GuestSection({ guests }) {
+  const [showAll, setShowAll] = useState(false);
+  const visible = showAll ? guests : guests.slice(0, 5);
+
+  return (
+    <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+      <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
+        👤 Guests ({guests.length})
+      </h3>
+
+      <div className="flex flex-wrap gap-2">
+        {visible.map((guest) => (
+          <div key={guest._id} className="relative group">
+            {/* Avatar */}
+            {guest.userPhoto ? (
+              <img
+                src={guest.userPhoto}
+                alt={guest.name}
+                className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm cursor-pointer"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm border-2 border-white shadow-sm cursor-pointer">
+                {guest.name?.[0]?.toUpperCase()}
+              </div>
+            )}
+
+            {/* Hover name tooltip */}
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-1 bg-zinc-800 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+              <p className="flex justify-center items-center gap-1">{guest.name}
+                {guest?.tshirtSize && (
+                <span className="text-white flex justify-center items-center gap-1">(<Shirt size={10} fill="yellow"/> {guest?.tshirtSize})</span>
+              )}
+              </p>
+
+              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {guests.length > 5 && (
+        <button
+          onClick={() => setShowAll(!showAll)}
+          className="mt-3 text-xs text-green-600 hover:text-green-700 font-medium transition-colors"
+        >
+          {showAll ? "Show less ↑" : `See more (${guests.length - 5} more) →`}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function VolunteerSection({ volunteers }) {
+  const [showAll, setShowAll] = useState(false);
+  const visible = showAll ? volunteers : volunteers.slice(0, 5);
+
+  return (
+    <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+      <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
+        🙋 Volunteers ({volunteers.length})
+      </h3>
+
+      <div className="flex flex-wrap gap-2">
+        {visible.map((vol) => (
+          <div key={vol._id} className="relative group">
+            {vol.userPhoto ? (
+              <img
+                src={vol.userPhoto}
+                alt={vol.name}
+                className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm cursor-pointer"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-sm border-2 border-white shadow-sm cursor-pointer">
+                {vol.name?.[0]?.toUpperCase()}
+              </div>
+            )}
+
+            {/* Hover tooltip */}
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-1 bg-zinc-800 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+              <p className="flex justify-center items-center gap-1">{vol.name}
+                {vol?.tshirtSize && (
+                <span className="text-white flex justify-center items-center gap-1">(<Shirt size={10} fill="blue"/> {vol?.tshirtSize})</span>
+              )}
+              </p>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {volunteers.length > 5 && (
+        <button
+          onClick={() => setShowAll(!showAll)}
+          className="mt-3 text-xs text-green-600 hover:text-green-700 font-medium transition-colors"
+        >
+          {showAll ? "Show less ↑" : `See more (${volunteers.length - 5} more) →`}
+        </button>
       )}
     </div>
   );

@@ -137,6 +137,8 @@ export default function VolunteerRegistration() {
     if (!form.phone.trim()) e.phone = "Phone is required";
     else if (!/^01[3-9]\d{8}$/.test(form.phone.replace(/\s/g, "")))
       e.phone = "Enter a valid BD number (01XXXXXXXXX)";
+    if (event?.isTshirt && !form.tshirtSize) {
+    e.tshirtSize = "Please select a T-shirt size";}
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -410,7 +412,7 @@ export default function VolunteerRegistration() {
 
             {/* T-Shirt Size */}
             {event?.isTshirt && (
-              <Field label="T-Shirt Size">
+              <Field label="T-Shirt Size" required error={errors.tshirtSize}>
                 <div className="overflow-x-auto rounded-xl border border-gray-200">
                   <table className="w-full text-sm">
                     <thead>
