@@ -395,6 +395,65 @@ export default function VolunteerRegistration() {
               </div>
             )}
 
+            {/* T-Shirt Size */}
+            {event?.isTshirt && (
+              <Field label="T-Shirt Size">
+                <div className="overflow-x-auto rounded-xl border border-gray-200">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Size</th>
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Chest</th>
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Height</th>
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Select</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { size: "S",   chest: `36"`, height: `5'4"` },
+                        { size: "M",   chest: `38"`, height: `5'6"` },
+                        { size: "L",   chest: `40"`, height: `5'8"` },
+                        { size: "XL",  chest: `42"`, height: `5'10"` },
+                        { size: "XXL", chest: `44"`, height: `6'0"` },
+                      ].map((row, i) => (
+                        <tr
+                          key={row.size}
+                          onClick={() => setF("tshirtSize", row.size)}
+                          className={`cursor-pointer transition-colors border-b border-gray-100 last:border-0 ${
+                            form.tshirtSize === row.size
+                              ? "bg-green-50"
+                              : i % 2 === 0 ? "bg-white hover:bg-gray-50" : "bg-gray-50/50 hover:bg-gray-100"
+                          }`}
+                        >
+                          <td className="px-4 py-3 font-semibold text-gray-800">{row.size}</td>
+                          <td className="px-4 py-3 text-gray-600">{row.chest}</td>
+                          <td className="px-4 py-3 text-gray-600">{row.height}</td>
+                          <td className="px-4 py-3">
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                              form.tshirtSize === row.size
+                                ? "border-green-500 bg-green-500"
+                                : "border-gray-300"
+                            }`}>
+                              {form.tshirtSize === row.size && (
+                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {form.tshirtSize && (
+                  <p className="text-xs text-green-600 mt-2 font-medium">
+                    ✅ Selected: {form.tshirtSize}
+                  </p>
+                )}
+              </Field>
+            )}
+
             {/* Payment notice */}
             {!isFree && !isFull && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800">

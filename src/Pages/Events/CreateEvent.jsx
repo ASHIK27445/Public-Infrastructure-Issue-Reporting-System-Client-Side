@@ -41,6 +41,7 @@ export default function CreateEvent() {
     maxVolunteers: 50,
     registrationFee: 0,
     equipmentList: [],
+    isTshirt: false,
     organizerContact: "",
     fundGoal: 0,
     coverImage: "",
@@ -453,6 +454,30 @@ export default function CreateEvent() {
                   )}
                 </Field>
 
+                {/* T-Shirt */}
+                <div
+                  onClick={() => set("isTshirt", !form.isTshirt)}
+                  className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                    form.isTshirt
+                      ? "border-green-500 bg-green-50 ring-1 ring-green-500"
+                      : "border-gray-200 bg-white hover:border-gray-300"
+                  }`}
+                >
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                    form.isTshirt ? "bg-green-500 border-green-500" : "border-gray-300"
+                  }`}>
+                    {form.isTshirt && (
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">👕 Provide T-Shirt</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Volunteers will be asked to select their size during registration</p>
+                  </div>
+                </div>
+
                 <Field label="Pinned Announcement (optional)">
                   <textarea
                     value={form.pinnedAnnouncement}
@@ -533,6 +558,7 @@ export default function CreateEvent() {
                   {form.equipmentList.length > 0 && (
                     <ReviewRow label="Equipment" value={form.equipmentList.join(", ")} />
                   )}
+                  <ReviewRow label="T-Shirt" value={form.isTshirt ? "Yes — size will be collected" : "No"} />
                   {form.organizerContact && (
                     <ReviewRow label="Contact" value={form.organizerContact} />
                   )}
