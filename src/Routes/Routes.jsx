@@ -47,6 +47,7 @@ import WaitlistPanelDemo from "../Pages/Events/WaitListDemo"
 import VideoScupping from "../Pages/Others/VideoScupping"
 import EventDetailPage from "../Pages/Events/EventDetailsPage"
 import EventsFeed from "../Pages/Events/Eventfeeds"
+import EventPaymentVerify from "../Pages/Events/EventPaymentVerify"
 
 export const router = createBrowserRouter([
     {
@@ -111,6 +112,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/waitlist', Component: WaitlistPanelDemo
+            },
+            {
+                path: '/event-payment-success', Component: EventPaymentVerify
             }
         ]
     },

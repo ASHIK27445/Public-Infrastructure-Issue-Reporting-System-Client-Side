@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useParams, useNavigate, Link, useSearchParams } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
 import { QRCodeCanvas } from "qrcode.react";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import { AuthContext } from "../AuthProvider/AuthContext";
 
 /* ─── Constants ─── */
 const AGE_GROUPS = [
@@ -43,6 +45,8 @@ export default function VolunteerRegistration() {
   const [submitted, setSubmitted]    = useState(false);
   const [result, setResult]          = useState(null);
   const [errors, setErrors]          = useState({});
+  const axiosSecure = useAxiosSecure()
+  const {user} = use(AuthContext)
 
   // Check if user just came back from Stripe payment
   const stripeSuccess   = searchParams.get("session_id");
@@ -142,12 +146,9 @@ export default function VolunteerRegistration() {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/${id}/volunteer`,
+      const res = await axiosSecure.post(
+        `/events/${id}/volunteer`,
         form,
-        { headers }
       );
       const reg = res.data?.registration;
 
@@ -472,7 +473,7 @@ function SuccessCard({ result, event, isFree, onCancel }) {
     <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
 
       {/* Banner */}
-      <div className={`py-10 px-8 text-center ${isWaitlisted ? "bg-amber-50" : "bg-gradient-to-br from-green-50 to-emerald-50"}`}>
+      <div className={`py-10 px-8 text-center ${isWaitlisted ? "bg-amber-50" : "bg-linear-to-br from-green-50 to-emerald-50"}`}>
         <div className="text-6xl mb-3 animate-bounce">{isWaitlisted ? "⏳" : "🎉"}</div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: "Fraunces,serif" }}>
           {isWaitlisted ? "You're on the Waitlist!" : "Registration Confirmed!"}
