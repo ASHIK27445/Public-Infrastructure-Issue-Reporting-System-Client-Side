@@ -63,7 +63,7 @@ export default function VolunteerRegistration() {
 
   /* ── Fetch event ── */
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/events/${id}`)
+    axios.get(`${import.meta.env.VITE_API_MANUAL}/events/${id}`)
       .then((r) => setEvent(r.data?.event))
       .catch(() => toast.error("Could not load event details"))
       .finally(() => setEventLoading(false));

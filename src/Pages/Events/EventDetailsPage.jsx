@@ -241,7 +241,7 @@ export default function EventDetailPage() {
                 <img src={event.coverImage} alt={event.title}
                   className="w-full h-full object-cover"
                   onError={(e) => { e.target.closest(".relative").className = `relative h-56 md:h-72 ${colorCls.bg} flex items-center justify-center`; e.target.replaceWith(Object.assign(document.createElement("span"), { className:"text-8xl opacity-20 select-none", textContent: typeMeta.emoji })); }} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
                 {/* Status overlay */}
                 <div className="absolute top-4 right-4">
                   <StatusBadge status={event.status} />
@@ -531,7 +531,7 @@ export default function EventDetailPage() {
                   <span>{fundPercent}%</span>
                 </div>
                 <div className="h-2.5 bg-stone-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full transition-all"
+                  <div className="h-full bg-linear-to-r from-emerald-400 to-teal-500 rounded-full transition-all"
                     style={{ width: `${fundPercent}%` }} />
                 </div>
                 <p className="text-xs text-stone-400 mt-1.5">Goal: ৳{event.fundGoal.toLocaleString()}</p>
@@ -667,9 +667,9 @@ function VolunteersTab({ confirmedCount, waitlistCount, maxVolunteers, spotsPerc
         </div>
         <div className="h-3 bg-stone-100 rounded-full overflow-hidden">
           <div className={`h-full rounded-full transition-all duration-700 ${
-            spotsLeft <= 0 ? "bg-gradient-to-r from-red-400 to-rose-500"
-            : spotsPercent >= 80 ? "bg-gradient-to-r from-amber-400 to-orange-400"
-            : "bg-gradient-to-r from-green-400 to-emerald-500"
+            spotsLeft <= 0 ? "bg-linear-to-r from-red-400 to-rose-500"
+            : spotsPercent >= 80 ? "bg-linear-to-r from-amber-400 to-orange-400"
+            : "bg-linear-to-r from-green-400 to-emerald-500"
           }`} style={{ width: `${spotsPercent}%` }} />
         </div>
       </div>
@@ -700,7 +700,7 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
   return (
     <div className="space-y-5">
       {/* Progress */}
-      <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100">
+      <div className="bg-linear-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100">
         <div className="flex justify-between items-end mb-3">
           <div>
             <p className="text-2xl font-bold text-emerald-700">৳{(fundRaised || 0).toLocaleString()}</p>
@@ -709,7 +709,7 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
           <p className="text-3xl font-bold text-emerald-300">{fundPercent}%</p>
         </div>
         <div className="h-3 bg-emerald-100 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full transition-all"
+          <div className="h-full bg-linear-to-r from-emerald-400 to-teal-500 rounded-full transition-all"
             style={{ width: `${fundPercent}%` }} />
         </div>
         <p className="text-xs text-emerald-600 mt-2">{donations?.length || 0} donors · Thank you! 💚</p>
@@ -1039,7 +1039,7 @@ function DonationForm({ eventId, onDonated }) {
 
   if (!showForm) return (
     <button onClick={() => setShowForm(true)}
-      className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600
+      className="w-full py-2.5 rounded-2xl bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600
                  text-white font-semibold text-sm transition-all shadow-sm">
       💚 Donate to This Event
     </button>

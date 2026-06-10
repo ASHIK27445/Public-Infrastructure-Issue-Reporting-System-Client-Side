@@ -106,11 +106,11 @@ export default function VolunteerRegistrationPage() {
     const fetchEvent = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/events/${id}`
+          `${import.meta.env.VITE_API_MANUAL}/events/${id}`
         );
         setEvent(res.data?.event);
       } catch {
-        setEvent(DEMO_EVENT);
+        // setEvent(DEMO_EVENT);
         toast.info("Showing demo event - API not connected");
       } finally {
         setEventLoading(false);

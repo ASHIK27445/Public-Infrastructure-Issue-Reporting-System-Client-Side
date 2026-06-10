@@ -107,7 +107,7 @@ export const router = createBrowserRouter([
                 path: '/event-card', Component: EventCardDemo
             },
             {
-                path: '/test', Component: VolunteerRegistration
+                path: '/events/:id/register', Component: VolunteerRegistration
             },
             {
                 path: '/waitlist', Component: WaitlistPanelDemo
