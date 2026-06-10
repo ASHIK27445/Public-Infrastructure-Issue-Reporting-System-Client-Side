@@ -154,7 +154,7 @@ export default function EventDetailPage() {
       //   ],
       //   volunteerStats: {
       //     confirmedCount: 32,
-      //     waitlistCount: 8
+      //     event?.waitlistCount: 8
       //   },
       //   userReaction: null,
       //   userRegistration: null
@@ -201,15 +201,17 @@ export default function EventDetailPage() {
     </Shell>
   );
 
-  const { event, donations, comments, volunteerStats, userReaction, userRegistration } = data;
+  const { event, donations, comments, userReaction, userRegistration } = data;
+  console.log(data)
   const typeMeta  = TYPE_META[event.eventType]   || TYPE_META.meetup;
   const colorCls  = COLOR_MAP[typeMeta.color]    || COLOR_MAP.teal;
   const eventDate = new Date(event.date);
   const isUpcoming = !isPast(eventDate);
   const isCancelled = event.status === "cancelled";
   const isCompleted = event.status === "completed";
-  const spotsLeft   = Math.max(0, (event.maxVolunteers || 0) - (volunteerStats?.confirmedCount || 0));
-  const spotsPercent = Math.min(100, ((volunteerStats?.confirmedCount || 0) / (event.maxVolunteers || 1)) * 100);
+  const volunteerCount = event?.volunteerCount
+  const spotsLeft   = Math.max(0, (event.maxVolunteers || 0) - (event?.volunteerCount || 0));
+  const spotsPercent = Math.min(100, ((event?.volunteerCount || 0) / (event.maxVolunteers || 1)) * 100);
   const fundPercent  = event.fundGoal > 0
     ? Math.min(100, Math.round(((event.fundRaised || 0) / event.fundGoal) * 100))
     : 0;
@@ -328,7 +330,7 @@ export default function EventDetailPage() {
             <div className="flex border-b border-stone-100 overflow-x-auto">
               {[
                 { id: "about",     label: "About",     icon: "📋" },
-                { id: "volunteers",label: "Volunteers", icon: "👥", count: volunteerStats?.confirmedCount },
+                { id: "volunteers",label: "Volunteers", icon: "👥", count: volunteerCount },
                 { id: "donors",    label: "Donors",     icon: "💰", count: donations?.length, show: event.fundGoal > 0 },
                 { id: "comments",  label: "Discussion", icon: "💬", count: comments?.length },
               ].filter(t => t.show !== false).map((tab) => (
@@ -415,8 +417,8 @@ export default function EventDetailPage() {
               {/* ── Volunteers tab ── */}
               {activeTab === "volunteers" && (
                 <VolunteersTab
-                  confirmedCount={volunteerStats?.confirmedCount || 0}
-                  waitlistCount={volunteerStats?.waitlistCount || 0}
+                  confirmedCount={event?.volunteerCount || 0}
+                  waitlistCount={event?.waitlistCount || 0}
                   maxVolunteers={event.maxVolunteers}
                   spotsPercent={spotsPercent}
                   spotsLeft={spotsLeft}
@@ -473,13 +475,13 @@ export default function EventDetailPage() {
               <p className="text-xs text-stone-400 mb-4">
                 {spotsLeft > 0
                   ? `${spotsLeft} spots remaining out of ${event.maxVolunteers}`
-                  : `All ${event.maxVolunteers} spots filled. ${volunteerStats?.waitlistCount || 0} on waitlist.`}
+                  : `All ${event.maxVolunteers} spots filled. ${event?.waitlistCount || 0} on waitlist.`}
               </p>
 
               {/* Progress bar */}
               <div className="mb-4">
                 <div className="flex justify-between text-xs text-stone-400 mb-1.5">
-                  <span>{volunteerStats?.confirmedCount || 0} joined</span>
+                  <span>{volunteerCount || 0} joined</span>
                   <span>{event.maxVolunteers} max</span>
                 </div>
                 <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
@@ -547,8 +549,8 @@ export default function EventDetailPage() {
             <div className="space-y-3">
               <StatRow icon="👋" label="Interested" value={event.interestedCount || 0} />
               <StatRow icon="✅" label="Going"      value={event.goingCount      || 0} />
-              <StatRow icon="🙋" label="Volunteers" value={volunteerStats?.confirmedCount || 0} />
-              <StatRow icon="⏳" label="Waitlisted" value={volunteerStats?.waitlistCount  || 0} />
+              <StatRow icon="🙋" label="Volunteers" value={volunteerCount || 0} />
+              <StatRow icon="⏳" label="Waitlisted" value={event?.waitlistCount  || 0} />
               {event.fundGoal > 0 && (
                 <StatRow icon="💰" label="Donations" value={`৳${(event.fundRaised||0).toLocaleString()}`} />
               )}
@@ -678,8 +680,8 @@ function VolunteersTab({ confirmedCount, waitlistCount, maxVolunteers, spotsPerc
         {confirmedCount === 0
           ? "No volunteers yet. Be the first to join! 🌱"
           : `${confirmedCount} ${confirmedCount === 1 ? "volunteer has" : "volunteers have"} signed up for this event.`}
-        {waitlistCount > 0 && (
-          <p className="text-amber-600 font-medium mt-1">{waitlistCount} on waitlist</p>
+        {event?.waitlistCount > 0 && (
+          <p className="text-amber-600 font-medium mt-1">{event?.waitlistCount} on waitlist</p>
         )}
       </div>
 
