@@ -42,6 +42,8 @@ export default function CreateEvent() {
     registrationFee: 0,
     equipmentList: [],
     isTshirt: false,
+    isGuestUnlimited: false,
+    guestNumber: 0,
     organizerContact: "",
     fundGoal: 0,
     coverImage: "",
@@ -138,13 +140,12 @@ export default function CreateEvent() {
       toast.error('You are not authorized.');
       return;
     }
-    if(role === 'admin'){
-      toast.success('ok')
-      return
-    }
+    // if(role === 'admin'){
+    //   toast.success('ok')
+    //   return
+    // }
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
       const payload = {
         ...form,
         location: {
@@ -287,7 +288,7 @@ export default function CreateEvent() {
                     <img
                       src={form.coverImage}
                       alt="cover preview"
-                      className="mt-2 rounded-lg h-32 w-full object-cover border border-gray-200"
+                      className="mt-2 rounded-lg h-75 w-full object-cover border border-gray-200"
                       onError={(e) => (e.target.style.display = "none")}
                     />
                   )}
@@ -478,6 +479,47 @@ export default function CreateEvent() {
                   </div>
                 </div>
 
+                {/* Guest Settings */}
+                <div className="space-y-3">
+                  <div
+                    onClick={() => set("isGuestUnlimited", !form.isGuestUnlimited)}
+                    className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                      form.isGuestUnlimited
+                        ? "border-green-500 bg-green-50 ring-1 ring-green-500"
+                        : "border-gray-200 bg-white hover:border-gray-300"
+                    }`}
+                  >
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                      form.isGuestUnlimited ? "bg-green-500 border-green-500" : "border-gray-300"
+                    }`}>
+                      {form.isGuestUnlimited && (
+                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">👤 Unlimited Guests</p>
+                      <p className="text-xs text-gray-400 mt-0.5">No limit on how many guests can register</p>
+                    </div>
+                  </div>
+
+                  {/* Guest number input — only show if NOT unlimited */}
+                  {!form.isGuestUnlimited && (
+                    <Field label="Max Guests">
+                      <input
+                        type="number"
+                        min={1}
+                        value={form.guestNumber}
+                        onChange={(e) => set("guestNumber", e.target.value)}
+                        placeholder="e.g. 10"
+                        className={inputClass()}
+                      />
+                      <p className="text-sm text-gray-400 mt-1">After this, guests cannot register</p>
+                    </Field>
+                  )}
+                </div>
+
                 <Field label="Pinned Announcement (optional)">
                   <textarea
                     value={form.pinnedAnnouncement}
@@ -559,6 +601,8 @@ export default function CreateEvent() {
                     <ReviewRow label="Equipment" value={form.equipmentList.join(", ")} />
                   )}
                   <ReviewRow label="T-Shirt" value={form.isTshirt ? "Yes — size will be collected" : "No"} />
+                  <ReviewRow label="Guest Limit" 
+                  value={form.isGuestUnlimited ? "Unlimited" : `${form.guestNumber} guests`}/>
                   {form.organizerContact && (
                     <ReviewRow label="Contact" value={form.organizerContact} />
                   )}

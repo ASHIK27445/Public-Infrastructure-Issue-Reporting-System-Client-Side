@@ -62,6 +62,7 @@ export default function VolunteerRegistration() {
     institution: "",
     ageGroup:    "18-25",
     skills:      [],
+    tshirtSize:  "",
     role:        "volunteer",
   });
 
@@ -255,6 +256,10 @@ export default function VolunteerRegistration() {
     </PageShell>
   );
 
+  const guestSpotsLeft = event?.isGuestUnlimited
+  ? null : Math.max(0, (event?.guestNumber || 0) - (event?.guestCount || 0));
+  const isGuestFull = !event?.isGuestUnlimited && guestSpotsLeft <= 0;
+
   /* ════════════════════════════════════════
      REGISTRATION FORM
   ════════════════════════════════════════ */
@@ -272,7 +277,8 @@ export default function VolunteerRegistration() {
         </button>
 
         {/* Event summary */}
-        <EventSummaryCard event={event} spotsLeft={spotsLeft} isFull={isFull} isFree={isFree} />
+        <EventSummaryCard event={event} spotsLeft={spotsLeft} isFull={isFull} isFree={isFree}
+        guestSpotsLeft={guestSpotsLeft} isGuestFull={isGuestFull} />
 
         {/* Cancelled payment notice */}
         {stripeCancelled && (
@@ -304,13 +310,20 @@ export default function VolunteerRegistration() {
             {/* Role toggle */}
             <div className="flex items-center gap-2 mt-5">
               {["volunteer", "guest"].map((r) => (
-                <button key={r} type="button" onClick={() => setF("role", r)}
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => !( r === "guest" && isGuestFull) && setF("role", r)}
+                  disabled={r === "guest" && isGuestFull}
                   className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
                     form.role === r
                       ? "bg-green-500 text-white border-green-500 shadow-sm"
+                      : r === "guest" && isGuestFull
+                      ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
                       : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
-                  }`}>
-                  {r === "volunteer" ? "🙋 Volunteer" : "👤 Guest"}
+                  }`}
+                >
+                  {r === "volunteer" ? "🙋 Volunteer" : isGuestFull ? "👤 Guest (Full)" : "👤 Guest"}
                 </button>
               ))}
               <p className="text-xs text-gray-400 ml-2">
@@ -670,7 +683,7 @@ function SuccessCard({ result, event, isFree, onCancel }) {
 /* ═══════════════════════════════════════════
    EVENT SUMMARY CARD (top of form)
 ═══════════════════════════════════════════ */
-function EventSummaryCard({ event, spotsLeft, isFull, isFree }) {
+function EventSummaryCard({ event, spotsLeft, isFull, isFree, guestSpotsLeft, isGuestFull }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-5 flex items-start gap-4">
       <div className="text-4xl shrink-0">{TYPE_EMOJI[event.eventType] || "🤝"}</div>
@@ -693,6 +706,23 @@ function EventSummaryCard({ event, spotsLeft, isFull, isFree }) {
               ✅ {spotsLeft} spots available
             </span>
           )}
+
+          {/* Guest badge */}
+          {event?.isGuestUnlimited ? (
+            <span className="text-xs bg-blue-50 text-blue-700 ring-1 ring-blue-200 px-2.5 py-1 rounded-full font-medium">
+              👤 Unlimited guests
+            </span>
+          ) : isGuestFull ? (
+            <span className="text-xs bg-red-50 text-red-700 ring-1 ring-red-200 px-2.5 py-1 rounded-full font-medium">
+              👤 Guest spots full
+            </span>
+          ) : (
+            <span className="text-xs bg-blue-50 text-blue-700 ring-1 ring-blue-200 px-2.5 py-1 rounded-full font-medium">
+              👤 {guestSpotsLeft} guest spots
+            </span>
+          )}
+
+
           {!isFree && (
             <span className="text-xs bg-blue-50 text-blue-700 ring-1 ring-blue-200 px-2.5 py-1 rounded-full font-medium">
               💳 ৳{event.registrationFee} fee
