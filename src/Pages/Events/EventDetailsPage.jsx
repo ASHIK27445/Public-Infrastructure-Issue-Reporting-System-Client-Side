@@ -240,7 +240,7 @@ export default function EventDetailPage() {
           <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm">
             {/* Cover */}
             {event.coverImage ? (
-              <div className="relative h-56 md:h-72 overflow-hidden">
+              <div className="relative h-56 md:h-72 lg:h-88 overflow-hidden">
                 <img src={event.coverImage} alt={event.title}
                   className="w-full h-full object-cover"
                   onError={(e) => { e.target.closest(".relative").className = `relative h-56 md:h-72 ${colorCls.bg} flex items-center justify-center`; e.target.replaceWith(Object.assign(document.createElement("span"), { className:"text-8xl opacity-20 select-none", textContent: typeMeta.emoji })); }} />
