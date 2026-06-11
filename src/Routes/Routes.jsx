@@ -48,6 +48,7 @@ import VideoScupping from "../Pages/Others/VideoScupping"
 import EventDetailPage from "../Pages/Events/EventDetailsPage"
 import EventsFeed from "../Pages/Events/Eventfeeds"
 import EventPaymentVerify from "../Pages/Events/EventPaymentVerify"
+import QRCheckinPage from "../Pages/Events/QRCheckingPage"
 
 export const router = createBrowserRouter([
     {
@@ -182,7 +183,10 @@ export const router = createBrowserRouter([
         path: '*', Component: ErrorPage
     },
     {
-        path: '/onlytest', Component: EventsFeed
+        path: '/onlytest', Component: QRCheckinPage
+    },
+    {
+        path: '/events', Component: EventsFeed
     },
     {
         path: '/events/:id', Component: EventDetailPage
