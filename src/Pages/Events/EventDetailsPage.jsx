@@ -1166,7 +1166,7 @@ function DonationForm({ user,  eventId, onDonated }) {
       const res = await axios.post(
         `${import.meta.env.VITE_API_MANUAL}/events/${eventId}/donate`,
         { amount: Number(amount), donorName: name || "Supporter", donorEmail: email,
-          donarPhone: phone || null, anonymous: anon, wantReceipt: !anon && wantReceipt },
+          donorPhone: phone || null, anonymous: anon, wantReceipt: !anon && wantReceipt },
         { headers: user?.accessToken ? { Authorization: `Bearer ${user?.accessToken}` } : {} }
       );
       if (res.data.paymentUrl) {
