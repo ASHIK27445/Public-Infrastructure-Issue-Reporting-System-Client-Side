@@ -847,33 +847,33 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
       </div>
 
       {/* Donor list */}
-      {donations?.length > 0 ? (
-        <div className="space-y-2">
-          <h4 className="text-xs font-semibold text-stone-400 uppercase tracking-wide">Recent Donors</h4>
-          {donations.map((d, i) => (
-            <div key={i} className="flex items-center justify-between py-2.5 border-b border-stone-50 last:border-0">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-xs font-bold">
-                  {d.anonymous ? "?" : d.donorName?.[0]?.toUpperCase() || "?"}
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-stone-800">
-                    {d.anonymous ? "Anonymous" : d.donorName}
-                  </p>
-                  <p className="text-xs text-stone-400">
-                    {formatDistanceToNow(new Date(d.createdAt), { addSuffix: true })}
-                  </p>
-                </div>
+      {donations.map((d, i) => (
+        <div key={i} className="flex items-center justify-between py-2.5 border-b border-stone-50 last:border-0">
+          <div className="flex items-center gap-3">
+            {/* ✅ userPhoto আছে এবং anonymous না হলে photo দেখাবে */}
+            {d.userPhoto && !d.anonymous ? (
+              <img
+                src={d.userPhoto}
+                alt={d.donorName}
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-xs font-bold">
+                {d.anonymous ? "?" : d.donorName?.[0]?.toUpperCase() || "?"}
               </div>
-              <span className="text-sm font-bold text-emerald-600">৳{d.amount.toLocaleString()}</span>
+            )}
+            <div>
+              <p className="text-sm font-medium text-stone-800">
+                {d.anonymous ? "Anonymous" : d.donorName}
+              </p>
+              <p className="text-xs text-stone-400">
+                {formatDistanceToNow(new Date(d.createdAt), { addSuffix: true })}
+              </p>
             </div>
-          ))}
+          </div>
+          <span className="text-sm font-bold text-emerald-600">৳{d.amount.toLocaleString()}</span>
         </div>
-      ) : (
-        <div className="text-center py-8 text-stone-400 text-sm">
-          Be the first to donate! 💚
-        </div>
-      )}
+      ))}
 
       {/* Spending breakdown */}
       {spendingBreakdown?.length > 0 && (
@@ -1167,7 +1167,7 @@ function DonationForm({ user,  eventId, onDonated }) {
         `${import.meta.env.VITE_API_MANUAL}/events/${eventId}/donate`,
         { amount: Number(amount), donorName: name || "Supporter", donorEmail: email,
           donarPhone: phone || null, anonymous: anon, wantReceipt: !anon && wantReceipt },
-        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+        { headers: user?.accessToken ? { Authorization: `Bearer ${user?.accessToken}` } : {} }
       );
       if (res.data.paymentUrl) {
         toast.info("Redirecting to payment...");
