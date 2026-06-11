@@ -34,7 +34,7 @@ const PaymentDetails = () => {
       setLoading(true)
       axiosSecure.get(`/payment-details/${paymentId}`)
         .then(res=> {
-          // console.log(res.data)
+          console.log(res.data)
           setPayment(res.data)
           setLoading(false)
         }).catch(err=> {
@@ -194,33 +194,66 @@ const PaymentDetails = () => {
                 <User className="w-5 h-5 text-purple-500" />
                 <span>User</span>
               </h3>
-              
-              <div className="space-y-5">
-                <div className="flex items-center space-x-4">
-                  <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-zinc-700">
-                    <img
-                      src={payment.performedBy?.photoURL || 'https://via.placeholder.com/150'}
-                      alt={payment.performedBy?.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white">{payment.performedBy?.name}</p>
-                    <p className="text-sm text-gray-400">{payment.performedBy?.email}</p>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm text-gray-400 mb-1 block">User ID</label>
-                    <p className="font-mono text-sm text-gray-300 truncate">{payment.userId}</p>
+              {payment.performedBy?.role === "anonymous" ? (
+                // ✅ Anonymous user
+                <div className="space-y-5">
+                  <div className="flex items-center gap-3 p-4 bg-zinc-900/30 rounded-xl">
+                    <div className="w-14 h-14 rounded-full bg-zinc-700 flex items-center justify-center">
+                      <User className="w-6 h-6 text-zinc-400" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-white">Anonymous</p>
+                      <span className="text-xs px-2 py-0.5 bg-zinc-700 text-zinc-400 rounded-full">Anonymous Donor</span>
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-sm text-gray-400 mb-1 block">Role</label>
-                    <p className="font-medium text-white capitalize">{payment.performedBy?.role}</p>
+
+                  <div className="space-y-3">
+                    {payment.performedBy?.email && (
+                      <div>
+                        <label className="text-sm text-gray-400 mb-1 block">Email</label>
+                        <p className="font-medium text-white">{payment.performedBy.email}</p>
+                      </div>
+                    )}
+                    {payment.performedBy?.phone && (
+                      <div>
+                        <label className="text-sm text-gray-400 mb-1 block">Phone</label>
+                        <p className="font-medium text-white">{payment.performedBy.phone}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
+              ) : (
+                // ✅ Normal user
+                <div className="space-y-5">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-zinc-700">
+                      <img
+                        src={payment.performedBy?.photoURL || 'https://via.placeholder.com/150'}
+                        alt={payment.performedBy?.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-white">{payment.performedBy?.name}</p>
+                      <p className="text-sm text-gray-400">{payment.performedBy?.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-gray-400 mb-1 block">User ID</label>
+                      <p className="font-mono text-sm text-gray-300 truncate">
+                        {payment?.userId || 'N/A'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-400 mb-1 block">Role</label>
+                      <p className="font-medium text-white capitalize">{payment.performedBy?.role}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Payment System */}
