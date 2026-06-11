@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { format, formatDistanceToNow, isPast, differenceInDays, differenceInHours } from "date-fns";
 import { QRCodeCanvas } from "qrcode.react";
 import { Shirt } from "lucide-react";
+import { AuthContext } from "../AuthProvider/AuthContext";
 
 /* ─── Constants ─── */
 const TYPE_META = {
@@ -37,6 +38,7 @@ export default function EventDetailPage() {
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("about"); // about | volunteers | donors | comments
+  const {user} = use(AuthContext)
 
   // user info from localStorage
   const currentUserId = localStorage.getItem("userId");
@@ -45,10 +47,24 @@ export default function EventDetailPage() {
 
   // scroll to donate section if ?donate=true
   useEffect(() => {
-    if (searchParams.get("donated") === "true") {
-      toast.success("🎉 Thank you for your donation!");
+    const sessionId = searchParams.get("session_id");
+    const donated   = searchParams.get("donated");
+    const donate    = searchParams.get("donate");
+
+    if (donated === "true" && sessionId) {
+      axios.get(`${import.meta.env.VITE_API_MANUAL}/verify-donation/${sessionId}`)
+        .then((res) => {
+          if (res.data.success && res.data.paid) {
+            toast.success("🎉 Thank you for your donation!");
+            fetchDetail();
+          } else {
+            toast.error("Donation verification failed.");
+          }
+        })
+        .catch(() => toast.error("Donation verification failed."));
     }
-    if (searchParams.get("donate") === "true") {
+
+    if (donate === "true") {
       setTimeout(() => donateRef.current?.scrollIntoView({ behavior: "smooth" }), 600);
     }
   }, [searchParams]);
@@ -540,7 +556,7 @@ export default function EventDetailPage() {
                 <p className="text-xs text-stone-400 mt-1.5">Goal: ৳{event.fundGoal.toLocaleString()}</p>
               </div>
 
-              <DonationForm eventId={event._id} onDonated={fetchDetail} />
+              <DonationForm user={user} eventId={event._id} onDonated={fetchDetail} />
             </div>
           )}
 
@@ -1120,10 +1136,12 @@ function CommentItem({ comment, currentUserId, isAdmin, token, onDelete, onDelet
 /* ═══════════════════════════════════════
    DONATION FORM (in sidebar)
 ═══════════════════════════════════════ */
-function DonationForm({ eventId, onDonated }) {
+function DonationForm({ user,  eventId, onDonated }) {
   const [amount,    setAmount]    = useState("");
-  const [name,      setName]      = useState(localStorage.getItem("userName") || "");
-  const [email,     setEmail]     = useState(localStorage.getItem("userEmail") || "");
+  const [name,      setName]      = useState(user?.displayName || "");
+  const [email,     setEmail]     = useState(user?.email || "");
+  const [phone,        setPhone]        = useState("");
+  const [wantReceipt,  setWantReceipt]  = useState(true)
   const [anon,      setAnon]      = useState(false);
   const [loading,   setLoading]   = useState(false);
   const [showForm,  setShowForm]  = useState(false);
@@ -1132,13 +1150,23 @@ function DonationForm({ eventId, onDonated }) {
 
   const handleDonate = async () => {
     if (!amount || Number(amount) < 10) { toast.error("Minimum donation is ৳10"); return; }
-    if (!email.trim()) { toast.error("Email is required for receipt"); return; }
+    if (anon && !email.trim() && !phone.trim()) {
+      toast.error("Anonymous donation requires at least an email or phone number");
+      return;
+    }
+
+    // Receipt: email must
+    if (!anon && wantReceipt && !email.trim()) {
+      toast.error("Please enter your email to receive a receipt");
+      return;
+    }
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/${eventId}/donate`,
-        { amount: Number(amount), donorName: name || "Supporter", donorEmail: email, anonymous: anon },
+        `${import.meta.env.VITE_API_MANUAL}/events/${eventId}/donate`,
+        { amount: Number(amount), donorName: name || "Supporter", donorEmail: email,
+          donarPhone: phone || null, anonymous: anon, wantReceipt: !anon && wantReceipt },
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
       if (res.data.paymentUrl) {
@@ -1180,7 +1208,7 @@ function DonationForm({ eventId, onDonated }) {
         placeholder="Custom amount (৳)"
         className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
 
-      {!localStorage.getItem("userId") && (
+      {!user && (
         <>
           <input type="text" value={name} onChange={(e) => setName(e.target.value)}
             placeholder="Your name (optional)"
@@ -1188,6 +1216,7 @@ function DonationForm({ eventId, onDonated }) {
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
             placeholder="Email for receipt *"
             className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+            
         </>
       )}
 
@@ -1196,6 +1225,48 @@ function DonationForm({ eventId, onDonated }) {
           className="rounded border-stone-300 text-emerald-500 focus:ring-emerald-400" />
         Donate anonymously
       </label>
+
+      {/* Anonymous: email OR phone required */}
+      {anon && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-2">
+          <p className="text-xs text-amber-700 font-medium">
+            ⚠️ Anonymous donations require at least one contact for verification:
+          </p>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email (optional)"
+            className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+          <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+            placeholder="Phone number (optional)"
+            className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+
+            <label className="flex items-center gap-2 text-xs text-stone-500 cursor-pointer select-none">
+              <input type="checkbox" checked={wantReceipt} onChange={(e) => setWantReceipt(e.target.checked)}
+                className="rounded border-stone-300 text-emerald-500 focus:ring-emerald-400" />
+              Send me a receipt via email
+            </label>
+        </div>
+      )}
+
+      {/* Normal: receipt toggle + email */}
+      {!anon && (
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-xs text-stone-500 cursor-pointer select-none">
+            <input type="checkbox" checked={wantReceipt} onChange={(e) => setWantReceipt(e.target.checked)}
+              className="rounded border-stone-300 text-emerald-500 focus:ring-emerald-400" />
+            Send me a receipt via email
+          </label>
+
+          {wantReceipt && (
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email for receipt *"
+              className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+          )}
+
+          <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+            placeholder="Phone number (optional)"
+            className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+        </div>
+      )}
 
       <div className="flex gap-2">
         <button onClick={() => setShowForm(false)}
