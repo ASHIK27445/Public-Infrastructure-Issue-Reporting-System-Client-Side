@@ -251,19 +251,50 @@ console.log(event)
   /* ════════════════════════════════════════
      SUCCESS STATE
   ════════════════════════════════════════ */
-  if (submitted && result) return (
-    <PageShell>
-      <div className="max-w-lg mx-auto">
-        <SuccessCard
-          result={result}
-          event={event}
-          isFree={isFree}
-          onCancel={handleCancel}
-        />
-      </div>
-    </PageShell>
-  );
+  if (submitted && result) {
+    const isWaitlistedVolunteer = result.status === "waitlisted" && result.role !== "guest";
+    const isWaitlistedGuest     = result.status === "waitlisted" && result.role === "guest";
 
+    return (
+      <PageShell>
+        <div className="max-w-lg mx-auto">
+          <SuccessCard result={result} event={event} isFree={isFree} onCancel={handleCancel} />
+
+          {/* waitlisted volunteer → guest switch */}
+          {isWaitlistedVolunteer && !isGuestFull && (
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-2xl p-5 text-center">
+              <p className="text-sm font-semibold text-blue-800 mb-1">👤 Guest spots still available!</p>
+              <p className="text-xs text-blue-700 mb-3">
+                Volunteer spots are full but you can switch to guest and attend the event.
+              </p>
+              <button
+                onClick={() => { setSubmitted(false); setResult(null); setF("role", "guest"); }}
+                className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-semibold transition-colors"
+              >
+                Switch to Guest →
+              </button>
+            </div>
+          )}
+
+          {/* waitlisted guest → volunteer switch */}
+          {isWaitlistedGuest && spotsLeft > 0 && (
+            <div className="mt-4 bg-green-50 border border-green-200 rounded-2xl p-5 text-center">
+              <p className="text-sm font-semibold text-green-800 mb-1">🙋 Volunteer spots available!</p>
+              <p className="text-xs text-green-700 mb-3">
+                Guest spots are full but {spotsLeft} volunteer spot{spotsLeft > 1 ? "s are" : " is"} still open.
+              </p>
+              <button
+                onClick={() => { setSubmitted(false); setResult(null); setF("role", "volunteer"); }}
+                className="px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-semibold transition-colors"
+              >
+                Switch to Volunteer →
+              </button>
+            </div>
+          )}
+        </div>
+      </PageShell>
+    );
+  }
 
   /* ════════════════════════════════════════
      REGISTRATION FORM
