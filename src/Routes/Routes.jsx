@@ -50,6 +50,7 @@ import EventsFeed from "../Pages/Events/Eventfeeds"
 import EventPaymentVerify from "../Pages/Events/EventPaymentVerify"
 import QRCheckinPage from "../Pages/Events/QRCheckingPage"
 import AdminWaitlistFeed from "../Pages/Events/AdminWaitListFeed"
+import FreeParticipateRegistration from "../Pages/Events/FreeParticipateRegistration"
 
 export const router = createBrowserRouter([
     {
@@ -120,6 +121,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/waitlist-feed', element: <PrivateRouter><AdminWaitlistFeed /></PrivateRouter>
+            },
+            {
+                path: '/events/:id/free-participate', Component: FreeParticipateRegistration
             },
             {
                 path: '/event-payment-success', Component: EventPaymentVerify

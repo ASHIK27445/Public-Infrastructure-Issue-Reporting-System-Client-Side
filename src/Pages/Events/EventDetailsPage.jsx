@@ -592,11 +592,12 @@ export default function EventDetailPage() {
           )}
 
           {/* ── Free Participants Section ── */}
-          {freeParticipants?.length > 0 && (
+          {console.log(event?.isFreeParticipate)}
+          {event?.isFreeParticipate && (
             <FreeParticipantsSection
               participants={freeParticipants}
               eventId={event._id}
-              hasFreeParticipate={event.isFreeParticipate}
+              hasFreeParticipate={event?.isFreeParticipate}
             /> )}
 
           {/* ── Share card ── */}
