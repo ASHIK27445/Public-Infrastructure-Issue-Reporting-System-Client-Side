@@ -290,6 +290,7 @@ export default function CreateEvent() {
                       alt="cover preview"
                       className="mt-2 rounded-lg h-75 w-full object-cover border border-gray-200"
                       onError={(e) => (e.target.style.display = "none")}
+                      loading="lazy"
                     />
                   )}
                 </Field>

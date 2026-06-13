@@ -49,6 +49,7 @@ import EventDetailPage from "../Pages/Events/EventDetailsPage"
 import EventsFeed from "../Pages/Events/Eventfeeds"
 import EventPaymentVerify from "../Pages/Events/EventPaymentVerify"
 import QRCheckinPage from "../Pages/Events/QRCheckingPage"
+import AdminWaitlistFeed from "../Pages/Events/AdminWaitListFeed"
 
 export const router = createBrowserRouter([
     {
@@ -113,6 +114,12 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/waitlist', Component: WaitlistPanelDemo
+            },
+            {
+                path: '/admin/events/:id/manage', element: <PrivateRouter><WaitlistManagementPanel /></PrivateRouter>
+            },
+            {
+                path: '/waitlist-feed', element: <PrivateRouter><AdminWaitlistFeed /></PrivateRouter>
             },
             {
                 path: '/event-payment-success', Component: EventPaymentVerify

@@ -1,29 +1,34 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
+import {
+  Download, RefreshCw, Search, CheckCircle2,
+  Clock, Users, CreditCard, ArrowUpCircle,
+  QrCode, UserMinus, Award, X,
+} from "lucide-react";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import { useParams } from "react-router";
 
 /* ═══════════════════════════════════════════
    WAITLIST MANAGEMENT PANEL
-   Used inside Admin Event Management page.
-   Props: eventId, eventTitle, maxVolunteers
+   Route: /admin/events/:id/manage
 ═══════════════════════════════════════════ */
-export default function WaitlistManagementPanel({ eventId, eventTitle, maxVolunteers }) {
+export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
+  const { id: eventId } = useParams();
+
   const [volunteers, setVolunteers] = useState([]);
   const [waitlist,   setWaitlist]   = useState([]);
   const [loading,    setLoading]    = useState(true);
-  const [tab,        setTab]        = useState("confirmed"); // confirmed | waitlist | attended
+  const [tab,        setTab]        = useState("confirmed");
   const [search,     setSearch]     = useState("");
-
-  const token = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
+  const axiosSecure = useAxiosSecure();
 
   const fetchAll = async () => {
     setLoading(true);
     try {
       const [confirmedRes, waitlistRes] = await Promise.all([
-        axios.get(`${import.meta.env.VITE_API_URL}/events/${eventId}/volunteers?waitlisted=false`, { headers }),
-        axios.get(`${import.meta.env.VITE_API_URL}/events/${eventId}/waitlist`, { headers }),
+        axiosSecure.get(`/events/${eventId}/volunteers?waitlisted=false`),
+        axiosSecure.get(`/events/${eventId}/waitlist`),
       ]);
       setVolunteers(confirmedRes.data?.registrations || []);
       setWaitlist(waitlistRes.data?.waitlist || []);
@@ -41,8 +46,8 @@ export default function WaitlistManagementPanel({ eventId, eventTitle, maxVolunt
   const paidCount     = volunteers.filter((v) => v.paymentStatus === "paid").length;
   const pendingCount  = volunteers.filter((v) => v.paymentStatus === "pending").length;
 
-  /* ── Filter by search ── */
-  const filtered = (tab === "waitlist" ? waitlist : volunteers).filter((v) => {
+  /* ── Filtered rows ── */
+  const rows = (tab === "waitlist" ? waitlist : volunteers).filter((v) => {
     if (tab === "attended" && !v.attended) return false;
     const q = search.toLowerCase();
     return (
@@ -64,228 +69,360 @@ export default function WaitlistManagementPanel({ eventId, eventTitle, maxVolunt
         format(new Date(v.createdAt), "dd/MM/yyyy HH:mm"),
       ]),
     ];
-    const csv    = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
-    const blob   = new Blob([csv], { type: "text/csv" });
-    const url    = URL.createObjectURL(blob);
-    const a      = document.createElement("a");
-    a.href       = url;
-    a.download   = `${eventTitle}-${tab}.csv`;
+    const csv  = rows.map((r) => r.map((c) => `"${c ?? ""}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `${eventTitle || "event"}-${tab}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("CSV exported!");
   };
 
-  /* ── Render ── */
+  /* ── Action handlers (wire to your API) ── */
+  const handlePromote   = (reg) => toast.info(`Promote: ${reg.name}`);
+  const handleRemove    = (reg) => toast.warn(`Remove: ${reg.name}`);
+  const handleCert      = (reg) => toast.success(`Certificate: ${reg.name}`);
+  const handleQR        = (reg) => toast.info(`QR: ${reg.name}`);
+
+  /* ── Tabs config ── */
+  const TABS = [
+    { id: "confirmed", label: "Confirmed", count: volunteers.length },
+    { id: "waitlist",  label: "Waitlist",  count: waitlist.length   },
+    { id: "attended",  label: "Attended",  count: attendedCount     },
+  ];
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden"
-      style={{ fontFamily: "'DM Sans',sans-serif" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap');`}</style>
+    <div className="min-h-screen bg-zinc-950 py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 overflow-hidden">
 
-      {/* Header */}
-      <div className="p-5 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h2 className="font-semibold text-gray-900 text-base">Volunteer Management</h2>
-          <p className="text-xs text-gray-400 mt-0.5">{eventTitle}</p>
-        </div>
-        <button onClick={exportCSV}
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-gray-200
-                     text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
-          Export CSV
-        </button>
-      </div>
-
-      {/* Stats bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-gray-100 border-b border-gray-100">
-        <StatBox label="Confirmed" value={volunteers.length} max={maxVolunteers} color="green" />
-        <StatBox label="Waitlist"  value={waitlist.length}   color="amber" />
-        <StatBox label="Attended"  value={attendedCount}     color="blue" />
-        <StatBox label="Paid"      value={paidCount} note={pendingCount > 0 ? `${pendingCount} pending` : null} color="purple" />
-      </div>
-
-      {/* Tabs + search */}
-      <div className="p-4 border-b border-gray-100 flex flex-wrap gap-3 items-center">
-        <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
-          {[
-            { id: "confirmed", label: `✅ Confirmed (${volunteers.length})` },
-            { id: "waitlist",  label: `⏳ Waitlist (${waitlist.length})` },
-            { id: "attended",  label: `🎫 Attended (${attendedCount})` },
-          ].map((t) => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                tab === t.id ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}>
-              {t.label}
+          {/* ── Header ── */}
+          <div className="px-6 py-5 border-b border-zinc-800 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 className="text-base font-semibold text-white">Volunteer management</h2>
+              <p className="text-xs text-zinc-500 mt-0.5">{eventTitle || "Event"}</p>
+            </div>
+            <button
+              onClick={exportCSV}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-700
+                         bg-transparent text-zinc-300 text-sm hover:bg-zinc-800 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
             </button>
-          ))}
-        </div>
-        <div className="flex-1 min-w-[180px]">
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, email, institution..."
-            className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:outline-none
-                       focus:border-green-400 focus:ring-1 focus:ring-green-100" />
-        </div>
-      </div>
+          </div>
 
-      {/* Table */}
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 text-sm">
-          {search ? `No results for "${search}"` : `No ${tab} registrations yet`}
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                {tab === "waitlist" && (
-                  <Th>#</Th>
-                )}
-                <Th>Name</Th>
-                <Th>Contact</Th>
-                <Th>Institution</Th>
-                <Th>Skills</Th>
-                {tab !== "waitlist" && <Th>Payment</Th>}
-                {tab !== "waitlist" && <Th>Attended</Th>}
-                <Th>Registered</Th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {filtered.map((v) => (
-                <tr key={v._id} className="hover:bg-gray-50/50 transition-colors">
-                  {tab === "waitlist" && (
-                    <Td>
-                      <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-xs
-                                       font-bold flex items-center justify-center">
-                        {v.waitlistPosition}
-                      </span>
-                    </Td>
-                  )}
-                  <Td>
-                    <div>
-                      <p className="font-medium text-gray-900 text-sm">{v.name}</p>
-                      <p className="text-xs text-gray-400">{v.role}</p>
-                    </div>
-                  </Td>
-                  <Td>
-                    <p className="text-xs text-gray-700">{v.email}</p>
-                    <p className="text-xs text-gray-400">{v.phone}</p>
-                  </Td>
-                  <Td>
-                    <p className="text-xs text-gray-700">{v.institution || "—"}</p>
-                    <p className="text-xs text-gray-400">{v.ageGroup}</p>
-                  </Td>
-                  <Td>
-                    <div className="flex flex-wrap gap-1">
-                      {v.skills?.length > 0
-                        ? v.skills.slice(0, 3).map((s) => (
-                          <span key={s} className="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
-                            {s}
+          {/* ── Stats bar ── */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-zinc-800 border-b border-zinc-800">
+            <StatCell icon={<Users className="w-4 h-4" />} label="Confirmed"
+              value={volunteers.length} sub={`/ ${maxVolunteers || "—"} spots`} color="emerald" />
+            <StatCell icon={<Clock className="w-4 h-4" />} label="Waitlist"
+              value={waitlist.length} color="amber" />
+            <StatCell icon={<CheckCircle2 className="w-4 h-4" />} label="Attended"
+              value={attendedCount} color="sky" />
+            <StatCell icon={<CreditCard className="w-4 h-4" />} label="Paid"
+              value={paidCount} sub={pendingCount > 0 ? `${pendingCount} pending` : null}
+              subColor="amber" color="violet" />
+          </div>
+
+          {/* ── Toolbar ── */}
+          <div className="px-4 py-3 border-b border-zinc-800 flex flex-wrap items-center gap-3">
+            {/* Tabs */}
+            <div className="flex gap-1 bg-zinc-800 rounded-xl p-1">
+              {TABS.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    tab === t.id
+                      ? "bg-zinc-700 text-white shadow-sm"
+                      : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  {t.label}
+                  <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] ${
+                    tab === t.id ? "bg-zinc-600 text-zinc-200" : "bg-zinc-700 text-zinc-500"
+                  }`}>
+                    {t.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* Search */}
+            <div className="flex-1 min-w-[180px] relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by name, email, institution..."
+                className="w-full pl-8 pr-3 py-2 rounded-xl border border-zinc-700 bg-zinc-800
+                           text-zinc-200 text-xs placeholder-zinc-500 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
+          {/* ── Table ── */}
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : rows.length === 0 ? (
+            <div className="text-center py-20 text-zinc-600 text-sm">
+              {search ? `No results for "${search}"` : `No ${tab} registrations yet`}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-zinc-800/60 border-b border-zinc-800">
+                    {tab === "waitlist" && <Th>#</Th>}
+                    <Th>Name</Th>
+                    <Th>Contact</Th>
+                    <Th>Institution</Th>
+                    <Th>Skills</Th>
+                    {tab !== "waitlist" && <Th>Payment</Th>}
+                    {tab === "attended"  && <Th>Check-in</Th>}
+                    {tab === "confirmed" && <Th>Attended</Th>}
+                    <Th>Registered</Th>
+                    <Th>Actions</Th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/60">
+                  {rows.map((v) => (
+                    <tr key={v._id} className="hover:bg-zinc-800/40 transition-colors">
+
+                      {/* Position badge (waitlist only) */}
+                      {tab === "waitlist" && (
+                        <Td>
+                          <span className="w-6 h-6 rounded-full bg-amber-500/10 text-amber-400 text-xs
+                                           font-bold flex items-center justify-center border border-amber-500/20">
+                            {v.waitlistPosition}
                           </span>
-                        ))
-                        : <span className="text-xs text-gray-300">—</span>
-                      }
-                    </div>
-                  </Td>
-                  {tab !== "waitlist" && (
-                    <Td>
-                      <PaymentBadge status={v.paymentStatus} />
-                    </Td>
-                  )}
-                  {tab !== "waitlist" && (
-                    <Td>
-                      {v.attended ? (
-                        <div>
-                          <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                            ✅ Attended
+                        </Td>
+                      )}
+
+                      {/* Name + role */}
+                      <Td>
+                        <p className="font-medium text-white text-sm">{v.name}</p>
+                        <p className="text-xs text-zinc-500 mt-0.5">{v.role}</p>
+                      </Td>
+
+                      {/* Contact */}
+                      <Td>
+                        <p className="text-xs text-zinc-300">{v.email}</p>
+                        <p className="text-xs text-zinc-500 mt-0.5">{v.phone}</p>
+                      </Td>
+
+                      {/* Institution */}
+                      <Td>
+                        <p className="text-xs text-zinc-300">{v.institution || "—"}</p>
+                        <p className="text-xs text-zinc-500 mt-0.5">{v.ageGroup}</p>
+                      </Td>
+
+                      {/* Skills */}
+                      <Td>
+                        <div className="flex flex-wrap gap-1">
+                          {v.skills?.length > 0
+                            ? v.skills.slice(0, 3).map((s) => (
+                              <span key={s} className="text-[10px] bg-emerald-500/10 text-emerald-400
+                                                        border border-emerald-500/20 px-1.5 py-0.5 rounded-full">
+                                {s}
+                              </span>
+                            ))
+                            : <span className="text-xs text-zinc-600">—</span>
+                          }
+                        </div>
+                      </Td>
+
+                      {/* Payment (confirmed + attended) */}
+                      {tab !== "waitlist" && (
+                        <Td><PaymentBadge status={v.paymentStatus} /></Td>
+                      )}
+
+                      {/* Check-in time (attended tab) */}
+                      {tab === "attended" && (
+                        <Td>
+                          <span className="inline-flex items-center gap-1 text-xs bg-emerald-500/10
+                                           text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                            <CheckCircle2 className="w-3 h-3" />
+                            {v.attendedAt ? format(new Date(v.attendedAt), "h:mm a") : "—"}
                           </span>
-                          {v.attendedAt && (
-                            <p className="text-[10px] text-gray-400 mt-1">
-                              {format(new Date(v.attendedAt), "h:mm a")}
-                            </p>
+                        </Td>
+                      )}
+
+                      {/* Attended flag (confirmed tab) */}
+                      {tab === "confirmed" && (
+                        <Td>
+                          {v.attended ? (
+                            <div>
+                              <span className="inline-flex items-center gap-1 text-xs bg-emerald-500/10
+                                               text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                                <CheckCircle2 className="w-3 h-3" /> Yes
+                              </span>
+                              {v.attendedAt && (
+                                <p className="text-[10px] text-zinc-500 mt-1">
+                                  {format(new Date(v.attendedAt), "h:mm a")}
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-zinc-600">—</span>
+                          )}
+                        </Td>
+                      )}
+
+                      {/* Registered at */}
+                      <Td>
+                        <p className="text-xs text-zinc-500">
+                          {format(new Date(v.createdAt), "dd MMM, h:mm a")}
+                        </p>
+                      </Td>
+
+                      {/* Actions */}
+                      <Td>
+                        <div className="flex flex-wrap gap-1.5">
+                          {tab === "waitlist" && (
+                            <>
+                              <ActionBtn
+                                icon={<ArrowUpCircle className="w-3.5 h-3.5" />}
+                                label="Promote"
+                                color="emerald"
+                                onClick={() => handlePromote(v)}
+                              />
+                              <ActionBtn
+                                icon={<QrCode className="w-3.5 h-3.5" />}
+                                label="QR"
+                                color="sky"
+                                onClick={() => handleQR(v)}
+                              />
+                              <ActionBtn
+                                icon={<X className="w-3.5 h-3.5" />}
+                                label="Remove"
+                                color="red"
+                                onClick={() => handleRemove(v)}
+                              />
+                            </>
+                          )}
+                          {tab === "confirmed" && (
+                            <>
+                              <ActionBtn
+                                icon={<Award className="w-3.5 h-3.5" />}
+                                label="Certificate"
+                                color="violet"
+                                onClick={() => handleCert(v)}
+                              />
+                              <ActionBtn
+                                icon={<UserMinus className="w-3.5 h-3.5" />}
+                                label="Remove"
+                                color="red"
+                                onClick={() => handleRemove(v)}
+                              />
+                            </>
+                          )}
+                          {tab === "attended" && (
+                            <ActionBtn
+                              icon={<Award className="w-3.5 h-3.5" />}
+                              label="Certificate"
+                              color="violet"
+                              onClick={() => handleCert(v)}
+                            />
                           )}
                         </div>
-                      ) : (
-                        <span className="text-xs text-gray-300">—</span>
-                      )}
-                    </Td>
-                  )}
-                  <Td>
-                    <p className="text-xs text-gray-500">
-                      {format(new Date(v.createdAt), "dd MMM, h:mm a")}
-                    </p>
-                  </Td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+                      </Td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-      {/* Footer */}
-      <div className="px-5 py-3 border-t border-gray-100 flex justify-between items-center">
-        <p className="text-xs text-gray-400">
-          Showing {filtered.length} of {tab === "waitlist" ? waitlist.length : volunteers.length} registrations
-        </p>
-        <button onClick={fetchAll}
-          className="text-xs text-green-600 hover:text-green-700 font-medium flex items-center gap-1">
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
-          Refresh
-        </button>
+          {/* ── Footer ── */}
+          <div className="px-6 py-3 border-t border-zinc-800 flex items-center justify-between">
+            <p className="text-xs text-zinc-600">
+              Showing {rows.length} of {tab === "waitlist" ? waitlist.length : volunteers.length} registrations
+            </p>
+            <button
+              onClick={fetchAll}
+              className="inline-flex items-center gap-1.5 text-xs text-emerald-500 hover:text-emerald-400 transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Refresh
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ── Small helpers ── */
-function StatBox({ label, value, max, color, note }) {
+/* ── StatCell ── */
+function StatCell({ icon, label, value, sub, color, subColor }) {
   const colors = {
-    green:  "text-green-600",
-    amber:  "text-amber-600",
-    blue:   "text-blue-600",
-    purple: "text-purple-600",
+    emerald: "text-emerald-400",
+    amber:   "text-amber-400",
+    sky:     "text-sky-400",
+    violet:  "text-violet-400",
   };
   return (
     <div className="p-4 text-center">
-      <p className={`text-2xl font-bold ${colors[color]}`}>{value}</p>
-      {max && <p className="text-xs text-gray-400">/ {max}</p>}
-      <p className="text-xs text-gray-500 mt-0.5">{label}</p>
-      {note && <p className="text-[10px] text-amber-500 mt-0.5">{note}</p>}
+      <div className={`flex items-center justify-center gap-1.5 mb-1 ${colors[color]} opacity-60`}>
+        {icon}
+        <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
+      </div>
+      <p className={`text-2xl font-semibold ${colors[color]}`}>{value}</p>
+      {sub     && <p className="text-[11px] text-zinc-500 mt-0.5">{sub}</p>}
+      {subColor && <p className={`text-[11px] mt-0.5 ${colors[subColor]}`}>{sub}</p>}
     </div>
   );
 }
 
+/* ── PaymentBadge ── */
 function PaymentBadge({ status }) {
-  const styles = {
-    "not-required": "bg-gray-100 text-gray-500",
-    "pending":      "bg-amber-100 text-amber-700",
-    "paid":         "bg-green-100 text-green-700",
-    "refunded":     "bg-blue-100 text-blue-700",
+  const map = {
+    "not-required": { cls: "bg-zinc-800 text-zinc-400 border-zinc-700",   label: "Free"      },
+    "pending":      { cls: "bg-amber-500/10 text-amber-400 border-amber-500/20",   label: "Pending"   },
+    "paid":         { cls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20", label: "Paid"   },
+    "refunded":     { cls: "bg-sky-500/10 text-sky-400 border-sky-500/20", label: "Refunded"  },
   };
-  const labels = {
-    "not-required": "Free",
-    "pending":      "⏳ Pending",
-    "paid":         "✅ Paid",
-    "refunded":     "↩ Refunded",
-  };
+  const s = map[status] || map["not-required"];
   return (
-    <span className={`text-xs px-2 py-1 rounded-full font-medium ${styles[status] || styles["not-required"]}`}>
-      {labels[status] || status}
+    <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${s.cls}`}>
+      {s.label}
     </span>
   );
 }
 
+/* ── ActionBtn ── */
+function ActionBtn({ icon, label, color, onClick }) {
+  const colors = {
+    emerald: "border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10",
+    red:     "border-red-500/30 text-red-400 hover:bg-red-500/10",
+    violet:  "border-violet-500/30 text-violet-400 hover:bg-violet-500/10",
+    sky:     "border-sky-500/30 text-sky-400 hover:bg-sky-500/10",
+  };
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-medium
+                  transition-colors ${colors[color]}`}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+/* ── Table helpers ── */
 function Th({ children }) {
-  return <th className="px-4 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide whitespace-nowrap">{children}</th>;
+  return (
+    <th className="px-4 py-2.5 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider whitespace-nowrap">
+      {children}
+    </th>
+  );
 }
 function Td({ children }) {
   return <td className="px-4 py-3 align-top">{children}</td>;
