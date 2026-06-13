@@ -34,6 +34,7 @@ export default function EventDetailPage() {
   const [searchParams]   = useSearchParams();
   const commentInputRef  = useRef(null);
   const donateRef        = useRef(null);
+  const [freeParticipants, setFreeParticipants] = useState([]);
 
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
@@ -590,6 +591,14 @@ export default function EventDetailPage() {
             <VolunteerSection volunteers={data.registrationInfo.filter(r => r.role === "volunteer")} />
           )}
 
+          {/* ── Free Participants Section ── */}
+          {freeParticipants?.length > 0 && (
+            <FreeParticipantsSection
+              participants={freeParticipants}
+              eventId={event._id}
+              hasFreeParticipate={event.isFreeParticipate}
+            /> )}
+
           {/* ── Share card ── */}
           <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
             <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Share Event</h3>
@@ -819,6 +828,66 @@ function VolunteerSection({ volunteers }) {
         >
           {showAll ? "Show less ↑" : `See more (${volunteers.length - 5} more) →`}
         </button>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════
+   FREE PARTICIPANTS SECTION
+═══════════════════════════════════════ */
+function FreeParticipantsSection({ participants, eventId, hasFreeParticipate }) {
+  const [showAll, setShowAll] = useState(false);
+  const [selectedName, setSelectedName] = useState(null);
+  const visible = showAll ? participants : participants.slice(0, 8);
+
+  return (
+    <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+      <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
+        🎟️ Free Participants ({participants.length})
+      </h3>
+
+      <div className="flex flex-wrap gap-2">
+        {visible.map((p) => (
+          <div key={p._id} className="relative group">
+            <button
+              onClick={() => setSelectedName(selectedName === p._id ? null : p._id)}
+              className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center
+                         text-blue-700 font-bold text-[10px] border-2 border-white shadow-sm
+                         hover:bg-blue-200 transition-colors"
+            >
+              {p.name?.[0]?.toUpperCase()}
+            </button>
+
+            {/* Click tooltip */}
+            {selectedName === p._id && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5
+                              bg-zinc-800 text-white text-xs rounded-lg whitespace-nowrap z-10 shadow-lg">
+                <p className="font-medium">{p.name}</p>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800" />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {participants.length > 8 && (
+        <button
+          onClick={() => setShowAll(!showAll)}
+          className="mt-3 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
+        >
+          {showAll ? "Show less ↑" : `See more (${participants.length - 8} more) →`}
+        </button>
+      )}
+
+      {hasFreeParticipate && (
+        <Link
+          to={`/events/${eventId}/free-participate`}
+          className="mt-4 flex items-center justify-center gap-1.5 w-full py-2 rounded-xl
+                     bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold transition-colors"
+        >
+          🎟️ Join as Free Participant →
+        </Link>
       )}
     </div>
   );
