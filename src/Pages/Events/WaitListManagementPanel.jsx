@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import { useParams } from "react-router";
+import { QRCodeCanvas } from "qrcode.react";
 
 /* ═══════════════════════════════════════════
    WAITLIST MANAGEMENT PANEL
@@ -21,6 +22,7 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
   const [loading,    setLoading]    = useState(true);
   const [tab,        setTab]        = useState("confirmed");
   const [search,     setSearch]     = useState("");
+  const [qrModal,    setQrModal]    = useState(null);
   const axiosSecure = useAxiosSecure();
 
   const fetchAll = async () => {
@@ -38,6 +40,8 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
       setLoading(false);
     }
   };
+
+  console.log(volunteers, waitlist)
 
   useEffect(() => { fetchAll(); }, [eventId]);
 
@@ -84,7 +88,9 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
   const handlePromote   = (reg) => toast.info(`Promote: ${reg.name}`);
   const handleRemove    = (reg) => toast.warn(`Remove: ${reg.name}`);
   const handleCert      = (reg) => toast.success(`Certificate: ${reg.name}`);
-  const handleQR        = (reg) => toast.info(`QR: ${reg.name}`);
+  const handleQR = (reg) => {
+    setQrModal({ name: reg.name, qrToken: reg.qrToken });
+  };
 
   /* ── Tabs config ── */
   const TABS = [
@@ -152,7 +158,7 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
             </div>
 
             {/* Search */}
-            <div className="flex-1 min-w-[180px] relative">
+            <div className="flex-1 min-w-45 relative">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
               <input
                 type="text"
@@ -310,6 +316,12 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
                           {tab === "confirmed" && (
                             <>
                               <ActionBtn
+                                icon={<QrCode className="w-3.5 h-3.5" />}
+                                label="QR"
+                                color="sky"
+                                onClick={() => handleQR(v)}
+                              />
+                              <ActionBtn
                                 icon={<Award className="w-3.5 h-3.5" />}
                                 label="Certificate"
                                 color="violet"
@@ -355,6 +367,45 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
           </div>
         </div>
       </div>
+
+       {/* QR Modal */}
+      {qrModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 w-full max-w-sm text-center">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-white font-semibold">{qrModal.name}</h3>
+              <button
+                onClick={() => setQrModal(null)}
+                className="text-zinc-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-white rounded-xl p-4 inline-block mb-4">
+              <QRCodeCanvas
+                value={qrModal.qrToken}
+                size={200}
+                bgColor="#ffffff"
+                fgColor="#111827"
+                level="M"
+              />
+            </div>
+
+            <p className="text-xs text-zinc-500 mb-2">Attendance QR Code</p>
+            <code className="block text-[11px] font-mono bg-zinc-800 rounded-lg px-3 py-2 text-zinc-400 break-all mb-5">
+              {qrModal.qrToken}
+            </code>
+
+            <button
+              onClick={() => setQrModal(null)}
+              className="w-full py-2.5 rounded-xl bg-zinc-800 text-zinc-300 text-sm hover:bg-zinc-700 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
