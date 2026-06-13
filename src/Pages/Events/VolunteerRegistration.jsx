@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useMemo } from "react";
 import { useParams, useNavigate, Link, useSearchParams } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -194,7 +194,13 @@ console.log(event)
 
   /* ── Derived ── */
   const spotsLeft  = event ? Math.max(0, (event.maxVolunteers || 0) - (event.volunteerCount || 0)) : null;
-  const isFull     = spotsLeft !== null && spotsLeft <= 0;
+  const guestSpotsLeft = event?.isGuestUnlimited
+    ? null : Math.max(0, (event?.guestNumber || 0) - (event?.guestCount || 0));
+  const isGuestFull = !event?.isGuestUnlimited && (guestSpotsLeft ?? 0) <= 0;
+  const isFull = useMemo(() => {
+    if (form.role === "guest") return isGuestFull;
+    return spotsLeft !== null && spotsLeft <= 0;
+  }, [form.role, spotsLeft, isGuestFull]);
   const isFree     = !event?.registrationFee || event.registrationFee === 0;
   const isPastDate = event ? new Date(event.date) < new Date() : false;
 
@@ -258,9 +264,6 @@ console.log(event)
     </PageShell>
   );
 
-  const guestSpotsLeft = event?.isGuestUnlimited
-  ? null : Math.max(0, (event?.guestNumber || 0) - (event?.guestCount || 0));
-  const isGuestFull = !event?.isGuestUnlimited && guestSpotsLeft <= 0;
 
   /* ════════════════════════════════════════
      REGISTRATION FORM
