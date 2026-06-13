@@ -34,7 +34,6 @@ export default function EventDetailPage() {
   const [searchParams]   = useSearchParams();
   const commentInputRef  = useRef(null);
   const donateRef        = useRef(null);
-  const [freeParticipants, setFreeParticipants] = useState([]);
 
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
@@ -219,7 +218,7 @@ export default function EventDetailPage() {
     </Shell>
   );
 
-  const { event, donations, comments, userReaction, userRegistration } = data;
+  const { event, donations, comments, userReaction, userRegistration, freeParticipants } = data;
   console.log(data)
   const typeMeta  = TYPE_META[event.eventType]   || TYPE_META.meetup;
   const colorCls  = COLOR_MAP[typeMeta.color]    || COLOR_MAP.teal;
@@ -592,7 +591,6 @@ export default function EventDetailPage() {
           )}
 
           {/* ── Free Participants Section ── */}
-          {console.log(event?.isFreeParticipate)}
           {event?.isFreeParticipate && (
             <FreeParticipantsSection
               participants={freeParticipants}
@@ -839,7 +837,7 @@ function VolunteerSection({ volunteers }) {
 ═══════════════════════════════════════ */
 function FreeParticipantsSection({ participants, eventId, hasFreeParticipate }) {
   const [showAll, setShowAll] = useState(false);
-  const [selectedName, setSelectedName] = useState(null);
+
   const visible = showAll ? participants : participants.slice(0, 8);
 
   return (
@@ -851,23 +849,29 @@ function FreeParticipantsSection({ participants, eventId, hasFreeParticipate }) 
       <div className="flex flex-wrap gap-2">
         {visible.map((p) => (
           <div key={p._id} className="relative group">
-            <button
-              onClick={() => setSelectedName(selectedName === p._id ? null : p._id)}
+            
+            {/* Avatar */}
+            <div
               className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center
                          text-blue-700 font-bold text-[10px] border-2 border-white shadow-sm
-                         hover:bg-blue-200 transition-colors"
+                         hover:bg-blue-200 transition-colors cursor-pointer"
             >
               {p.name?.[0]?.toUpperCase()}
-            </button>
+            </div>
 
-            {/* Click tooltip */}
-            {selectedName === p._id && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5
-                              bg-zinc-800 text-white text-xs rounded-lg whitespace-nowrap z-10 shadow-lg">
-                <p className="font-medium">{p.name}</p>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800" />
-              </div>
-            )}
+            {/* Hover Tooltip */}
+            <div
+              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5
+                         bg-zinc-800 text-white text-xs rounded-lg whitespace-nowrap
+                         opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                         transition-all duration-150 z-10 shadow-lg"
+            >
+              {p.name}
+              
+              {/* arrow */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800" />
+            </div>
+
           </div>
         ))}
       </div>
