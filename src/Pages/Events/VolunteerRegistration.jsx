@@ -74,7 +74,7 @@ export default function VolunteerRegistration() {
       .finally(() => setEventLoading(false));
   }, [id]);
 
-
+console.log(event)
 
 //   useEffect(() => {
 //   // Demo event directly

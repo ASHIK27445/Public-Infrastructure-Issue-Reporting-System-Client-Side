@@ -512,7 +512,7 @@ export default function CreateEvent() {
                         type="number"
                         min={1}
                         value={form.guestNumber}
-                        onChange={(e) => set("guestNumber", e.target.value)}
+                        onChange={(e) => set("guestNumber", Number(e.target.value))}
                         placeholder="e.g. 10"
                         className={inputClass()}
                       />
