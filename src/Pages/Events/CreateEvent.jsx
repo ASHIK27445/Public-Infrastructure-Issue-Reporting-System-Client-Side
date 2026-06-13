@@ -44,6 +44,8 @@ export default function CreateEvent() {
     isTshirt: false,
     isGuestUnlimited: false,
     guestNumber: 0,
+    isFreeParticipate: false,
+    maxFreeParticipate: 0,
     organizerContact: "",
     fundGoal: 0,
     coverImage: "",
@@ -519,6 +521,48 @@ export default function CreateEvent() {
                       <p className="text-sm text-gray-400 mt-1">After this, guests cannot register</p>
                     </Field>
                   )}
+
+                  {/* Free Participate */}
+                  <div className="space-y-3">
+                    <div
+                      onClick={() => set("isFreeParticipate", !form.isFreeParticipate)}
+                      className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                        form.isFreeParticipate
+                          ? "border-green-500 bg-green-50 ring-1 ring-green-500"
+                          : "border-gray-200 bg-white hover:border-gray-300"
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                        form.isFreeParticipate ? "bg-green-500 border-green-500" : "border-gray-300"
+                      }`}>
+                        {form.isFreeParticipate && (
+                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">🎟️ Free Participate</p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          Allow anyone to join without login — phone & email required, confirmation sent via email
+                        </p>
+                      </div>
+                    </div>
+
+                    {form.isFreeParticipate && (
+                      <Field label="Max Free Participants (0 = Unlimited)">
+                        <input
+                          type="number"
+                          min={0}
+                          value={form.maxFreeParticipate}
+                          onChange={(e) => set("maxFreeParticipate", Number(e.target.value))}
+                          placeholder="0 = Unlimited"
+                          className={inputClass()}
+                        />
+                        <p className="text-sm text-gray-400 mt-1">Leave 0 for unlimited free participants</p>
+                      </Field>
+                    )}
+                  </div>
                 </div>
 
                 <Field label="Pinned Announcement (optional)">
@@ -604,6 +648,7 @@ export default function CreateEvent() {
                   <ReviewRow label="T-Shirt" value={form.isTshirt ? "Yes — size will be collected" : "No"} />
                   <ReviewRow label="Guest Limit" 
                   value={form.isGuestUnlimited ? "Unlimited" : `${form.guestNumber} guests`}/>
+                  <ReviewRow label="Free Participate" value={form.isFreeParticipate ? form.maxFreeParticipate === 0 ? "Yes — Unlimited" : `Yes — Max ${form.maxFreeParticipate}`: "No"}/>
                   {form.organizerContact && (
                     <ReviewRow label="Contact" value={form.organizerContact} />
                   )}
