@@ -171,7 +171,7 @@ export default function EventDetailPage() {
       //   ],
       //   volunteerStats: {
       //     confirmedCount: 32,
-      //     event?.waitlistCount: 8
+      //     waitlistCount: 8
       //   },
       //   userReaction: null,
       //   userRegistration: null
@@ -218,7 +218,7 @@ export default function EventDetailPage() {
     </Shell>
   );
 
-  const { event, donations, comments, userReaction, userRegistration, freeParticipants } = data;
+  const { event, donations, comments, userReaction, userRegistration, freeParticipants, waitlistCount } = data;
   console.log(data)
   const typeMeta  = TYPE_META[event.eventType]   || TYPE_META.meetup;
   const colorCls  = COLOR_MAP[typeMeta.color]    || COLOR_MAP.teal;
@@ -435,7 +435,7 @@ export default function EventDetailPage() {
               {activeTab === "volunteers" && (
                 <VolunteersTab
                   confirmedCount={event?.volunteerCount || 0}
-                  waitlistCount={event?.waitlistCount || 0}
+                  waitlistCount={waitlistCount || 0}
                   maxVolunteers={event.maxVolunteers}
                   spotsPercent={spotsPercent}
                   spotsLeft={spotsLeft}
@@ -492,7 +492,7 @@ export default function EventDetailPage() {
               <p className="text-xs text-stone-400 mb-4">
                 {spotsLeft > 0
                   ? `${spotsLeft} spots remaining out of ${event.maxVolunteers}`
-                  : `All ${event.maxVolunteers} spots filled. ${event?.waitlistCount || 0} on waitlist.`}
+                  : `All ${event.maxVolunteers} spots filled. ${waitlistCount || 0} on waitlist.`}
               </p>
 
               {/* Progress bar */}
@@ -567,7 +567,7 @@ export default function EventDetailPage() {
               <StatRow icon="👋" label="Interested" value={event.interestedCount || 0} />
               <StatRow icon="✅" label="Going"      value={event.goingCount      || 0} />
               <StatRow icon="🙋" label="Volunteers" value={volunteerCount || 0} />
-              <StatRow icon="⏳" label="Waitlisted" value={event?.waitlistCount  || 0} />
+              <StatRow icon="⏳" label="Waitlisted" value={waitlistCount  || 0} />
               {event.fundGoal > 0 && (
                 <StatRow icon="💰" label="Donations" value={`৳${(event.fundRaised||0).toLocaleString()}`} />
               )}
@@ -715,8 +715,8 @@ function VolunteersTab({ confirmedCount, waitlistCount, maxVolunteers, spotsPerc
         {confirmedCount === 0
           ? "No volunteers yet. Be the first to join! 🌱"
           : `${confirmedCount} ${confirmedCount === 1 ? "volunteer has" : "volunteers have"} signed up for this event.`}
-        {event?.waitlistCount > 0 && (
-          <p className="text-amber-600 font-medium mt-1">{event?.waitlistCount} on waitlist</p>
+        {waitlistCount > 0 && (
+          <p className="text-amber-600 font-medium mt-1">{waitlistCount} on waitlist</p>
         )}
       </div>
 
