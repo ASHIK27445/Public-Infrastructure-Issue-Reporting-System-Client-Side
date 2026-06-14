@@ -361,6 +361,7 @@ export default function AdminEventManagePage() {
               participants={freeParticipants}
               eventId={id}
               onRefresh={fetchData}
+              axiosSecure={axiosSecure}
             />
           )}
 
@@ -463,7 +464,7 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
           <tbody className="divide-y divide-stone-50">
             {filtered.map((v) => (
               <>
-                <tr key={v._id} className="hover:bg-stone-50/60 transition-colors">
+                <tr key={v?._id} className="hover:bg-stone-50/60 transition-colors">
                   {isWaitlist && (
                     <Td>
                       <span className="w-7 h-7 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center">
@@ -641,7 +642,7 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
 /* ═══════════════════════════════════════
    FREE PARTICIPANTS TAB
 ═══════════════════════════════════════ */
-function FreeParticipantsTab({ participants, eventId, onRefresh }) {
+function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) {
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState(null);
 
@@ -667,13 +668,12 @@ function FreeParticipantsTab({ participants, eventId, onRefresh }) {
             onClick={async () => {
               toast.dismiss();
               try {
-                await axios.delete(
-                  `${import.meta.env.VITE_API_URL}/admin/events/${eventId}/free-participant/${participantId}`,
-                  { headers }
-                );
+                await axiosSecure.delete(
+                  `/admin/events/${eventId}/free-participant/${participantId}`);
                 toast.success(`${name} removed.`);
                 onRefresh();
               } catch (err) {
+                console.log(err)
                 toast.error(err.response?.data?.message || "Remove failed");
               }
             }}
