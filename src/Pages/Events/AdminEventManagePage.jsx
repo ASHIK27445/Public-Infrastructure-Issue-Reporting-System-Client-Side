@@ -7,12 +7,22 @@ import { QRCodeCanvas } from "qrcode.react";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import {
   ClipboardList, Calendar, Settings2, Image, Package,
-  Pin, FileText, Save, Loader2, Eye, EyeOff, Download, QrCode, Trash2, Clock, Users, CheckCircle2,
-  Ticket
+  Pin, FileText, Save, Loader2, Eye, EyeOff, Download, QrCode, Trash2, Clock, Users,
+  Ticket, ArrowLeft, Globe, Pencil, ScanQrCode, Radio, CheckCircle2,
+  XCircle, Plus, X, Brush, TreeDeciduous, Wrench, Megaphone,
+  GraduationCap, Handshake, CalendarDays, Wallet, BarChart2
 } from "lucide-react";
 
 /* ─── Constants ─── */
-const TYPE_EMOJI = { cleanup:"🧹", plantation:"🌳", repair:"🏗️", awareness:"📢", student:"🎓", meetup:"🤝" };
+const TYPE_ICON = {
+  cleanup:   Brush,
+  plantation: TreeDeciduous,
+  repair:    Wrench,
+  awareness: Megaphone,
+  student:   GraduationCap,
+  meetup:    Handshake,
+};
+
 const STATUS_NEXT = {
   draft:    ["upcoming","cancelled"],
   upcoming: ["ongoing","cancelled"],
@@ -20,10 +30,10 @@ const STATUS_NEXT = {
   completed:[], cancelled:[],
 };
 const PAYMENT_BADGE = {
-  "not-required": { bg:"bg-stone-100", text:"text-stone-500", label:"Free" },
-  "pending":      { bg:"bg-amber-100", text:"text-amber-700", label:"⏳ Pending" },
-  "paid":         { bg:"bg-green-100", text:"text-green-700", label:"✅ Paid" },
-  "refunded":     { bg:"bg-blue-100",  text:"text-blue-700",  label:"↩ Refunded" },
+  "not-required": { bg:"bg-stone-100", text:"text-stone-500", label:"Free"     },
+  "pending":      { bg:"bg-amber-100", text:"text-amber-700", label:"Pending"  },
+  "paid":         { bg:"bg-green-100", text:"text-green-700", label:"Paid"     },
+  "refunded":     { bg:"bg-blue-100",  text:"text-blue-700",  label:"Refunded" },
 };
 
 /* ═══════════════════════════════════════
@@ -146,8 +156,67 @@ export default function AdminEventManagePage() {
   /* ─── Loading ─── */
   if (loading) return (
     <Shell>
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-10 h-10 border-[3px] border-green-500 border-t-transparent rounded-full animate-spin" />
+      <div className="animate-pulse space-y-6">
+
+        {/* Header skeleton */}
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="space-y-3">
+            <div className="h-3 bg-stone-200 rounded-full w-20" />
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 bg-stone-200 rounded-full" />
+              <div className="h-7 bg-stone-200 rounded-xl w-64" />
+              <div className="h-6 bg-stone-200 rounded-full w-20" />
+            </div>
+            <div className="h-3 bg-stone-200 rounded-full w-80" />
+          </div>
+          <div className="flex gap-2">
+            <div className="h-9 bg-stone-200 rounded-xl w-28" />
+            <div className="h-9 bg-stone-200 rounded-xl w-20" />
+            <div className="h-9 bg-stone-200 rounded-xl w-28" />
+            <div className="h-9 bg-stone-200 rounded-xl w-24" />
+          </div>
+        </div>
+
+        {/* Stats bar skeleton */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div key={i} className="bg-stone-100 rounded-2xl p-3 space-y-2">
+              <div className="h-6 bg-stone-200 rounded-lg w-10 mx-auto" />
+              <div className="h-2.5 bg-stone-200 rounded-full w-14 mx-auto" />
+            </div>
+          ))}
+        </div>
+
+        {/* Tabs + Table skeleton */}
+        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+          {/* Tab bar */}
+          <div className="flex gap-1 px-4 py-3 border-b border-stone-100">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-8 bg-stone-100 rounded-lg w-32" />
+            ))}
+          </div>
+
+          {/* Table rows */}
+          <div className="p-6 space-y-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <div className="w-8 h-8 bg-stone-100 rounded-full shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 bg-stone-100 rounded-full w-40" />
+                  <div className="h-2.5 bg-stone-100 rounded-full w-24" />
+                </div>
+                <div className="h-3 bg-stone-100 rounded-full w-28" />
+                <div className="h-3 bg-stone-100 rounded-full w-20" />
+                <div className="h-6 bg-stone-100 rounded-full w-16" />
+                <div className="h-3 bg-stone-100 rounded-full w-12" />
+                <div className="flex gap-1">
+                  <div className="w-7 h-7 bg-stone-100 rounded-lg" />
+                  <div className="w-7 h-7 bg-stone-100 rounded-lg" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </Shell>
   );
@@ -168,13 +237,11 @@ export default function AdminEventManagePage() {
         <div>
           <button onClick={() => navigate("/admin/events")}
             className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-800 mb-3 transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ArrowLeft size={15} />
             All Events
           </button>
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-2xl">{TYPE_EMOJI[event.eventType] || "📅"}</span>
+            {(() => { const TIcon = TYPE_ICON[event.eventType]; return TIcon ? <TIcon size={22} className="text-stone-600" /> : <CalendarDays size={22} className="text-stone-600" />; })()}
             <h1 className="text-2xl font-bold text-stone-900" style={{ fontFamily:"Fraunces,serif" }}>
               {event.title}
             </h1>
@@ -188,25 +255,30 @@ export default function AdminEventManagePage() {
         {/* Quick actions */}
         <div className="flex items-center gap-2 flex-wrap">
           <Link to={`/events/${event._id}`}
-            className="px-4 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
-            👁️ Public Page
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
+            <Globe size={14} /> Public Page
           </Link>
-          <Link to={`/admin/events/edit/${event._id}`}
-            className="px-4 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
-            ✏️ Edit
-          </Link>
+          <button
+            onClick={() => setActiveTab("edit")}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
+            <Pencil size={14} /> Edit
+          </button>
           <Link to={`/admin/events/${event._id}/checkin`}
-            className="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors">
-            📱 QR Check-in
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors">
+            <ScanQrCode size={14} /> QR Check-in
           </Link>
           {available.map((s) => (
             <button key={s} onClick={() => handleStatusChange(s)} disabled={statusUpdating}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 ${
                 s==="cancelled" ? "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200"
                 : s==="completed" ? "bg-blue-500 hover:bg-blue-600 text-white"
                 : "bg-green-500 hover:bg-green-600 text-white"
               }`}>
-              {statusUpdating ? "..." : s==="ongoing" ? "🔴 Go Live" : s==="completed" ? "✅ Complete" : "❌ Cancel"}
+              {statusUpdating ? <Loader2 size={14} className="animate-spin" /> : (
+                s==="ongoing" ? <><Radio size={14} /> Go Live</> :
+                s==="completed" ? <><CheckCircle2 size={14} /> Complete</> :
+                <><XCircle size={14} /> Cancel</>
+              )}
             </button>
           ))}
         </div>
@@ -229,29 +301,29 @@ export default function AdminEventManagePage() {
       {/* ── Tabs ── */}
       <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
         <div className="flex border-b border-stone-100 overflow-x-auto">
-          {[
-            { id:"volunteers", label:"Confirmed Volunteers", icon:"✅", count: stats.confirmedCount },
-            { id:"waitlist",   label:"Waitlist",             icon:"⏳", count: stats.waitlistCount  },
-            { id:"donations",  label:"Donations",            icon:"💰", count: stats.donorCount, show: event.fundGoal > 0 },
-            { id:"free",       label:"Free Participants", icon:"🎟️", count: stats.freeParticipantCount, show: event.isFreeParticipate   },
-            { id:"edit",       label:"Edit Event",           icon:"✏️" },
-            { id:"spending",   label:"Spending",             icon:"📊", show: event.status === "completed" },
-          ].filter(t => t.show !== false).map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
-                activeTab===tab.id
-                  ? "border-green-500 text-green-600 bg-green-50/50"
-                  : "border-transparent text-stone-500 hover:text-stone-700 hover:bg-stone-50"
-              }`}>
-              <span>{tab.icon}</span>
-              <span>{tab.label}</span>
-              {tab.count > 0 && (
-                <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${activeTab===tab.id ? "bg-green-100 text-green-700" : "bg-stone-100 text-stone-500"}`}>
-                  {tab.count}
-                </span>
-              )}
-            </button>
-          ))}
+        {[
+          { id:"volunteers", label:"Confirmed Volunteers", icon:<CheckCircle2 size={14} />, count: stats.confirmedCount },
+          { id:"waitlist",   label:"Waitlist",             icon:<Clock size={14} />,        count: stats.waitlistCount  },
+          { id:"donations",  label:"Donations",            icon:<Wallet size={14} />,       count: stats.donorCount, show: event.fundGoal > 0 },
+          { id:"free",       label:"Free Participants",    icon:<Ticket size={14} />,       count: stats.freeParticipantCount, show: event.isFreeParticipate },
+          { id:"edit",       label:"Edit Event",           icon:<Pencil size={14} />        },
+          { id:"spending",   label:"Spending",             icon:<BarChart2 size={14} />,    show: event.status === "completed" },
+        ].filter(t => t.show !== false).map((tab) => (
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
+              activeTab===tab.id
+                ? "border-green-500 text-green-600 bg-green-50/50"
+                : "border-transparent text-stone-500 hover:text-stone-700 hover:bg-stone-50"
+            }`}>
+            {tab.icon}
+            <span>{tab.label}</span>
+            {tab.count > 0 && (
+              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${activeTab===tab.id ? "bg-green-100 text-green-700" : "bg-stone-100 text-stone-500"}`}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
         </div>
         <div className="p-6">
           {/* ── Confirmed Volunteers ── */}
@@ -1015,22 +1087,6 @@ function Toggle({ label, desc, checked, onChange }) {
   );
 }
 
-/* ── Section wrapper ── */
-function Section({ icon, title, subtitle, children }) {
-  return (
-    <div className="rounded-2xl border border-stone-100 bg-stone-50/40 overflow-hidden">
-      <div className="flex items-center gap-3 px-5 py-3.5 border-b border-stone-100 bg-white">
-        <span className="text-lg">{icon}</span>
-        <div>
-          <p className="text-sm font-semibold text-stone-800">{title}</p>
-          {subtitle && <p className="text-[11px] text-stone-400 leading-tight">{subtitle}</p>}
-        </div>
-      </div>
-      <div className="p-5">{children}</div>
-    </div>
-  );
-}
-
 /* ═══════════════════════════════════════
    SPENDING TAB (after event completed)
 ═══════════════════════════════════════ */
@@ -1088,7 +1144,7 @@ function SpendingTab({ eventId, fundRaised, spendingBreakdown, onSaved, token })
             </div>
             <button onClick={() => removeItem(i)}
               className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-red-50 text-stone-400 hover:text-red-500 transition-all">
-              ✕
+              <X size={14} />
             </button>
           </div>
         ))}
@@ -1104,11 +1160,11 @@ function SpendingTab({ eventId, fundRaised, spendingBreakdown, onSaved, token })
       <div className="flex gap-3">
         <button onClick={addItem}
           className="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors flex items-center gap-2">
-          + Add Item
+          <Plus size={14} /> Add Item
         </button>
         <button onClick={handleSave} disabled={saving}
           className="px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-60 flex items-center gap-2">
-          {saving ? <><Spinner/> Saving...</> : "💾 Save Breakdown"}
+          {saving ? <><Loader2 size={14} className="animate-spin" /> Saving...</> : <><Save size={14} /> Save Breakdown</>}
         </button>
       </div>
 
@@ -1132,9 +1188,20 @@ function Shell({ children }) {
 }
 
 function StatusPill({ status }) {
-  const s = { upcoming:{bg:"bg-green-100",text:"text-green-700"}, ongoing:{bg:"bg-blue-100",text:"text-blue-700"}, completed:{bg:"bg-stone-100",text:"text-stone-600"}, cancelled:{bg:"bg-red-100",text:"text-red-700"}, draft:{bg:"bg-yellow-100",text:"text-yellow-700"} };
+  const s = {
+    upcoming:  { bg:"bg-green-100",  text:"text-green-700"  },
+    ongoing:   { bg:"bg-blue-100",   text:"text-blue-700"   },
+    completed: { bg:"bg-stone-100",  text:"text-stone-600"  },
+    cancelled: { bg:"bg-red-100",    text:"text-red-700"    },
+    draft:     { bg:"bg-yellow-100", text:"text-yellow-700" },
+  };
   const c = s[status] || s.upcoming;
-  return <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${c.bg} ${c.text} capitalize`}>{status==="ongoing"?"🔴 Live":status}</span>;
+  return (
+    <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${c.bg} ${c.text} capitalize`}>
+      {status === "ongoing" && <Radio size={10} className="animate-pulse" />}
+      {status === "ongoing" ? "Live" : status}
+    </span>
+  );
 }
 
 function MiniStat({ label, value, color }) {
