@@ -131,7 +131,7 @@ export const router = createBrowserRouter([
                 path: '/event-payment-success', Component: EventPaymentVerify
             },
             {
-                path: '/admin/events/edit/:id', Component: AdminEventManagePage
+                path: '/admin/events/edit/:id', element: <PrivateRouter><AdminEventManagePage /></PrivateRouter>
             }
         ]
     },

@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { format, formatDistanceToNow } from "date-fns";
 import { QRCodeCanvas } from "qrcode.react";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 /* ─── Constants ─── */
 const TYPE_EMOJI = { cleanup:"🧹", plantation:"🌳", repair:"🏗️", awareness:"📢", student:"🎓", meetup:"🤝" };
@@ -31,6 +32,7 @@ export default function AdminEventManagePage() {
   const [loading,   setLoading]   = useState(true);
   const [activeTab, setActiveTab] = useState("volunteers");
   const [statusUpdating, setStatusUpdating] = useState(false);
+  const axiosSecure = useAxiosSecure()
 
   const token   = localStorage.getItem("token");
   const headers = { Authorization: `Bearer ${token}` };
@@ -38,9 +40,7 @@ export default function AdminEventManagePage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/admin/events/${id}/manage`, { headers }
-      );
+      const res = await axiosSecure.get(`/admin/events/${id}/manage`);
       setData(res.data);
     } catch (err) {
       toast.error(err.response?.data?.message || "Could not load event");
@@ -48,6 +48,7 @@ export default function AdminEventManagePage() {
       setLoading(false);
     }
   };
+  console.log(data)
 
   useEffect(() => { fetchData(); }, [id]);
 
@@ -186,7 +187,6 @@ export default function AdminEventManagePage() {
             </button>
           ))}
         </div>
-
         <div className="p-6">
           {/* ── Confirmed Volunteers ── */}
           {activeTab === "volunteers" && (
@@ -216,6 +216,7 @@ export default function AdminEventManagePage() {
               fundGoal={event.fundGoal}
             />
           )}
+          {console.log(donations)}
 
           {/* ── Edit Event ── */}
           {activeTab === "edit" && (
@@ -250,6 +251,8 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
     return v.name?.toLowerCase().includes(q) || v.email?.toLowerCase().includes(q) || v.institution?.toLowerCase().includes(q);
   });
 
+  console.log(filtered)
+
   const exportCSV = () => {
     const rows = [
       ["#","Name","Email","Phone","Institution","Age","Skills","Role","Payment","Attended","Registered"],
@@ -283,7 +286,7 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
       <div className="flex items-center gap-3 mb-4 flex-wrap">
         <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, email, institution..."
-          className="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100" />
+          className="flex-1 min-w-50 px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100" />
         <button onClick={exportCSV}
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,8 +326,11 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
                   )}
                   <Td>
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs shrink-0">
-                        {v.name?.[0]?.toUpperCase()}
+                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs shrink-0 overflow-hidden">
+                        {v.userPhoto
+                          ? <img src={v.userPhoto} alt={v.name} className="w-full h-full object-cover rounded-full" />
+                          : v.name?.[0]?.toUpperCase()
+                        }
                       </div>
                       <div>
                         <p className="font-medium text-stone-800 text-sm">{v.name}</p>
@@ -419,7 +425,7 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
   return (
     <div className="space-y-5">
       {/* Summary */}
-      <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100">
+      <div className="bg-linear-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100">
         <div className="flex justify-between items-end mb-3">
           <div>
             <p className="text-2xl font-bold text-emerald-700">৳{(totalDonated||0).toLocaleString()}</p>
@@ -428,7 +434,7 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
           <p className="text-3xl font-bold text-emerald-200">{fundPercent}%</p>
         </div>
         <div className="h-3 bg-emerald-100 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full" style={{ width:`${fundPercent}%` }} />
+          <div className="h-full bg-linear-to-r from-emerald-400 to-teal-500 rounded-full" style={{ width:`${fundPercent}%` }} />
         </div>
       </div>
 
@@ -452,9 +458,14 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
                 <tr key={d._id} className="hover:bg-stone-50/50">
                   <Td>
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs">
-                        {d.anonymous ? "?" : d.donorName?.[0]?.toUpperCase()}
-                      </div>
+                    <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs overflow-hidden">
+                      {d.anonymous
+                        ? "?"
+                        : d.userPhoto
+                          ? <img src={d.userPhoto} alt={d.donorName} className="w-full h-full object-cover rounded-full" />
+                          : d.donorName?.[0]?.toUpperCase()
+                      }
+                    </div>
                       <span className="text-sm font-medium text-stone-800">
                         {d.anonymous ? "Anonymous" : d.donorName}
                       </span>
@@ -479,24 +490,27 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
 }
 
 /* ═══════════════════════════════════════
-   EDIT EVENT FORM (inline)
+   EDIT EVENT FORM (inline) — Full Width
 ═══════════════════════════════════════ */
 function EditEventForm({ event, onSaved, token }) {
-  const [form, setForm]       = useState({
+  const [form, setForm] = useState({
     title:              event.title || "",
     description:        event.description || "",
-    date:               event.date ? new Date(event.date).toISOString().slice(0,16) : "",
-    endDate:            event.endDate ? new Date(event.endDate).toISOString().slice(0,16) : "",
+    date:               event.date ? new Date(event.date).toISOString().slice(0, 16) : "",
+    endDate:            event.endDate ? new Date(event.endDate).toISOString().slice(0, 16) : "",
+    address:            event.location?.address || "",
+    organizerContact:   event.organizerContact || "",
     maxVolunteers:      event.maxVolunteers || 50,
     registrationFee:    event.registrationFee || 0,
     fundGoal:           event.fundGoal || 0,
-    organizerContact:   event.organizerContact || "",
+    isTshirt:           event.isTshirt || false,
+    isGuestUnlimited:   event.isGuestUnlimited || false,
+    guestNumber:        event.guestNumber || 0,
+    equipmentList:      (event.equipmentList || []).join(", "),
     coverImage:         event.coverImage || "",
     pinnedAnnouncement: event.pinnedAnnouncement || "",
-    address:            event.location?.address || "",
   });
   const [saving, setSaving] = useState(false);
-
   const setF = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
   const handleSave = async () => {
@@ -508,10 +522,14 @@ function EditEventForm({ event, onSaved, token }) {
           title:              form.title,
           description:        form.description,
           date:               form.date,
-          endDate:            form.endDate || undefined,
+          endDate:            form.endDate || null,
           maxVolunteers:      Number(form.maxVolunteers),
           registrationFee:    Number(form.registrationFee),
           fundGoal:           Number(form.fundGoal),
+          isTshirt:           form.isTshirt,
+          isGuestUnlimited:   form.isGuestUnlimited,
+          guestNumber:        Number(form.guestNumber),
+          equipmentList:      form.equipmentList.split(",").map(s => s.trim()).filter(Boolean),
           organizerContact:   form.organizerContact,
           coverImage:         form.coverImage,
           pinnedAnnouncement: form.pinnedAnnouncement,
@@ -521,59 +539,219 @@ function EditEventForm({ event, onSaved, token }) {
       );
       toast.success("Event updated!");
       onSaved();
-    } catch (err) { toast.error(err.response?.data?.message || "Update failed"); }
-    finally { setSaving(false); }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Update failed");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <div className="space-y-5 max-w-2xl">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <EField label="Event Title">
-          <input type="text" value={form.title} onChange={(e) => setF("title", e.target.value)} className={ei()} />
-        </EField>
-        <EField label="Address">
-          <input type="text" value={form.address} onChange={(e) => setF("address", e.target.value)} className={ei()} />
-        </EField>
-        <EField label="Start Date & Time">
-          <input type="datetime-local" value={form.date} onChange={(e) => setF("date", e.target.value)} className={ei()} />
-        </EField>
-        <EField label="End Date & Time">
-          <input type="datetime-local" value={form.endDate} onChange={(e) => setF("endDate", e.target.value)} className={ei()} />
-        </EField>
-        <EField label="Max Volunteers">
-          <input type="number" min={1} value={form.maxVolunteers} onChange={(e) => setF("maxVolunteers", e.target.value)} className={ei()} />
-        </EField>
-        <EField label="Registration Fee (৳)">
-          <input type="number" min={0} value={form.registrationFee} onChange={(e) => setF("registrationFee", e.target.value)} className={ei()} />
-        </EField>
-        <EField label="Fund Goal (৳)">
-          <input type="number" min={0} value={form.fundGoal} onChange={(e) => setF("fundGoal", e.target.value)} className={ei()} />
-        </EField>
-        <EField label="Organizer Contact">
-          <input type="text" value={form.organizerContact} onChange={(e) => setF("organizerContact", e.target.value)} className={ei()} />
-        </EField>
-      </div>
-      <EField label="Cover Image URL">
-        <input type="url" value={form.coverImage} onChange={(e) => setF("coverImage", e.target.value)} className={ei()} />
-        {form.coverImage && (
-          <img src={form.coverImage} alt="preview" className="mt-2 h-28 w-full object-cover rounded-xl border border-stone-200"
-            onError={(e) => e.target.style.display="none"} />
-        )}
-      </EField>
-      <EField label="Pinned Announcement">
-        <textarea value={form.pinnedAnnouncement} onChange={(e) => setF("pinnedAnnouncement", e.target.value)}
-          rows={2} placeholder="Important note shown at the top of the event page..."
-          className={ei()} />
-      </EField>
-      <EField label="Description">
-        <textarea value={form.description} onChange={(e) => setF("description", e.target.value)}
-          rows={5} className={ei()} />
-      </EField>
+    <div className="w-full space-y-4">
 
-      <button onClick={handleSave} disabled={saving}
-        className="px-6 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-2xl text-sm font-semibold transition-colors disabled:opacity-60 flex items-center gap-2">
-        {saving ? <><Spinner /> Saving...</> : "💾 Save Changes"}
-      </button>
+      {/* ── Row 1: Basic Info + Schedule + Capacity (3 cols) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        {/* Basic Info */}
+        <EditSection icon="📋" title="Basic Information" subtitle="Public event details">
+          <div className="space-y-3">
+            <EField label="Event Title">
+              <input type="text" value={form.title}
+                onChange={(e) => setF("title", e.target.value)}
+                className={ei()} placeholder="e.g. River Cleanup Drive" />
+            </EField>
+            <EField label="Location / Address">
+              <input type="text" value={form.address}
+                onChange={(e) => setF("address", e.target.value)}
+                className={ei()} placeholder="e.g. Sadarghat, Dhaka" />
+            </EField>
+            <EField label="Organizer Contact">
+              <input type="text" value={form.organizerContact}
+                onChange={(e) => setF("organizerContact", e.target.value)}
+                className={ei()} placeholder="Phone or email" />
+            </EField>
+          </div>
+        </EditSection>
+
+        {/* Schedule */}
+        <EditSection icon="🗓️" title="Schedule" subtitle="Start and end time">
+          <div className="space-y-3">
+            <EField label="Start Date & Time">
+              <input type="datetime-local" value={form.date}
+                onChange={(e) => setF("date", e.target.value)} className={ei()} />
+            </EField>
+            <EField label="End Date & Time">
+              <input type="datetime-local" value={form.endDate}
+                onChange={(e) => setF("endDate", e.target.value)} className={ei()} />
+            </EField>
+            <EField label="Cover Image URL">
+              <input type="url" value={form.coverImage}
+                onChange={(e) => setF("coverImage", e.target.value)}
+                className={ei()} placeholder="https://..." />
+            </EField>
+          </div>
+        </EditSection>
+
+        {/* Capacity & Fees */}
+        <EditSection icon="⚙️" title="Capacity & Fees" subtitle="Slots and financial config">
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <EField label="Max Volunteers">
+                <input type="number" min={1} value={form.maxVolunteers}
+                  onChange={(e) => setF("maxVolunteers", e.target.value)} className={ei()} />
+              </EField>
+              <EField label="Guest Slots">
+                <input type="number" min={0} value={form.guestNumber}
+                  onChange={(e) => setF("guestNumber", e.target.value)}
+                  disabled={form.isGuestUnlimited} className={`${ei()} disabled:opacity-50`} />
+              </EField>
+              <EField label="Reg. Fee (৳)">
+                <input type="number" min={0} value={form.registrationFee}
+                  onChange={(e) => setF("registrationFee", e.target.value)} className={ei()} />
+                {Number(form.registrationFee) === 0 && (
+                  <p className="text-[10px] text-emerald-600 mt-1">✓ Free event</p>
+                )}
+              </EField>
+              <EField label="Donation Goal (৳)">
+                <input type="number" min={0} value={form.fundGoal}
+                  onChange={(e) => setF("fundGoal", e.target.value)} className={ei()} />
+                {Number(form.fundGoal) === 0 && (
+                  <p className="text-[10px] text-stone-400 mt-1">0 = hide tab</p>
+                )}
+              </EField>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Toggle label="T-Shirt Registration" desc="Ask for shirt size"
+                checked={form.isTshirt} onChange={(v) => setF("isTshirt", v)} />
+              <Toggle label="Unlimited Guests" desc="Remove guest cap"
+                checked={form.isGuestUnlimited} onChange={(v) => setF("isGuestUnlimited", v)} />
+            </div>
+          </div>
+        </EditSection>
+      </div>
+
+      {/* ── Row 2: Cover preview + Equipment + Announcement (3 cols) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        {/* Cover preview */}
+        <EditSection icon="🖼️" title="Cover Preview" subtitle="Banner image">
+          {form.coverImage ? (
+            <div className="relative rounded-xl overflow-hidden border border-stone-200 h-36 bg-stone-100">
+              <img src={form.coverImage} alt="Cover"
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.style.display = "none"; }} />
+              <span className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm">
+                Preview
+              </span>
+            </div>
+          ) : (
+            <div className="h-36 rounded-xl border-2 border-dashed border-stone-200 flex flex-col items-center justify-center text-stone-300 gap-2">
+              <span className="text-3xl">🖼️</span>
+              <span className="text-xs">No image URL set</span>
+            </div>
+          )}
+        </EditSection>
+
+        {/* Equipment */}
+        <EditSection icon="🎒" title="Equipment List" subtitle="Comma separated items">
+          <EField label="Items volunteers should bring">
+            <textarea value={form.equipmentList}
+              onChange={(e) => setF("equipmentList", e.target.value)}
+              rows={3} className={ei()}
+              placeholder="e.g. gloves, water bottle, comfortable shoes" />
+          </EField>
+          {form.equipmentList && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {form.equipmentList.split(",").map(s => s.trim()).filter(Boolean).map((item, i) => (
+                <span key={i} className="text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full font-medium">
+                  {item}
+                </span>
+              ))}
+            </div>
+          )}
+        </EditSection>
+
+        {/* Pinned Announcement */}
+        <EditSection icon="📌" title="Pinned Announcement" subtitle="Highlighted banner on event page">
+          <EField label="Announcement text">
+            <textarea value={form.pinnedAnnouncement}
+              onChange={(e) => setF("pinnedAnnouncement", e.target.value)}
+              rows={3} className={ei()}
+              placeholder="e.g. Bring your own gloves. Meet at Gate 2." />
+          </EField>
+          <p className="text-[10px] text-amber-600 mt-2 font-medium">
+            ⚠️ Leave empty to hide the banner
+          </p>
+        </EditSection>
+      </div>
+
+      {/* ── Row 3: Description (full width) ── */}
+      <EditSection icon="📝" title="Description" subtitle="Full event description shown to volunteers">
+        <textarea value={form.description}
+          onChange={(e) => setF("description", e.target.value)}
+          rows={5} className={ei()}
+          placeholder="Describe the event goals, schedule, what volunteers should expect..." />
+      </EditSection>
+
+      {/* ── Save bar ── */}
+      <div className="flex items-center justify-between py-3 border-t border-stone-100">
+        <p className="text-xs text-stone-400">
+          Last updated: {format(new Date(event.updatedAt || event.createdAt), "dd MMM yyyy, h:mm a")}
+        </p>
+        <button onClick={handleSave} disabled={saving}
+          className="px-6 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-2xl text-sm font-semibold transition-colors disabled:opacity-60 flex items-center gap-2 shadow-sm shadow-green-200">
+          {saving ? <><Spinner /> Saving...</> : "💾 Save Changes"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Section wrapper ── */
+function EditSection({ icon, title, subtitle, children }) {
+  return (
+    <div className="rounded-2xl border border-stone-100 overflow-hidden">
+      <div className="flex items-center gap-2.5 px-4 py-3 border-b border-stone-100 bg-stone-50">
+        <span className="text-base">{icon}</span>
+        <div>
+          <p className="text-sm font-semibold text-stone-800">{title}</p>
+          {subtitle && <p className="text-[11px] text-stone-400 leading-tight">{subtitle}</p>}
+        </div>
+      </div>
+      <div className="p-4 bg-white">{children}</div>
+    </div>
+  );
+}
+
+/* ── Toggle ── */
+function Toggle({ label, desc, checked, onChange }) {
+  return (
+    <label className="flex items-center gap-3 cursor-pointer bg-stone-50 hover:bg-stone-100 transition-colors px-3 py-2 rounded-xl border border-stone-200">
+      <div className="relative shrink-0">
+        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="sr-only" />
+        <div className={`w-8 h-4 rounded-full transition-colors ${checked ? "bg-green-500" : "bg-stone-300"}`} />
+        <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${checked ? "translate-x-4" : ""}`} />
+      </div>
+      <div>
+        <p className="text-xs font-semibold text-stone-700">{label}</p>
+        <p className="text-[10px] text-stone-400">{desc}</p>
+      </div>
+    </label>
+  );
+}
+
+/* ── Section wrapper ── */
+function Section({ icon, title, subtitle, children }) {
+  return (
+    <div className="rounded-2xl border border-stone-100 bg-stone-50/40 overflow-hidden">
+      <div className="flex items-center gap-3 px-5 py-3.5 border-b border-stone-100 bg-white">
+        <span className="text-lg">{icon}</span>
+        <div>
+          <p className="text-sm font-semibold text-stone-800">{title}</p>
+          {subtitle && <p className="text-[11px] text-stone-400 leading-tight">{subtitle}</p>}
+        </div>
+      </div>
+      <div className="p-5">{children}</div>
     </div>
   );
 }
