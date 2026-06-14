@@ -99,14 +99,15 @@ export default function AdminEventsPage() {
   };
 
   const handleStatusChange = async (eventId, newStatus) => {
+    if(!user)return;
     const confirmMsg = newStatus === "cancelled"
       ? "Cancel this event? All paid registrations will be refunded."
       : `Change status to "${newStatus}"?`;
     if (!window.confirm(confirmMsg)) return;
     try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/admin/events/${eventId}/status`,
-        { status: newStatus }, { headers }
+      await axiosSecure.patch(
+        `/admin/events/${eventId}/status`,
+        { status: newStatus }
       );
       toast.success(`Status → ${newStatus}`);
       fetchEvents();
@@ -358,8 +359,8 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
             </div>
           )}
           <div className="min-w-0">
-            <p className="font-semibold text-stone-900 text-sm truncate max-w-[180px]">{event.title}</p>
-            <p className="text-xs text-stone-400 truncate max-w-[180px]">{event.location?.address}</p>
+            <p className="font-semibold text-stone-900 text-sm truncate max-w-45">{event.title}</p>
+            <p className="text-xs text-stone-400 truncate max-w-45">{event.location?.address}</p>
           </div>
         </div>
       </td>
@@ -423,7 +424,7 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
           </button>
 
           {statusMenuOpen && available.length > 0 && (
-            <div className="absolute left-0 top-8 z-30 bg-white border border-stone-200 rounded-2xl shadow-xl py-1 min-w-[140px]">
+            <div className="absolute left-0 top-8 z-30 bg-white border border-stone-200 rounded-2xl shadow-xl py-1 min-w-35">
               {available.map((s) => (
                 <button key={s} onClick={() => { setStatusMenuOpen(false); onStatusChange(event._id, s); }}
                   className={`w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-stone-50 transition-colors capitalize ${
