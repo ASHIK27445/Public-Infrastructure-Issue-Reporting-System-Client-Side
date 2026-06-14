@@ -367,7 +367,7 @@ export default function AdminEventManagePage() {
 
           {/* ── Edit Event ── */}
           {activeTab === "edit" && (
-            <EditEventForm event={event} onSaved={fetchData} token={token} />
+            <EditEventForm event={event} onSaved={fetchData} axiosSecure={axiosSecure} />
           )}
 
           {/* ── Spending breakdown ── */}
@@ -827,12 +827,19 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
 /* ═══════════════════════════════════════
    EDIT EVENT FORM (inline) — Full Width
 ═══════════════════════════════════════ */
-function EditEventForm({ event, onSaved, token }) {
+function EditEventForm({ event, onSaved, axiosSecure }) {
+  const toLocalInput = (dateStr) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    const offset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - offset).toISOString().slice(0, 16);
+  }
+
   const [form, setForm] = useState({
     title:              event.title || "",
     description:        event.description || "",
-    date:               event.date ? new Date(event.date).toISOString().slice(0, 16) : "",
-    endDate:            event.endDate ? new Date(event.endDate).toISOString().slice(0, 16) : "",
+    date:               toLocalInput(event.date),
+    endDate:            toLocalInput(event.endDate),
     address:            event.location?.address || "",
     organizerContact:   event.organizerContact || "",
     maxVolunteers:      event.maxVolunteers || 50,
@@ -853,8 +860,8 @@ function EditEventForm({ event, onSaved, token }) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/admin/events/${event._id}`,
+      await axiosSecure.patch(
+        `/admin/events/${event._id}`,
         {
           title:              form.title,
           description:        form.description,
@@ -873,8 +880,7 @@ function EditEventForm({ event, onSaved, token }) {
           coverImage:         form.coverImage,
           pinnedAnnouncement: form.pinnedAnnouncement,
           location:           { ...event.location, address: form.address },
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
       toast.success("Event updated!");
       onSaved();
