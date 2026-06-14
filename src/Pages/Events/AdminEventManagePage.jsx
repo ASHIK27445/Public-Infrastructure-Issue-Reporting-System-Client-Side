@@ -53,32 +53,89 @@ export default function AdminEventManagePage() {
   useEffect(() => { fetchData(); }, [id]);
 
   const handleStatusChange = async (newStatus) => {
-    const msg = newStatus === "cancelled"
+    const isCancel = newStatus === "cancelled";
+    const msg = isCancel
       ? "Cancel event? All paid registrations will be refunded."
-      : `Mark as "${newStatus}"?`;
-    if (!window.confirm(msg)) return;
-    setStatusUpdating(true);
-    try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/admin/events/${id}/status`,
-        { status: newStatus }, { headers }
-      );
-      toast.success(`Status → ${newStatus}`);
-      fetchData();
-    } catch (err) { toast.error(err.response?.data?.message || "Failed"); }
-    finally { setStatusUpdating(false); }
+      : `Mark event as "${newStatus}"?`;
+
+    toast.info(
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-stone-800">{msg}</p>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              toast.dismiss();
+              setStatusUpdating(true);
+              try {
+                await axiosSecure.patch(`/admin/events/${id}/status`, { status: newStatus });
+                toast.success(`Status → ${newStatus}`);
+                fetchData();
+              } catch (err) {
+                toast.error(err.response?.data?.message || "Failed");
+              } finally {
+                setStatusUpdating(false);
+              }
+            }}
+            className={`px-3 py-1 rounded-lg text-xs font-semibold text-white transition-colors ${
+              isCancel ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+            }`}
+          >
+            {isCancel ? "Yes, Cancel" : "Confirm"}
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            className="px-3 py-1 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      </div>,
+      {
+        autoClose: false,
+        closeButton: false,
+        closeOnClick: false,
+      }
+    );
   };
 
   const handleRemoveVolunteer = async (regId, name) => {
-    if (!window.confirm(`Remove ${name}? If they paid, they'll be refunded.`)) return;
-    try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/admin/events/${id}/volunteer/${regId}/remove`,
-        {}, { headers }
-      );
-      toast.success(`${name} removed. Waitlist updated.`);
-      fetchData();
-    } catch (err) { toast.error(err.response?.data?.message || "Remove failed"); }
+    toast.warn(
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-stone-800">Remove <span className="font-bold">{name}</span>?</p>
+        <p className="text-xs text-stone-500">If they paid, they'll be refunded automatically.</p>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              toast.dismiss();
+              try {
+                await axios.patch(
+                  `${import.meta.env.VITE_API_URL}/admin/events/${id}/volunteer/${regId}/remove`,
+                  {}, { headers }
+                );
+                toast.success(`${name} removed. Waitlist updated.`);
+                fetchData();
+              } catch (err) {
+                toast.error(err.response?.data?.message || "Remove failed");
+              }
+            }}
+            className="px-3 py-1 rounded-lg text-xs font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors"
+          >
+            Yes, Remove
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            className="px-3 py-1 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      {
+        autoClose: false,
+        closeButton: false,
+        closeOnClick: false,
+      }
+    );
   };
 
   /* ─── Loading ─── */
@@ -96,7 +153,7 @@ export default function AdminEventManagePage() {
     </Shell>
   );
 
-  const { event, confirmed, waitlist, donations, stats } = data;
+  const { event, confirmed, waitlist, donations, freeParticipants, stats } = data;
   const available = STATUS_NEXT[event.status] || [];
 
   return (
@@ -151,7 +208,7 @@ export default function AdminEventManagePage() {
       </div>
 
       {/* ── Stats bar ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
+      <div className={`grid grid-cols-2 sm:grid-cols-4 ${event.isFreeParticipate ? 'grid-cols-3  sm:grid-cols-5 lg:grid-cols-8' : 'grid-cols-2  sm:grid-cols-4 lg:grid-cols-7'} gap-3 mb-6`}>
         <MiniStat label="Confirmed"    value={stats.confirmedCount} color="green"  />
         <MiniStat label="Waitlisted"   value={stats.waitlistCount}  color="amber"  />
         <MiniStat label="Attended"     value={stats.attendedCount}  color="blue"   />
@@ -159,6 +216,9 @@ export default function AdminEventManagePage() {
         <MiniStat label="Pmt Pending"  value={stats.pendingPayment} color="orange" />
         <MiniStat label="Donated"      value={`৳${(stats.totalDonated||0).toLocaleString()}`} color="emerald" />
         <MiniStat label="Comments"     value={stats.commentCount}   color="stone"  />
+        {event.isFreeParticipate && (
+          <MiniStat label="Free Parts." value={stats.freeParticipantCount} color="violet" />
+        )}
       </div>
 
       {/* ── Tabs ── */}
@@ -168,6 +228,7 @@ export default function AdminEventManagePage() {
             { id:"volunteers", label:"Confirmed Volunteers", icon:"✅", count: stats.confirmedCount },
             { id:"waitlist",   label:"Waitlist",             icon:"⏳", count: stats.waitlistCount  },
             { id:"donations",  label:"Donations",            icon:"💰", count: stats.donorCount, show: event.fundGoal > 0 },
+            { id:"free",       label:"Free Participants", icon:"🎟️", count: stats.freeParticipantCount, show: event.isFreeParticipate   },
             { id:"edit",       label:"Edit Event",           icon:"✏️" },
             { id:"spending",   label:"Spending",             icon:"📊", show: event.status === "completed" },
           ].filter(t => t.show !== false).map((tab) => (
@@ -216,7 +277,14 @@ export default function AdminEventManagePage() {
               fundGoal={event.fundGoal}
             />
           )}
-          {console.log(donations)}
+
+          {/* ── Free Participants ── */}
+          {activeTab === "free" && (
+            <FreeParticipantsTab
+              participants={freeParticipants}
+              eventId={id}
+            />
+          )}
 
           {/* ── Edit Event ── */}
           {activeTab === "edit" && (
@@ -250,8 +318,6 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
     const q = search.toLowerCase();
     return v.name?.toLowerCase().includes(q) || v.email?.toLowerCase().includes(q) || v.institution?.toLowerCase().includes(q);
   });
-
-  console.log(filtered)
 
   const exportCSV = () => {
     const rows = [
@@ -490,6 +556,123 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
 }
 
 /* ═══════════════════════════════════════
+   FREE PARTICIPANTS TAB
+═══════════════════════════════════════ */
+function FreeParticipantsTab({ participants, eventId }) {
+  const [search, setSearch] = useState("");
+
+  const filtered = participants.filter((p) => {
+    const q = search.toLowerCase();
+    return (
+      p.name?.toLowerCase().includes(q) ||
+      p.email?.toLowerCase().includes(q) ||
+      p.phone?.includes(q)
+    );
+  });
+
+  const exportCSV = () => {
+    const rows = [
+      ["#", "Name", "Email", "Phone", "Attended", "Registered"],
+      ...filtered.map((p, i) => [
+        i + 1, p.name, p.email, p.phone,
+        p.attended ? "Yes" : "No",
+        format(new Date(p.createdAt), "dd/MM/yyyy HH:mm"),
+      ]),
+    ];
+    const csv  = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a    = document.createElement("a");
+    a.href     = URL.createObjectURL(blob);
+    a.download = `free-participants-${eventId}.csv`;
+    a.click();
+    toast.success("CSV exported!");
+  };
+
+  if (participants.length === 0) return (
+    <div className="text-center py-16 text-stone-400">
+      <div className="text-4xl mb-3">🎟️</div>
+      <p className="text-sm">No free participants yet</p>
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-4 flex-wrap">
+        <input
+          type="text" value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name, email, phone..."
+          className="flex-1 min-w-50 px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100"
+        />
+        <button onClick={exportCSV}
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          Export CSV
+        </button>
+        <span className="text-xs text-stone-400">{filtered.length} shown</span>
+      </div>
+
+      <div className="overflow-x-auto rounded-2xl border border-stone-100">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-stone-50 border-b border-stone-100">
+              <Th>#</Th>
+              <Th>Name</Th>
+              <Th>Email</Th>
+              <Th>Phone</Th>
+              <Th>QR Token</Th>
+              <Th>Attended</Th>
+              <Th>Registered</Th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-stone-50">
+            {filtered.map((p, i) => (
+              <tr key={p._id} className="hover:bg-stone-50/60 transition-colors">
+                <Td>
+                  <span className="w-6 h-6 rounded-full bg-stone-100 text-stone-500 text-xs font-bold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                </Td>
+                <Td>
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-xs shrink-0">
+                      {p.name?.[0]?.toUpperCase()}
+                    </div>
+                    <p className="text-sm font-medium text-stone-800">{p.name}</p>
+                  </div>
+                </Td>
+                <Td><span className="text-xs text-stone-600">{p.email}</span></Td>
+                <Td><span className="text-xs text-stone-600">{p.phone}</span></Td>
+                <Td>
+                  <code className="text-[10px] font-mono bg-stone-100 px-1.5 py-0.5 rounded text-stone-500 break-all">
+                    {p.qrToken?.slice(0, 16)}...
+                  </code>
+                </Td>
+                <Td>
+                  {p.attended ? (
+                    <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                      ✅ Yes
+                    </span>
+                  ) : (
+                    <span className="text-xs text-stone-300">—</span>
+                  )}
+                </Td>
+                <Td>
+                  <p className="text-xs text-stone-500">{format(new Date(p.createdAt), "dd MMM")}</p>
+                  <p className="text-[10px] text-stone-400">{formatDistanceToNow(new Date(p.createdAt), { addSuffix: true })}</p>
+                </Td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════
    EDIT EVENT FORM (inline) — Full Width
 ═══════════════════════════════════════ */
 function EditEventForm({ event, onSaved, token }) {
@@ -506,6 +689,8 @@ function EditEventForm({ event, onSaved, token }) {
     isTshirt:           event.isTshirt || false,
     isGuestUnlimited:   event.isGuestUnlimited || false,
     guestNumber:        event.guestNumber || 0,
+    isFreeParticipate:  event.isFreeParticipate  || false,
+    maxFreeParticipate: event.maxFreeParticipate || 0,
     equipmentList:      (event.equipmentList || []).join(", "),
     coverImage:         event.coverImage || "",
     pinnedAnnouncement: event.pinnedAnnouncement || "",
@@ -619,12 +804,23 @@ function EditEventForm({ event, onSaved, token }) {
                   <p className="text-[10px] text-stone-400 mt-1">0 = hide tab</p>
                 )}
               </EField>
+              <EField label="Max Free Participants">
+                <input type="number" min={0} value={form.maxFreeParticipate}
+                  onChange={(e) => setF("maxFreeParticipate", e.target.value)}
+                  disabled={!form.isFreeParticipate} className={`${ei()} disabled:opacity-50`} />
+                {form.isFreeParticipate && Number(form.maxFreeParticipate) === 0 && (
+                  <p className="text-[10px] text-emerald-600 mt-1">0 = unlimited</p>
+                )}
+              </EField>
             </div>
+
             <div className="flex flex-col gap-2">
               <Toggle label="T-Shirt Registration" desc="Ask for shirt size"
                 checked={form.isTshirt} onChange={(v) => setF("isTshirt", v)} />
               <Toggle label="Unlimited Guests" desc="Remove guest cap"
                 checked={form.isGuestUnlimited} onChange={(v) => setF("isGuestUnlimited", v)} />
+              <Toggle label="Free Participation" desc="Anyone can join without login"
+                checked={form.isFreeParticipate} onChange={(v) => setF("isFreeParticipate", v)} />
             </div>
           </div>
         </EditSection>
@@ -863,7 +1059,7 @@ function StatusPill({ status }) {
 }
 
 function MiniStat({ label, value, color }) {
-  const colors = { green:"bg-green-50 text-green-700", amber:"bg-amber-50 text-amber-700", blue:"bg-blue-50 text-blue-700", purple:"bg-purple-50 text-purple-700", orange:"bg-orange-50 text-orange-700", emerald:"bg-emerald-50 text-emerald-700", stone:"bg-stone-50 text-stone-600" };
+  const colors = { green:"bg-green-50 text-green-700", amber:"bg-amber-50 text-amber-700", blue:"bg-blue-50 text-blue-700", purple:"bg-purple-50 text-purple-700", orange:"bg-orange-50 text-orange-700", emerald:"bg-emerald-50 text-emerald-700", stone:"bg-stone-50 text-stone-600", violet: "bg-violet-50 text-violet-700" };
   return (
     <div className={`rounded-2xl p-3 text-center ${colors[color]||colors.stone}`}>
       <p className="text-xl font-bold">{value}</p>
