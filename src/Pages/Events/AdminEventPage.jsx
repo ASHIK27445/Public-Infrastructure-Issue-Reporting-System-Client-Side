@@ -383,8 +383,14 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
       <td className="px-4 py-3.5">
         <div className="text-sm">
           <span className="font-bold text-stone-800">{event.volunteerCount || 0}</span>
-          <span className="text-stone-400">/{event.maxVolunteers}</span>
+          <span className="text-stone-400">/{event.maxVolunteers} volunteers</span>
         </div>
+        {event.guestCount > 0 && (
+          <p className="text-xs text-blue-600">{event.guestCount} guests</p>
+        )}
+        {event.freeParticipantCount > 0 && (
+          <p className="text-xs text-purple-600">{event.freeParticipantCount} free participants</p>
+        )}
         {event.waitlistCount > 0 && (
           <p className="text-xs text-amber-600">{event.waitlistCount} waiting</p>
         )}
