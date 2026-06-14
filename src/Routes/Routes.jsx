@@ -51,6 +51,8 @@ import EventPaymentVerify from "../Pages/Events/EventPaymentVerify"
 import QRCheckinPage from "../Pages/Events/QRCheckingPage"
 import AdminWaitlistFeed from "../Pages/Events/AdminWaitListFeed"
 import FreeParticipateRegistration from "../Pages/Events/FreeParticipateRegistration"
+import AdminEventsPage from "../Pages/Events/AdminEventPage"
+import AdminEventManagePage from "../Pages/Events/AdminEventManagePAge"
 
 export const router = createBrowserRouter([
     {
@@ -194,7 +196,7 @@ export const router = createBrowserRouter([
         path: '*', Component: ErrorPage
     },
     {
-        path: '/onlytest', Component: QRCheckinPage
+        path: '/onlytest', Component: AdminEventsPage
     },
     {
         path: '/events', Component: EventsFeed
