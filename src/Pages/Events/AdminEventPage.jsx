@@ -4,20 +4,32 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { format, formatDistanceToNow } from "date-fns";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import {
+  Plus, Eye, Settings2, Pencil, Trash2, Loader2,
+  Search, X, ChevronDown, Radio, CheckCircle2,
+  XCircle, Clock, Users, Wallet, CalendarDays,
+  Leaf, TrendingUp, Ban, Ticket, Brush, TreeDeciduous, Wrench, 
+  Megaphone, GraduationCap, Handshake
+} from "lucide-react";
 import { AuthContext } from "../AuthProvider/AuthContext";
 
 /* ─── Constants ─── */
-const TYPE_EMOJI = {
-  cleanup:"🧹", plantation:"🌳", repair:"🏗️",
-  awareness:"📢", student:"🎓", meetup:"🤝",
-};
+const TYPE_ICON = {
+  cleanup:   Brush,
+  plantation: TreeDeciduous,
+  repair:    Wrench,
+  awareness: Megaphone,
+  student:   GraduationCap,
+  meetup:    Handshake,
+}
+
 const TYPE_LABEL = {
   cleanup:"Cleanup", plantation:"Plantation", repair:"Repair",
   awareness:"Awareness", student:"Student Day", meetup:"Meetup",
 };
 const STATUS_STYLE = {
   upcoming:  { bg:"bg-green-100",  text:"text-green-700",  dot:"bg-green-500",  label:"Upcoming"  },
-  ongoing:   { bg:"bg-blue-100",   text:"text-blue-700",   dot:"bg-blue-500",   label:"🔴 Live"   },
+  ongoing: { bg:"bg-blue-100", text:"text-blue-700", dot:"bg-blue-500", label:"Live" },
   completed: { bg:"bg-stone-100",  text:"text-stone-600",  dot:"bg-stone-400",  label:"Completed" },
   cancelled: { bg:"bg-red-100",    text:"text-red-700",    dot:"bg-red-500",    label:"Cancelled" },
   draft:     { bg:"bg-yellow-100", text:"text-yellow-700", dot:"bg-yellow-500", label:"Draft"     },
@@ -99,30 +111,66 @@ export default function AdminEventsPage() {
   };
 
   const handleStatusChange = async (eventId, newStatus) => {
-    if(!user)return;
-    const confirmMsg = newStatus === "cancelled"
+    if (!user) return;
+    const isCancel = newStatus === "cancelled";
+    const msg = isCancel
       ? "Cancel this event? All paid registrations will be refunded."
       : `Change status to "${newStatus}"?`;
-    if (!window.confirm(confirmMsg)) return;
-    try {
-      await axiosSecure.patch(
-        `/admin/events/${eventId}/status`,
-        { status: newStatus }
-      );
-      toast.success(`Status → ${newStatus}`);
-      fetchEvents();
-    } catch (err) { toast.error(err.response?.data?.message || "Update failed"); }
+
+    toast.info(
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-stone-800">{msg}</p>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              toast.dismiss();
+              try {
+                await axiosSecure.patch(`/admin/events/${eventId}/status`, { status: newStatus });
+                toast.success(`Status → ${newStatus}`);
+                fetchEvents();
+              } catch (err) { toast.error(err.response?.data?.message || "Update failed"); }
+            }}
+            className={`px-3 py-1 rounded-lg text-xs font-semibold text-white ${isCancel ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"}`}>
+            {isCancel ? "Yes, Cancel" : "Confirm"}
+          </button>
+          <button onClick={() => toast.dismiss()}
+            className="px-3 py-1 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700">
+            Dismiss
+          </button>
+        </div>
+      </div>,
+      { autoClose: false, closeButton: false, closeOnClick: false }
+    );
   };
 
   const handleDelete = async (eventId, title) => {
-    if (!window.confirm(`Delete "${title}"? This will remove all registrations, donations and comments. This cannot be undone.`)) return;
-    setDeleting(eventId);
-    try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/admin/events/${eventId}`, { headers });
-      toast.success("Event deleted");
-      fetchEvents();
-    } catch (err) { toast.error(err.response?.data?.message || "Delete failed"); }
-    finally { setDeleting(null); }
+    toast.warn(
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-stone-800">Delete <span className="font-bold">"{title}"</span>?</p>
+        <p className="text-xs text-stone-500">Removes all registrations, donations and comments. Cannot be undone.</p>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              toast.dismiss();
+              setDeleting(eventId);
+              try {
+                await axios.delete(`${import.meta.env.VITE_API_URL}/admin/events/${eventId}`, { headers });
+                toast.success("Event deleted");
+                fetchEvents();
+              } catch (err) { toast.error(err.response?.data?.message || "Delete failed"); }
+              finally { setDeleting(null); }
+            }}
+            className="px-3 py-1 rounded-lg text-xs font-semibold text-white bg-red-500 hover:bg-red-600">
+            Yes, Delete
+          </button>
+          <button onClick={() => toast.dismiss()}
+            className="px-3 py-1 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700">
+            Cancel
+          </button>
+        </div>
+      </div>,
+      { autoClose: false, closeButton: false, closeOnClick: false }
+    );
   };
 
   /* ─────────── RENDER ─────────── */
@@ -143,11 +191,8 @@ export default function AdminEventsPage() {
             </p>
           </div>
           <Link to="/admin/events/create"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600
-                       text-white font-semibold rounded-2xl transition-colors shadow-sm text-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4"/>
-            </svg>
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-2xl transition-colors shadow-sm text-sm">
+            <Plus size={16} strokeWidth={2.5} />
             Create Event
           </Link>
         </div>
@@ -164,15 +209,24 @@ export default function AdminEventsPage() {
           </div>
         ) : stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <StatCard icon="🗓️" label="Total Events"  value={stats.overview.totalEvents}    color="stone"  />
-            <StatCard icon="🔴" label="Live Now"       value={stats.overview.ongoingCount}   color="blue"   />
-            <StatCard icon="✅" label="Upcoming"       value={stats.overview.upcomingCount}  color="green"  />
-            <StatCard icon="🎉" label="Completed"      value={stats.overview.completedCount} color="purple" />
-            <StatCard icon="🙋" label="Volunteers"     value={stats.overview.totalVolunteers}  color="green"  />
-            <StatCard icon="⏳" label="Waitlisted"     value={stats.overview.totalWaitlisted}  color="amber"  />
-            <StatCard icon="💰" label="Total Donated"  value={`৳${(stats.overview.totalDonated||0).toLocaleString()}`} color="emerald" />
-            <StatCard icon="❌" label="Cancelled"      value={stats.overview.cancelledCount} color="red"    />
-            <StatCard icon="🎟️" label="Free Participants" value={stats.overview.totalParticipants || 0} color="teal" />
+              <StatCard icon={CalendarDays} label="Total Events"      
+              value={stats.overview.totalEvents} color="stone"   />
+              <StatCard icon={Radio}        label="Live Now"           
+              value={stats.overview.ongoingCount}                              color="blue"    />
+              <StatCard icon={CheckCircle2} label="Upcoming"          
+              value={stats.overview.upcomingCount}                             color="green"   />
+              <StatCard icon={TrendingUp}   label="Completed"         
+              value={stats.overview.completedCount}                            color="purple"  />
+              <StatCard icon={Users}        label="Volunteers"        
+              value={stats.overview.totalVolunteers}                           color="green"   />
+              <StatCard icon={Clock}        label="Waitlisted"        
+              value={stats.overview.totalWaitlisted}                           color="amber"   />
+              <StatCard icon={Wallet}       label="Total Donated"     
+              value={`৳${(stats.overview.totalDonated||0).toLocaleString()}`} color="emerald" />
+              <StatCard icon={Ban}          label="Cancelled"         
+              value={stats.overview.cancelledCount} color="red"     />
+              <StatCard icon={Ticket}       label="Free Participants" 
+              value={stats.overview.totalParticipants || 0}  color="teal"    />
           </div>
         )}
 
@@ -181,24 +235,27 @@ export default function AdminEventsPage() {
           <div className="bg-white rounded-2xl border border-stone-200 p-5 mb-6">
             <h3 className="text-sm font-semibold text-stone-500 mb-4">Events by Type</h3>
             <div className="flex gap-3 flex-wrap">
-              {stats.typeBreakdown.map((t) => (
-                <button key={t._id} onClick={() => setParam("type", t._id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all ${
-                    type === t._id
-                      ? "bg-green-500 text-white border-green-500"
-                      : "bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-300"
-                  }`}>
-                  <span>{TYPE_EMOJI[t._id] || "📅"}</span>
-                  <span className="font-medium">{TYPE_LABEL[t._id] || t._id}</span>
-                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${type === t._id ? "bg-white/20" : "bg-stone-200 text-stone-600"}`}>
-                    {t.count}
-                  </span>
-                </button>
-              ))}
+              {stats.typeBreakdown.map((t) => {
+                const TIcon = TYPE_ICON[t._id];
+                return (
+                  <button key={t._id} onClick={() => setParam("type", t._id)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all ${
+                      type === t._id
+                        ? "bg-green-500 text-white border-green-500"
+                        : "bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-300"
+                    }`}>
+                    {TIcon && <TIcon size={14} />}
+                    <span className="font-medium">{TYPE_LABEL[t._id] || t._id}</span>
+                    <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${type === t._id ? "bg-white/20" : "bg-stone-200 text-stone-600"}`}>
+                      {t.count}
+                    </span>
+                  </button>
+                );
+              })}
               {type !== "all" && (
                 <button onClick={() => setParam("type", "all")}
-                  className="text-xs text-stone-400 hover:text-red-500 transition-colors px-2">
-                  ✕ Clear
+                  className="flex items-center gap-1 text-xs text-stone-400 hover:text-red-500 transition-colors px-2">
+                  <X size={12} /> Clear
                 </button>
               )}
             </div>
@@ -216,7 +273,7 @@ export default function AdminEventsPage() {
                     ? "bg-green-500 text-white shadow-sm"
                     : "text-stone-500 hover:text-stone-700 hover:bg-stone-50"
                 }`}>
-                {s === "all" ? "All" : s === "ongoing" ? "🔴 Live" : s.charAt(0).toUpperCase() + s.slice(1)}
+                {s === "all" ? "All" : s === "ongoing" ? "Live" : s.charAt(0).toUpperCase() + s.slice(1)}
               </button>
             ))}
           </div>
@@ -224,10 +281,7 @@ export default function AdminEventsPage() {
           {/* Search */}
           <form onSubmit={handleSearch} className="flex gap-2 ml-auto">
             <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" strokeWidth="2"/>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35"/>
-              </svg>
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
               <input type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search events..."
                 className="pl-9 pr-4 py-2 rounded-xl border border-stone-200 bg-white text-sm focus:outline-none focus:border-green-400 w-56" />
@@ -238,8 +292,8 @@ export default function AdminEventsPage() {
             </button>
             {search && (
               <button type="button" onClick={() => { setSearchInput(""); setParam("search", ""); }}
-                className="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-xl text-sm transition-colors">
-                ✕
+                className="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-xl text-sm transition-colors flex items-center">
+                <X size={14} />
               </button>
             )}
           </form>
@@ -260,7 +314,7 @@ export default function AdminEventsPage() {
             </div>
           ) : events.length === 0 ? (
             <div className="text-center py-20">
-              <div className="text-5xl mb-4">🌿</div>
+              <Leaf size={40} className="text-stone-300 mx-auto mb-4" />
               <p className="text-stone-500 text-sm">No events found</p>
               {(search || status !== "all" || type !== "all") && (
                 <button onClick={() => setSearchParams(new URLSearchParams())}
@@ -353,11 +407,14 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
           {event.coverImage ? (
             <img src={event.coverImage} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0 border border-stone-100"
               onError={(e) => { e.target.style.display="none"; }} />
-          ) : (
-            <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-xl shrink-0">
-              {TYPE_EMOJI[event.eventType] || "📅"}
-            </div>
-          )}
+          ) : (() => {
+            const TIcon = TYPE_ICON[event.eventType];
+            return (
+              <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
+                {TIcon ? <TIcon size={18} className="text-green-600" /> : <CalendarDays size={18} className="text-green-600" />}
+              </div>
+            );
+          })()}
           <div className="min-w-0">
             <p className="font-semibold text-stone-900 text-sm truncate max-w-45">{event.title}</p>
             <p className="text-xs text-stone-400 truncate max-w-45">{event.location?.address}</p>
@@ -367,9 +424,15 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
 
       {/* Type */}
       <td className="px-4 py-3.5">
-        <span className="text-xs text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full font-medium">
-          {TYPE_EMOJI[event.eventType]} {TYPE_LABEL[event.eventType] || event.eventType}
-        </span>
+        {(() => {
+          const TIcon = TYPE_ICON[event.eventType];
+          return (
+            <span className="inline-flex items-center gap-1.5 text-xs text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full font-medium">
+              {TIcon && <TIcon size={12} />}
+              {TYPE_LABEL[event.eventType] || event.eventType}
+            </span>
+          );
+        })()}
       </td>
 
       {/* Date */}
@@ -420,17 +483,20 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
             className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-full ${st.bg} ${st.text} ${available.length > 0 ? "cursor-pointer hover:opacity-80" : "cursor-default"} transition-opacity`}>
             <span className={`w-1.5 h-1.5 rounded-full ${st.dot} ${event.status==="ongoing" ? "animate-pulse" : ""}`}/>
             {st.label}
-            {available.length > 0 && <span className="opacity-60">▾</span>}
+            {available.length > 0 && <ChevronDown size={11} className="opacity-60" />}
           </button>
 
           {statusMenuOpen && available.length > 0 && (
             <div className="absolute left-0 top-8 z-30 bg-white border border-stone-200 rounded-2xl shadow-xl py-1 min-w-35">
               {available.map((s) => (
                 <button key={s} onClick={() => { setStatusMenuOpen(false); onStatusChange(event._id, s); }}
-                  className={`w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-stone-50 transition-colors capitalize ${
+                  className={`w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-stone-50 transition-colors flex items-center gap-2 ${
                     s==="cancelled" ? "text-red-600" : s==="completed" ? "text-blue-600" : "text-green-600"
                   }`}>
-                  {s==="ongoing" ? "🔴 Mark Live" : s==="completed" ? "✅ Complete" : s==="cancelled" ? "❌ Cancel" : `→ ${s}`}
+                  {s==="ongoing"   && <Radio size={12} />}
+                  {s==="completed" && <CheckCircle2 size={12} />}
+                  {s==="cancelled" && <XCircle size={12} />}
+                  {s==="ongoing" ? "Mark Live" : s==="completed" ? "Complete" : s==="cancelled" ? "Cancel" : `→ ${s}`}
                 </button>
               ))}
               <button onClick={() => setStatusMenuOpen(false)}
@@ -445,16 +511,15 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
       {/* Actions */}
       <td className="px-4 py-3.5">
         <div className="flex items-center gap-1.5">
-          <ActionBtn onClick={() => navigate(`/events/${event._id}`)} title="View public page" icon="👁️" />
-          <ActionBtn onClick={() => navigate(`/admin/events/${event._id}/manage`)} title="Manage volunteers" icon="⚙️" color="blue" />
-          <ActionBtn onClick={() => navigate(`/admin/events/edit/${event._id}`)} title="Edit event" icon="✏️" color="amber" />
-          <ActionBtn
-            onClick={() => onDelete(event._id, event.title)}
-            title="Delete event"
-            icon={deleting ? "⏳" : "🗑️"}
-            color="red"
-            disabled={deleting}
-          />
+        <ActionBtn onClick={() => navigate(`/events/${event._id}`)}              
+        title="View public page"  icon={Eye}                              />
+        <ActionBtn onClick={() => navigate(`/admin/events/${event._id}/manage`)} 
+        title="Manage volunteers" icon={Settings2} color="blue"          />
+        <ActionBtn onClick={() => navigate(`/admin/events/edit/${event._id}`)}   
+        title="Edit event"        icon={Pencil}    color="amber"         />
+        <ActionBtn onClick={() => onDelete(event._id, event.title)}              
+        title="Delete event" icon={deleting ? Loader2 : Trash2} color="red" 
+        disabled={deleting} spinning={deleting} />
         </div>
       </td>
     </tr>
@@ -464,7 +529,7 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
 /* ═══════════════════════════════════════
    SMALL HELPERS
 ═══════════════════════════════════════ */
-function StatCard({ icon, label, value, color }) {
+function StatCard({ icon: Icon, label, value, color }) {
   const colors = {
     stone:   "from-stone-50  to-stone-100/50  text-stone-700",
     blue:    "from-blue-50   to-blue-100/50   text-blue-700",
@@ -473,18 +538,18 @@ function StatCard({ icon, label, value, color }) {
     amber:   "from-amber-50  to-amber-100/50  text-amber-700",
     emerald: "from-emerald-50 to-emerald-100/50 text-emerald-700",
     red:     "from-red-50    to-red-100/50    text-red-700",
-    teal: "from-teal-50 to-teal-100/50 text-teal-700"
+    teal:    "from-teal-50   to-teal-100/50   text-teal-700",
   };
   return (
-    <div className={`bg-gradient-to-br ${colors[color] || colors.stone} border border-white rounded-2xl p-5 shadow-sm`}>
-      <div className="text-2xl mb-2">{icon}</div>
+    <div className={`bg-linear-to-br ${colors[color] || colors.stone} border border-white rounded-2xl p-5 shadow-sm`}>
+      <Icon size={20} className="mb-2 opacity-70" />
       <div className="text-2xl font-bold" style={{ fontFamily:"Fraunces,serif" }}>{value}</div>
       <div className="text-xs font-medium opacity-70 mt-0.5">{label}</div>
     </div>
   );
 }
 
-function ActionBtn({ onClick, title, icon, color, disabled }) {
+function ActionBtn({ onClick, title, icon: Icon, color, disabled, spinning }) {
   const colors = {
     blue:  "hover:bg-blue-50  hover:text-blue-600",
     amber: "hover:bg-amber-50 hover:text-amber-600",
@@ -492,10 +557,10 @@ function ActionBtn({ onClick, title, icon, color, disabled }) {
   };
   return (
     <button onClick={onClick} title={title} disabled={disabled}
-      className={`w-8 h-8 flex items-center justify-center rounded-lg text-stone-400 transition-all text-base
+      className={`w-8 h-8 flex items-center justify-center rounded-lg text-stone-400 transition-all
                   ${colors[color] || "hover:bg-stone-100 hover:text-stone-700"}
                   disabled:opacity-40 disabled:cursor-not-allowed`}>
-      {icon}
+      <Icon size={16} className={spinning ? "animate-spin" : ""} />
     </button>
   );
 }

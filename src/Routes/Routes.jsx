@@ -132,6 +132,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/admin/events/edit/:id', element: <PrivateRouter><AdminEventManagePage /></PrivateRouter>
+            },
+            {
+                path: '/admin/events', element: <PrivateRouter><AdminEventsPage /></PrivateRouter>
             }
         ]
     },
@@ -199,7 +202,7 @@ export const router = createBrowserRouter([
         path: '*', Component: ErrorPage
     },
     {
-        path: '/onlytest', Component: AdminEventsPage
+        path: '/onlytest', Component: AdminWaitlistFeed
     },
     {
         path: '/events', Component: EventsFeed
