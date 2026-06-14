@@ -5,6 +5,11 @@ import { toast } from "react-toastify";
 import { format, formatDistanceToNow } from "date-fns";
 import { QRCodeCanvas } from "qrcode.react";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import {
+  ClipboardList, Calendar, Settings2, Image, Package,
+  Pin, FileText, Save, Loader2, Eye, EyeOff, Download, QrCode, Trash2, Clock, Users, CheckCircle2,
+  Ticket
+} from "lucide-react";
 
 /* ─── Constants ─── */
 const TYPE_EMOJI = { cleanup:"🧹", plantation:"🌳", repair:"🏗️", awareness:"📢", student:"🎓", meetup:"🤝" };
@@ -283,6 +288,7 @@ export default function AdminEventManagePage() {
             <FreeParticipantsTab
               participants={freeParticipants}
               eventId={id}
+              onRefresh={fetchData}
             />
           )}
 
@@ -341,7 +347,12 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
 
   if (volunteers.length === 0) return (
     <div className="text-center py-16 text-stone-400">
-      <div className="text-4xl mb-3">{isWaitlist ? "⏳" : "🙋"}</div>
+      <div className="flex justify-center mb-3">
+        {isWaitlist
+          ? <Clock size={36} className="text-stone-300" />
+          : <Users size={36} className="text-stone-300" />
+        }
+      </div>
       <p className="text-sm">{isWaitlist ? "No one on waitlist" : "No confirmed volunteers yet"}</p>
     </div>
   );
@@ -355,9 +366,7 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
           className="flex-1 min-w-50 px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100" />
         <button onClick={exportCSV}
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
+          <Download size={14} />
           Export CSV
         </button>
         <span className="text-xs text-stone-400">{filtered.length} shown</span>
@@ -430,7 +439,7 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
                     <Td>
                       {v.attended ? (
                         <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                          ✅ Yes
+                          <CheckCircle2 size={11} /> Yes
                         </span>
                       ) : (
                         <span className="text-xs text-stone-300">—</span>
@@ -444,16 +453,19 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
                   <Td>
                     <div className="flex gap-1">
                       <button onClick={() => setExpanded(expanded===v._id ? null : v._id)}
-                        title="View QR" className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:bg-blue-50 hover:text-blue-600 transition-all text-sm">
-                        📱
+                        title="View QR"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:bg-blue-50 hover:text-blue-600 transition-all">
+                        <QrCode size={14} color="black" />
                       </button>
                       <button onClick={() => onRemove(v._id, v.name)}
-                        title="Remove" className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:bg-red-50 hover:text-red-500 transition-all text-sm">
-                        🗑️
+                        title="Remove"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:bg-red-50 hover:text-red-500 transition-all">
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   </Td>
                 </tr>
+
                 {/* Expanded QR row */}
                 {expanded === v._id && !isWaitlist && (
                   <tr key={`${v._id}-expanded`} className="bg-blue-50/30">
@@ -481,7 +493,6 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
     </div>
   );
 }
-
 /* ═══════════════════════════════════════
    DONATIONS TAB
 ═══════════════════════════════════════ */
@@ -558,8 +569,12 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
 /* ═══════════════════════════════════════
    FREE PARTICIPANTS TAB
 ═══════════════════════════════════════ */
-function FreeParticipantsTab({ participants, eventId }) {
+function FreeParticipantsTab({ participants, eventId, onRefresh }) {
   const [search, setSearch] = useState("");
+  const [expanded, setExpanded] = useState(null);
+
+  const token   = localStorage.getItem("token");
+  const headers = { Authorization: `Bearer ${token}` };
 
   const filtered = participants.filter((p) => {
     const q = search.toLowerCase();
@@ -569,6 +584,42 @@ function FreeParticipantsTab({ participants, eventId }) {
       p.phone?.includes(q)
     );
   });
+
+  const handleRemove = (participantId, name) => {
+    toast.warn(
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-stone-800">Remove <span className="font-bold">{name}</span>?</p>
+        <p className="text-xs text-stone-500">This free participant will be permanently removed.</p>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              toast.dismiss();
+              try {
+                await axios.delete(
+                  `${import.meta.env.VITE_API_URL}/admin/events/${eventId}/free-participant/${participantId}`,
+                  { headers }
+                );
+                toast.success(`${name} removed.`);
+                onRefresh();
+              } catch (err) {
+                toast.error(err.response?.data?.message || "Remove failed");
+              }
+            }}
+            className="px-3 py-1 rounded-lg text-xs font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors"
+          >
+            Yes, Remove
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            className="px-3 py-1 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      { autoClose: false, closeButton: false, closeOnClick: false }
+    );
+  };
 
   const exportCSV = () => {
     const rows = [
@@ -590,7 +641,9 @@ function FreeParticipantsTab({ participants, eventId }) {
 
   if (participants.length === 0) return (
     <div className="text-center py-16 text-stone-400">
-      <div className="text-4xl mb-3">🎟️</div>
+      <div className="flex justify-center mb-3">
+        <Ticket size={36} className="text-stone-300" />
+      </div>
       <p className="text-sm">No free participants yet</p>
     </div>
   );
@@ -598,17 +651,13 @@ function FreeParticipantsTab({ participants, eventId }) {
   return (
     <div>
       <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <input
-          type="text" value={search}
+        <input type="text" value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, email, phone..."
-          className="flex-1 min-w-50 px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100"
-        />
+          className="flex-1 min-w-50 px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100" />
         <button onClick={exportCSV}
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
+          <Download size={14} />
           Export CSV
         </button>
         <span className="text-xs text-stone-400">{filtered.length} shown</span>
@@ -620,50 +669,81 @@ function FreeParticipantsTab({ participants, eventId }) {
             <tr className="bg-stone-50 border-b border-stone-100">
               <Th>#</Th>
               <Th>Name</Th>
-              <Th>Email</Th>
-              <Th>Phone</Th>
-              <Th>QR Token</Th>
+              <Th>Contact</Th>
               <Th>Attended</Th>
               <Th>Registered</Th>
+              <Th>Actions</Th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-50">
             {filtered.map((p, i) => (
-              <tr key={p._id} className="hover:bg-stone-50/60 transition-colors">
-                <Td>
-                  <span className="w-6 h-6 rounded-full bg-stone-100 text-stone-500 text-xs font-bold flex items-center justify-center">
-                    {i + 1}
-                  </span>
-                </Td>
-                <Td>
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-xs shrink-0">
-                      {p.name?.[0]?.toUpperCase()}
-                    </div>
-                    <p className="text-sm font-medium text-stone-800">{p.name}</p>
-                  </div>
-                </Td>
-                <Td><span className="text-xs text-stone-600">{p.email}</span></Td>
-                <Td><span className="text-xs text-stone-600">{p.phone}</span></Td>
-                <Td>
-                  <code className="text-[10px] font-mono bg-stone-100 px-1.5 py-0.5 rounded text-stone-500 break-all">
-                    {p.qrToken?.slice(0, 16)}...
-                  </code>
-                </Td>
-                <Td>
-                  {p.attended ? (
-                    <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                      ✅ Yes
+              <>
+                <tr key={p._id} className="hover:bg-stone-50/60 transition-colors">
+                  <Td>
+                    <span className="w-6 h-6 rounded-full bg-stone-100 text-stone-500 text-xs font-bold flex items-center justify-center">
+                      {i + 1}
                     </span>
-                  ) : (
-                    <span className="text-xs text-stone-300">—</span>
-                  )}
-                </Td>
-                <Td>
-                  <p className="text-xs text-stone-500">{format(new Date(p.createdAt), "dd MMM")}</p>
-                  <p className="text-[10px] text-stone-400">{formatDistanceToNow(new Date(p.createdAt), { addSuffix: true })}</p>
-                </Td>
-              </tr>
+                  </Td>
+                  <Td>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-xs shrink-0">
+                        {p.name?.[0]?.toUpperCase()}
+                      </div>
+                      <p className="text-sm font-medium text-stone-800">{p.name}</p>
+                    </div>
+                  </Td>
+                  <Td>
+                    <p className="text-xs text-stone-700">{p.email}</p>
+                    <p className="text-xs text-stone-400">{p.phone}</p>
+                  </Td>
+                  <Td>
+                    {p.attended ? (
+                      <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                        <CheckCircle2 size={11} /> Yes
+                      </span>
+                    ) : (
+                      <span className="text-xs text-stone-300">—</span>
+                    )}
+                  </Td>
+                  <Td>
+                    <p className="text-xs text-stone-500">{format(new Date(p.createdAt), "dd MMM")}</p>
+                    <p className="text-[10px] text-stone-400">{formatDistanceToNow(new Date(p.createdAt), { addSuffix: true })}</p>
+                  </Td>
+                  <Td>
+                    <div className="flex gap-1">
+                      <button onClick={() => setExpanded(expanded === p._id ? null : p._id)}
+                        title="View QR"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-800 hover:bg-blue-50 hover:text-blue-600 transition-all">
+                        <QrCode size={14} />
+                      </button>
+                      <button onClick={() => handleRemove(p._id, p.name)}
+                        title="Remove"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:bg-red-50 hover:text-red-500 transition-all">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </Td>
+                </tr>
+
+                {expanded === p._id && (
+                  <tr key={`${p._id}-expanded`} className="bg-blue-50/30">
+                    <td colSpan={99} className="px-6 py-4">
+                      <div className="flex items-center gap-6 flex-wrap">
+                        <div className="bg-white rounded-2xl p-3 border border-stone-200 shadow-sm">
+                          <QRCodeCanvas value={p.qrToken} size={100} level="M" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide">QR Token</p>
+                          <code className="text-xs font-mono bg-stone-100 px-2 py-1 rounded text-stone-600 break-all block max-w-xs">
+                            {p.qrToken}
+                          </code>
+                          <p className="text-xs text-stone-400 mt-1">Used for attendance check-in at the event</p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
             ))}
           </tbody>
         </table>
@@ -689,7 +769,7 @@ function EditEventForm({ event, onSaved, token }) {
     isTshirt:           event.isTshirt || false,
     isGuestUnlimited:   event.isGuestUnlimited || false,
     guestNumber:        event.guestNumber || 0,
-    isFreeParticipate:  event.isFreeParticipate  || false,
+    isFreeParticipate:  event.isFreeParticipate || false,
     maxFreeParticipate: event.maxFreeParticipate || 0,
     equipmentList:      (event.equipmentList || []).join(", "),
     coverImage:         event.coverImage || "",
@@ -714,6 +794,8 @@ function EditEventForm({ event, onSaved, token }) {
           isTshirt:           form.isTshirt,
           isGuestUnlimited:   form.isGuestUnlimited,
           guestNumber:        Number(form.guestNumber),
+          isFreeParticipate:  form.isFreeParticipate,
+          maxFreeParticipate: Number(form.maxFreeParticipate),
           equipmentList:      form.equipmentList.split(",").map(s => s.trim()).filter(Boolean),
           organizerContact:   form.organizerContact,
           coverImage:         form.coverImage,
@@ -734,11 +816,10 @@ function EditEventForm({ event, onSaved, token }) {
   return (
     <div className="w-full space-y-4">
 
-      {/* ── Row 1: Basic Info + Schedule + Capacity (3 cols) ── */}
+      {/* ── Row 1: Basic Info + Schedule + Capacity ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-        {/* Basic Info */}
-        <EditSection icon="📋" title="Basic Information" subtitle="Public event details">
+        <EditSection icon={ClipboardList} title="Basic Information" subtitle="Public event details">
           <div className="space-y-3">
             <EField label="Event Title">
               <input type="text" value={form.title}
@@ -758,8 +839,7 @@ function EditEventForm({ event, onSaved, token }) {
           </div>
         </EditSection>
 
-        {/* Schedule */}
-        <EditSection icon="🗓️" title="Schedule" subtitle="Start and end time">
+        <EditSection icon={Calendar} title="Schedule" subtitle="Start and end time">
           <div className="space-y-3">
             <EField label="Start Date & Time">
               <input type="datetime-local" value={form.date}
@@ -777,8 +857,7 @@ function EditEventForm({ event, onSaved, token }) {
           </div>
         </EditSection>
 
-        {/* Capacity & Fees */}
-        <EditSection icon="⚙️" title="Capacity & Fees" subtitle="Slots and financial config">
+        <EditSection icon={Settings2} title="Capacity & Fees" subtitle="Slots and financial config">
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <EField label="Max Volunteers">
@@ -794,7 +873,7 @@ function EditEventForm({ event, onSaved, token }) {
                 <input type="number" min={0} value={form.registrationFee}
                   onChange={(e) => setF("registrationFee", e.target.value)} className={ei()} />
                 {Number(form.registrationFee) === 0 && (
-                  <p className="text-[10px] text-emerald-600 mt-1">✓ Free event</p>
+                  <p className="text-[10px] text-emerald-600 mt-1">Free event</p>
                 )}
               </EField>
               <EField label="Donation Goal (৳)">
@@ -826,30 +905,28 @@ function EditEventForm({ event, onSaved, token }) {
         </EditSection>
       </div>
 
-      {/* ── Row 2: Cover preview + Equipment + Announcement (3 cols) ── */}
+      {/* ── Row 2: Cover preview + Equipment + Announcement ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-        {/* Cover preview */}
-        <EditSection icon="🖼️" title="Cover Preview" subtitle="Banner image">
+        <EditSection icon={Image} title="Cover Preview" subtitle="Banner image">
           {form.coverImage ? (
             <div className="relative rounded-xl overflow-hidden border border-stone-200 h-36 bg-stone-100">
               <img src={form.coverImage} alt="Cover"
                 className="w-full h-full object-cover"
                 onError={(e) => { e.target.style.display = "none"; }} />
-              <span className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm">
-                Preview
+              <span className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm flex items-center gap-1">
+                <Eye size={10} /> Preview
               </span>
             </div>
           ) : (
             <div className="h-36 rounded-xl border-2 border-dashed border-stone-200 flex flex-col items-center justify-center text-stone-300 gap-2">
-              <span className="text-3xl">🖼️</span>
+              <EyeOff size={28} />
               <span className="text-xs">No image URL set</span>
             </div>
           )}
         </EditSection>
 
-        {/* Equipment */}
-        <EditSection icon="🎒" title="Equipment List" subtitle="Comma separated items">
+        <EditSection icon={Package} title="Equipment List" subtitle="Comma separated items">
           <EField label="Items volunteers should bring">
             <textarea value={form.equipmentList}
               onChange={(e) => setF("equipmentList", e.target.value)}
@@ -867,8 +944,7 @@ function EditEventForm({ event, onSaved, token }) {
           )}
         </EditSection>
 
-        {/* Pinned Announcement */}
-        <EditSection icon="📌" title="Pinned Announcement" subtitle="Highlighted banner on event page">
+        <EditSection icon={Pin} title="Pinned Announcement" subtitle="Highlighted banner on event page">
           <EField label="Announcement text">
             <textarea value={form.pinnedAnnouncement}
               onChange={(e) => setF("pinnedAnnouncement", e.target.value)}
@@ -876,13 +952,13 @@ function EditEventForm({ event, onSaved, token }) {
               placeholder="e.g. Bring your own gloves. Meet at Gate 2." />
           </EField>
           <p className="text-[10px] text-amber-600 mt-2 font-medium">
-            ⚠️ Leave empty to hide the banner
+            Leave empty to hide the banner
           </p>
         </EditSection>
       </div>
 
-      {/* ── Row 3: Description (full width) ── */}
-      <EditSection icon="📝" title="Description" subtitle="Full event description shown to volunteers">
+      {/* ── Row 3: Description ── */}
+      <EditSection icon={FileText} title="Description" subtitle="Full event description shown to volunteers">
         <textarea value={form.description}
           onChange={(e) => setF("description", e.target.value)}
           rows={5} className={ei()}
@@ -896,7 +972,10 @@ function EditEventForm({ event, onSaved, token }) {
         </p>
         <button onClick={handleSave} disabled={saving}
           className="px-6 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-2xl text-sm font-semibold transition-colors disabled:opacity-60 flex items-center gap-2 shadow-sm shadow-green-200">
-          {saving ? <><Spinner /> Saving...</> : "💾 Save Changes"}
+          {saving
+            ? <><Loader2 size={14} className="animate-spin" /> Saving...</>
+            : <><Save size={14} /> Save Changes</>
+          }
         </button>
       </div>
     </div>
@@ -904,11 +983,11 @@ function EditEventForm({ event, onSaved, token }) {
 }
 
 /* ── Section wrapper ── */
-function EditSection({ icon, title, subtitle, children }) {
+function EditSection({ icon: Icon, title, subtitle, children }) {
   return (
     <div className="rounded-2xl border border-stone-100 overflow-hidden">
       <div className="flex items-center gap-2.5 px-4 py-3 border-b border-stone-100 bg-stone-50">
-        <span className="text-base">{icon}</span>
+        <Icon size={15} className="text-stone-400 shrink-0" />
         <div>
           <p className="text-sm font-semibold text-stone-800">{title}</p>
           {subtitle && <p className="text-[11px] text-stone-400 leading-tight">{subtitle}</p>}
