@@ -235,7 +235,7 @@ export default function AdminEventManagePage() {
       {/* ── Back + Header ── */}
       <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
-          <button onClick={() => navigate("/admin/events")}
+          <button onClick={() => navigate("/dashboard/admin/events")}
             className="flex items-center gap-1.5 text-sm text-white hover:text-stone-800 mb-3 transition-colors">
             <ArrowLeft size={15} />
             All Events
@@ -527,8 +527,8 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
                     <div className="flex gap-1">
                       <button onClick={() => setExpanded(expanded===v._id ? null : v._id)}
                         title="View QR"
-                        className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:bg-blue-50 hover:text-blue-600 transition-all">
-                        <QrCode size={14} color="black" />
+                        className="w-7 h-7 flex items-center justify-center rounded-lg text-white hover:bg-blue-50 hover:text-blue-600 transition-all">
+                        <QrCode size={14} />
                       </button>
                       <button onClick={() => onRemove(v._id, v.name)}
                         title="Remove"
