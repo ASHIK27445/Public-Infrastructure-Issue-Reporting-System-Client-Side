@@ -120,7 +120,7 @@ export default function AdminEventsPage() {
 
     toast.info(
       <div className="space-y-2">
-        <p className="text-sm font-medium text-white">{msg}</p>
+        <p className="text-sm font-medium text-black">{msg}</p>
         <div className="flex gap-2">
           <button
             onClick={async () => {
@@ -147,7 +147,7 @@ export default function AdminEventsPage() {
   const handleDelete = async (eventId, title) => {
     toast.warn(
       <div className="space-y-2">
-        <p className="text-sm font-medium text-white">Delete <span className="font-bold">"{title}"</span>?</p>
+        <p className="text-sm font-medium text-black">Delete <span className="font-bold">"{title}"</span>?</p>
         <p className="text-xs text-stone-500">Removes all registrations, donations and comments. Cannot be undone.</p>
         <div className="flex gap-2">
           <button
@@ -191,11 +191,17 @@ export default function AdminEventsPage() {
               Manage all community events, volunteers, and donations
             </p>
           </div>
-          <Link to="/dashboard/admin/create-events"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-2xl transition-colors shadow-sm text-sm">
-            <Plus size={16} strokeWidth={2.5} />
-            Create Event
-          </Link>
+          <div>
+            <Link to="/dashboard/admin/create-events"
+              className="inline-flex items-center gap-2 px-5 mr-2 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-2xl transition-colors shadow-sm text-sm">
+              <Plus size={16} strokeWidth={2.5} />
+              Create Event
+            </Link>
+            <Link to="/dashboard/admin/waitlist-feed"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-2xl transition-colors shadow-sm text-sm">
+              WaitList Feed
+            </Link>
+          </div>
         </div>
 
         {/* STATS SECTION */}
@@ -298,7 +304,7 @@ export default function AdminEventsPage() {
                     {TIcon && <TIcon size={14} />}
                     <span className="font-medium">{TYPE_LABEL[t._id] || t._id}</span>
                     <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${type === t._id ? "bg-white text-gray-700 border-zinc-800" : "bg-zinc-700 text-white"}`}>
-                      {t.count} ola
+                      {t.count}
                     </span>
                   </button>
                 );
@@ -564,7 +570,7 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
         <div className="flex items-center gap-1.5">
         <ActionBtn onClick={() => navigate(`/events/${event._id}`)}              
         title="View public page"  icon={Eye}                              />
-        <ActionBtn onClick={() => navigate(`/admin/events/${event._id}/manage`)} 
+        <ActionBtn onClick={() => navigate(`/dashboard/admin/events/${event._id}/manage`)} 
         title="Manage volunteers" icon={Settings2} color="blue"          />
         <ActionBtn onClick={() => navigate(`/dashboard/admin/events/edit/${event._id}`)}   
         title="Edit event"        icon={Pencil}    color="amber"         />

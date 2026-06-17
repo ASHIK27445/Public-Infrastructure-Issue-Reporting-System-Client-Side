@@ -111,12 +111,6 @@ export const router = createBrowserRouter([
                 path: '/events/:id/register', Component: VolunteerRegistration
             },
             {
-                path: '/waitlist', Component: WaitlistPanelDemo
-            },
-            {
-                path: '/waitlist-feed', element: <PrivateRouter><AdminWaitlistFeed /></PrivateRouter>
-            },
-            {
                 path: '/events/:id/free-participate', Component: FreeParticipateRegistration
             },
             {
