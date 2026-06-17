@@ -9,7 +9,7 @@ import {
   ClipboardList, Calendar, Settings2, Image, Package,
   Pin, FileText, Save, Loader2, Eye, EyeOff, Download, QrCode, Trash2, Clock, Users,
   Ticket, ArrowLeft, Globe, Pencil, ScanQrCode, Radio, CheckCircle2,
-  XCircle, Plus, X, Brush, TreeDeciduous, Wrench, Megaphone,
+  XCircle, Plus, X, Brush, TreeDeciduous, Wrench, Megaphone, ListChecks, Star,
   GraduationCap, Handshake, CalendarDays, Wallet, BarChart2
 } from "lucide-react";
 
@@ -853,6 +853,10 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
     equipmentList:      (event.equipmentList || []).join(", "),
     coverImage:         event.coverImage || "",
     pinnedAnnouncement: event.pinnedAnnouncement || "",
+    hasEventLogs:     event.hasEventLogs     || false,
+    eventLogs:        event.eventLogs        || [],
+    hasSpecialGuests: event.hasSpecialGuests || false,
+    specialGuests:    event.specialGuests    || [],
   });
   const [saving, setSaving] = useState(false);
   const setF = (k, v) => setForm((p) => ({ ...p, [k]: v }));
@@ -880,6 +884,10 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
           coverImage:         form.coverImage,
           pinnedAnnouncement: form.pinnedAnnouncement,
           location:           { ...event.location, address: form.address },
+          hasEventLogs:     form.hasEventLogs,
+          eventLogs:        form.eventLogs,
+          hasSpecialGuests: form.hasSpecialGuests,
+          specialGuests:    form.specialGuests,
         }
       );
       toast.success("Event updated!");
@@ -1042,6 +1050,175 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
           rows={5} className={ei()}
           placeholder="Describe the event goals, schedule, what volunteers should expect..." />
       </EditSection>
+
+      {/* ── Row 4: Event Logs + Special Guests ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        {/* Event Logs */}
+        <EditSection icon={ListChecks} title="Event Timeline / Logs" subtitle="Schedule of what happens during the event">
+          <div className="space-y-3">
+            <Toggle
+              label="Enable Event Timeline"
+              desc="Show a timeline of activities on the event page"
+              checked={form.hasEventLogs}
+              onChange={(v) => setF("hasEventLogs", v)}
+            />
+
+            {form.hasEventLogs && (
+              <div className="space-y-2 mt-2">
+                {form.eventLogs.map((log, i) => (
+                  <div key={i} className="flex gap-2 items-start">
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <input
+                        type="time"
+                        value={log.time || ""}
+                        onChange={(e) => {
+                          const updated = [...form.eventLogs];
+                          updated[i] = { ...updated[i], time: e.target.value };
+                          setF("eventLogs", updated);
+                        }}
+                        className={ei()}
+                      />
+                      <input
+                        type="text"
+                        value={log.title || ""}
+                        placeholder="e.g. Opening Ceremony"
+                        onChange={(e) => {
+                          const updated = [...form.eventLogs];
+                          updated[i] = { ...updated[i], title: e.target.value };
+                          setF("eventLogs", updated);
+                        }}
+                        className={ei()}
+                      />
+                      <input
+                        type="text"
+                        value={log.description || ""}
+                        placeholder="Short description (optional)"
+                        onChange={(e) => {
+                          const updated = [...form.eventLogs];
+                          updated[i] = { ...updated[i], description: e.target.value };
+                          setF("eventLogs", updated);
+                        }}
+                        className={ei()}
+                      />
+                    </div>
+                    <button
+                      onClick={() => setF("eventLogs", form.eventLogs.filter((_, idx) => idx !== i))}
+                      className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-red-50 text-stone-400 hover:text-red-500 transition-all mt-1 shrink-0">
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+
+                {/* ── Add + Remove All ── */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setF("eventLogs", [...form.eventLogs, { time: "", title: "", description: "" }])}
+                    className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-stone-300 text-stone-500 text-xs font-medium hover:bg-stone-50 transition-colors justify-center">
+                    <Plus size={13} /> Add Timeline Entry
+                  </button>
+                  {form.eventLogs.length > 0 && (
+                    <button
+                      onClick={() => setF("eventLogs", [])}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-red-200 text-red-400 text-xs font-medium hover:bg-red-50 transition-colors justify-center shrink-0">
+                      <Trash2 size={13} /> Remove All
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </EditSection>
+
+        {/* Special Guests */}
+        <EditSection icon={Star} title="Special Guests" subtitle="Notable attendees or speakers">
+          <div className="space-y-3">
+            <Toggle
+              label="Enable Special Guests"
+              desc="Show guest profiles on the event page"
+              checked={form.hasSpecialGuests}
+              onChange={(v) => setF("hasSpecialGuests", v)}
+            />
+
+            {form.hasSpecialGuests && (
+              <div className="space-y-3 mt-2">
+                {form.specialGuests.map((guest, i) => (
+                  <div key={i} className="bg-stone-50 rounded-xl p-3 space-y-2">
+
+                    {/* Remove button */}
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => setF("specialGuests", form.specialGuests.filter((_, idx) => idx !== i))}
+                        className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-red-50 text-stone-300 hover:text-red-500 transition-all">
+                        <X size={12} />
+                      </button>
+                    </div>
+
+                    <input type="text" value={guest.name || ""} placeholder="Guest name *"
+                      onChange={(e) => {
+                        const updated = [...form.specialGuests];
+                        updated[i] = { ...updated[i], name: e.target.value };
+                        setF("specialGuests", updated);
+                      }}
+                      className={ei()} />
+                    <input type="text" value={guest.designation || ""} placeholder="Designation / Title"
+                      onChange={(e) => {
+                        const updated = [...form.specialGuests];
+                        updated[i] = { ...updated[i], designation: e.target.value };
+                        setF("specialGuests", updated);
+                      }}
+                      className={ei()} />
+                    <input type="text" value={guest.organization || ""} placeholder="Organization / Institution"
+                      onChange={(e) => {
+                        const updated = [...form.specialGuests];
+                        updated[i] = { ...updated[i], organization: e.target.value };
+                        setF("specialGuests", updated);
+                      }}
+                      className={ei()} />
+                    <input type="url" value={guest.photo || ""} placeholder="Photo URL (optional)"
+                      onChange={(e) => {
+                        const updated = [...form.specialGuests];
+                        updated[i] = { ...updated[i], photo: e.target.value };
+                        setF("specialGuests", updated);
+                      }}
+                      className={ei()} />
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <div className="relative shrink-0">
+                        <input type="checkbox" checked={guest.isMainGuest || false}
+                          onChange={(e) => {
+                            const updated = [...form.specialGuests];
+                            updated[i] = { ...updated[i], isMainGuest: e.target.checked };
+                            setF("specialGuests", updated);
+                          }}
+                          className="sr-only" />
+                        <div className={`w-8 h-4 rounded-full transition-colors ${guest.isMainGuest ? "bg-amber-500" : "bg-stone-300"}`} />
+                        <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${guest.isMainGuest ? "translate-x-4" : ""}`} />
+                      </div>
+                      <span className="text-xs font-medium text-stone-600">Chief / Main Guest</span>
+                    </label>
+                  </div>
+                ))}
+
+                {/* ── Add + Remove All ── */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setF("specialGuests", [...form.specialGuests, { name: "", designation: "", organization: "", photo: "", isMainGuest: false }])}
+                    className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-stone-300 text-stone-500 text-xs font-medium hover:bg-stone-50 transition-colors justify-center">
+                    <Plus size={13} /> Add Guest
+                  </button>
+                  {form.specialGuests.length > 0 && (
+                    <button
+                      onClick={() => setF("specialGuests", [])}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-red-200 text-red-400 text-xs font-medium hover:bg-red-50 transition-colors justify-center shrink-0">
+                      <Trash2 size={14} /> Remove All
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </EditSection>
+      </div>
 
       {/* ── Save bar ── */}
       <div className="flex items-center justify-between py-3 border-t border-stone-100">
