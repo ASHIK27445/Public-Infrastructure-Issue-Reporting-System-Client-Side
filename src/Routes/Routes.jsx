@@ -53,6 +53,7 @@ import AdminWaitlistFeed from "../Pages/Events/AdminWaitListFeed"
 import FreeParticipateRegistration from "../Pages/Events/FreeParticipateRegistration"
 import AdminEventsPage from "../Pages/Events/AdminEventPage"
 import AdminEventManagePage from "../Pages/Events/AdminEventManagePAge"
+import CertificateVerifyPage from "../Pages/Events/CertificateVerifyPage"
 
 export const router = createBrowserRouter([
     {
@@ -107,19 +108,10 @@ export const router = createBrowserRouter([
                 path:'/payment-boost-success', Component: PaymentBoostSuccess
             },
             {
-                path: '/create-events', Component: CreateEvent
-            },
-            {
-                path: '/event-card', Component: EventCardDemo
-            },
-            {
                 path: '/events/:id/register', Component: VolunteerRegistration
             },
             {
                 path: '/waitlist', Component: WaitlistPanelDemo
-            },
-            {
-                path: '/admin/events/:id/manage', element: <PrivateRouter><WaitlistManagementPanel /></PrivateRouter>
             },
             {
                 path: '/waitlist-feed', element: <PrivateRouter><AdminWaitlistFeed /></PrivateRouter>
@@ -133,8 +125,9 @@ export const router = createBrowserRouter([
             {
                 path: '/admin/events/edit/:id', element: <PrivateRouter><AdminEventManagePage /></PrivateRouter>
             },
+
             {
-                path: '/admin/events', element: <PrivateRouter><AdminEventsPage /></PrivateRouter>
+                path: '/admin/waitlist-feed', element: <PrivateRouter><AdminWaitlistFeed /> </PrivateRouter>
             }
         ]
     },
@@ -194,7 +187,16 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'admin/staff-insights', Component: StaffPerformanceInsights
-            }
+            },
+            {
+                path: 'admin/create-events', Component: CreateEvent
+            },
+            {
+                path: 'admin/events/:id/manage', Component:WaitlistManagementPanel
+            },
+            {
+                path: 'admin/events', Component: AdminEventsPage
+            },
 
         ]
     },
@@ -202,7 +204,7 @@ export const router = createBrowserRouter([
         path: '*', Component: ErrorPage
     },
     {
-        path: '/onlytest', Component: AdminWaitlistFeed
+        path: '/onlytest', Component: CertificateVerifyPage
     },
     {
         path: '/events', Component: EventsFeed

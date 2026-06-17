@@ -476,7 +476,7 @@ export default function EventDetailPage() {
                       .sort((a, b) => (a.time || "").localeCompare(b.time || ""))
                       .map((log, i) => (
                         <div key={i} className="relative">
-                          <div className="absolute -left-4 w-2 h-2 rounded-full bg-green-400 border-2 border-white mt-1.5 -translate-x-[3px]" />
+                          <div className="absolute -left-4 w-2 h-2 rounded-full bg-green-400 border-2 border-white mt-1.5 -translate-x-0.75" />
                           <div>
                             <div className="flex items-center gap-2 flex-wrap mb-0.5">
                               {log.time && (

@@ -12,6 +12,7 @@ import {
   Megaphone, GraduationCap, Handshake
 } from "lucide-react";
 import { AuthContext } from "../AuthProvider/AuthContext";
+import './event.css'
 
 /* ─── Constants ─── */
 const TYPE_ICON = {
@@ -28,11 +29,11 @@ const TYPE_LABEL = {
   awareness:"Awareness", student:"Student Day", meetup:"Meetup",
 };
 const STATUS_STYLE = {
-  upcoming:  { bg:"bg-green-100",  text:"text-green-700",  dot:"bg-green-500",  label:"Upcoming"  },
-  ongoing: { bg:"bg-blue-100", text:"text-blue-700", dot:"bg-blue-500", label:"Live" },
-  completed: { bg:"bg-stone-100",  text:"text-stone-600",  dot:"bg-stone-400",  label:"Completed" },
-  cancelled: { bg:"bg-red-100",    text:"text-red-700",    dot:"bg-red-500",    label:"Cancelled" },
-  draft:     { bg:"bg-yellow-100", text:"text-yellow-700", dot:"bg-yellow-500", label:"Draft"     },
+  upcoming:  {  text:"text-green-700",  dot:"bg-green-500",  label:"Upcoming"  },
+  ongoing: {  text:"text-blue-700", dot:"bg-blue-500", label:"Live" },
+  completed: {  text:"text-stone-600",  dot:"bg-stone-400",  label:"Completed" },
+  cancelled: {   text:"text-red-700",    dot:"bg-red-500",    label:"Cancelled" },
+  draft:     { text:"text-yellow-700", dot:"bg-yellow-500", label:"Draft"     },
 };
 
 /* ═══════════════════════════════════════
@@ -119,7 +120,7 @@ export default function AdminEventsPage() {
 
     toast.info(
       <div className="space-y-2">
-        <p className="text-sm font-medium text-stone-800">{msg}</p>
+        <p className="text-sm font-medium text-white">{msg}</p>
         <div className="flex gap-2">
           <button
             onClick={async () => {
@@ -146,7 +147,7 @@ export default function AdminEventsPage() {
   const handleDelete = async (eventId, title) => {
     toast.warn(
       <div className="space-y-2">
-        <p className="text-sm font-medium text-stone-800">Delete <span className="font-bold">"{title}"</span>?</p>
+        <p className="text-sm font-medium text-white">Delete <span className="font-bold">"{title}"</span>?</p>
         <p className="text-xs text-stone-500">Removes all registrations, donations and comments. Cannot be undone.</p>
         <div className="flex gap-2">
           <button
@@ -175,7 +176,7 @@ export default function AdminEventsPage() {
 
   /* ─────────── RENDER ─────────── */
   return (
-    <div className="min-h-screen bg-[#f5f4f0]" style={{ fontFamily:"'DM Sans',sans-serif" }}>
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@600;700;800&display=swap');`}</style>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -183,57 +184,107 @@ export default function AdminEventsPage() {
         {/* ── Header ── */}
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-stone-900" style={{ fontFamily:"Fraunces,serif" }}>
-              Event Management
+            <h1 className="text-3xl lg:text-4xl font-black text-white" >
+              Event <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Management</span>
             </h1>
             <p className="text-stone-500 text-sm mt-1">
               Manage all community events, volunteers, and donations
             </p>
           </div>
-          <Link to="/admin/events/create"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-2xl transition-colors shadow-sm text-sm">
+          <Link to="/dashboard/admin/create-events"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-2xl transition-colors shadow-sm text-sm">
             <Plus size={16} strokeWidth={2.5} />
             Create Event
           </Link>
         </div>
 
-        {/* ── Stats overview ── */}
+        {/* STATS SECTION */}
         {statsLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-stone-200 p-5 animate-pulse">
-                <div className="h-8 bg-stone-100 rounded-lg w-16 mb-2"/>
-                <div className="h-4 bg-stone-100 rounded w-24"/>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-700 p-5 animate-pulse shadow-sm"
+              >
+                <div className="h-8 w-12 bg-stone-100 rounded-md mb-3" />
+                <div className="h-4 w-20 bg-stone-100 rounded" />
               </div>
             ))}
           </div>
-        ) : stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <StatCard icon={CalendarDays} label="Total Events"      
-              value={stats.overview.totalEvents} color="stone"   />
-              <StatCard icon={Radio}        label="Live Now"           
-              value={stats.overview.ongoingCount}                              color="blue"    />
-              <StatCard icon={CheckCircle2} label="Upcoming"          
-              value={stats.overview.upcomingCount}                             color="green"   />
-              <StatCard icon={TrendingUp}   label="Completed"         
-              value={stats.overview.completedCount}                            color="purple"  />
-              <StatCard icon={Users}        label="Volunteers"        
-              value={stats.overview.totalVolunteers}                           color="green"   />
-              <StatCard icon={Clock}        label="Waitlisted"        
-              value={stats.overview.totalWaitlisted}                           color="amber"   />
-              <StatCard icon={Wallet}       label="Total Donated"     
-              value={`৳${(stats.overview.totalDonated||0).toLocaleString()}`} color="emerald" />
-              <StatCard icon={Ban}          label="Cancelled"         
-              value={stats.overview.cancelledCount} color="red"     />
-              <StatCard icon={Ticket}       label="Free Participants" 
-              value={stats.overview.totalParticipants || 0}  color="teal"    />
-          </div>
+        ) : (
+          stats && (
+            <div className="grid grid-cols-2 items-center justify-center sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+              
+              <StatCard
+                icon={CalendarDays}
+                label="Total Events"
+                value={stats.overview.totalEvents}
+                color="stone"
+              />
+
+              <StatCard
+                icon={Radio}
+                label="Live Now"
+                value={stats.overview.ongoingCount}
+                color="blue"
+              />
+
+              <StatCard
+                icon={CheckCircle2}
+                label="Upcoming"
+                value={stats.overview.upcomingCount}
+                color="green"
+              />
+
+              <StatCard
+                icon={TrendingUp}
+                label="Completed"
+                value={stats.overview.completedCount}
+                color="purple"
+              />
+
+              <StatCard
+                icon={Users}
+                label="Volunteers"
+                value={stats.overview.totalVolunteers}
+                color="green"
+              />
+
+              <StatCard
+                icon={Clock}
+                label="Waitlisted"
+                value={stats.overview.totalWaitlisted}
+                color="amber"
+              />
+
+              <StatCard
+                icon={Wallet}
+                label="Total Donated"
+                value={`৳${(stats.overview.totalDonated || 0).toLocaleString()}`}
+                color="emerald"
+              />
+
+              <StatCard
+                icon={Ban}
+                label="Cancelled"
+                value={stats.overview.cancelledCount}
+                color="red"
+              />
+
+              <StatCard
+                icon={Ticket}
+                label="Free Participants"
+                value={stats.overview.totalParticipants || 0}
+                color="teal"
+              />
+            </div>
+          )
         )}
 
         {/* ── Type breakdown mini chart ── */}
         {stats?.typeBreakdown?.length > 0 && (
-          <div className="bg-white rounded-2xl border border-stone-200 p-5 mb-6">
-            <h3 className="text-sm font-semibold text-stone-500 mb-4">Events by Type</h3>
+          <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-700 p-5 mb-6">
+            <h3 className="text-sm font-semibold text-white mb-4">Events by Type</h3>
             <div className="flex gap-3 flex-wrap">
               {stats.typeBreakdown.map((t) => {
                 const TIcon = TYPE_ICON[t._id];
@@ -241,13 +292,13 @@ export default function AdminEventsPage() {
                   <button key={t._id} onClick={() => setParam("type", t._id)}
                     className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all ${
                       type === t._id
-                        ? "bg-green-500 text-white border-green-500"
-                        : "bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-300"
+                        ? "bg-emerald-500 text-white border-emerald-500"
+                        : "bg-zinc-800 text-white border-zinc-700 hover:border-zinc-800"
                     }`}>
                     {TIcon && <TIcon size={14} />}
                     <span className="font-medium">{TYPE_LABEL[t._id] || t._id}</span>
-                    <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${type === t._id ? "bg-white/20" : "bg-stone-200 text-stone-600"}`}>
-                      {t.count}
+                    <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${type === t._id ? "bg-white text-gray-700 border-zinc-800" : "bg-zinc-700 text-white"}`}>
+                      {t.count} ola
                     </span>
                   </button>
                 );
@@ -265,12 +316,12 @@ export default function AdminEventsPage() {
         {/* ── Filters row ── */}
         <div className="flex flex-wrap gap-3 mb-5 items-center">
           {/* Status tabs */}
-          <div className="flex gap-1 bg-white rounded-xl border border-stone-200 p-1">
+          <div className="flex gap-1 bg-linear-to-br from-zinc-800 to-zinc-900 rounded-xl border border-zinc-700 p-1">
             {["all","upcoming","ongoing","completed","cancelled","draft"].map((s) => (
               <button key={s} onClick={() => setParam("status", s)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize ${
                   status === s
-                    ? "bg-green-500 text-white shadow-sm"
+                    ? "bg-emerald-500 text-white shadow-sm"
                     : "text-stone-500 hover:text-stone-700 hover:bg-stone-50"
                 }`}>
                 {s === "all" ? "All" : s === "ongoing" ? "Live" : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -284,10 +335,10 @@ export default function AdminEventsPage() {
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
               <input type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search events..."
-                className="pl-9 pr-4 py-2 rounded-xl border border-stone-200 bg-white text-sm focus:outline-none focus:border-green-400 w-56" />
+                className="pl-9 pr-4 py-2 rounded-xl border border-zinc-700 bg-linear-to-br from-zinc-800 to-zinc-900 text-sm focus:outline-none focus:border-emerald-400 w-56" />
             </div>
             <button type="submit"
-              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-medium transition-colors">
+              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-medium transition-colors">
               Search
             </button>
             {search && (
@@ -302,15 +353,15 @@ export default function AdminEventsPage() {
         {/* Result count */}
         {!loading && (
           <p className="text-sm text-stone-500 mb-4">
-            <span className="font-semibold text-stone-800">{total}</span> events found
+            <span className="font-semibold text-white">{total}</span> events found
           </p>
         )}
 
         {/* ── Events table ── */}
-        <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+        <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-700 shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="w-10 h-10 border-[3px] border-green-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-10 h-10 border-[3px] border-emerald-500 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : events.length === 0 ? (
             <div className="text-center py-20">
@@ -318,7 +369,7 @@ export default function AdminEventsPage() {
               <p className="text-stone-500 text-sm">No events found</p>
               {(search || status !== "all" || type !== "all") && (
                 <button onClick={() => setSearchParams(new URLSearchParams())}
-                  className="mt-3 text-sm text-green-600 hover:underline">
+                  className="mt-3 text-sm text-emerald-600 hover:underline">
                   Clear all filters
                 </button>
               )}
@@ -327,7 +378,7 @@ export default function AdminEventsPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-stone-50 border-b border-stone-100">
+                  <tr className="bg-zinc-800 border-b border-b-zinc-700">
                     <Th>Event</Th>
                     <Th>Type</Th>
                     <Th>Date</Th>
@@ -337,7 +388,7 @@ export default function AdminEventsPage() {
                     <Th>Actions</Th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-50">
+                <tbody>
                   {events.map((event) => (
                     <EventRow
                       key={event._id}
@@ -369,7 +420,7 @@ export default function AdminEventsPage() {
                 ? <span key={`d${i}`} className="px-2 text-stone-400 text-sm">…</span>
                 : <button key={p} onClick={() => setPage(p)}
                     className={`w-9 h-9 rounded-xl text-sm font-medium transition-colors ${
-                      p===page ? "bg-green-500 text-white shadow-sm" : "bg-white border border-stone-200 text-stone-700 hover:bg-stone-50"
+                      p===page ? "bg-green-500 text-white shadow-sm" : "bg-linear-to-br from-zinc-800 to-zinc-900 border border-zinc-700 text-stone-700 hover:bg-stone-50"
                     }`}>{p}</button>
               )}
             <PageBtn onClick={() => setPage(page+1)} disabled={page===totalPages} label="›" />
@@ -400,23 +451,23 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
   const available = nextStatuses[event.status] || [];
 
   return (
-    <tr className="hover:bg-stone-50/70 transition-colors group">
+    <tr className=" transition-colors group border-b border-b-zinc-700">
       {/* Event name */}
       <td className="px-4 py-3.5">
         <div className="flex items-center gap-3">
           {event.coverImage ? (
-            <img src={event.coverImage} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0 border border-stone-100"
+            <img src={event.coverImage} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0 border border-zinc-700"
               onError={(e) => { e.target.style.display="none"; }} />
           ) : (() => {
             const TIcon = TYPE_ICON[event.eventType];
             return (
               <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
-                {TIcon ? <TIcon size={18} className="text-green-600" /> : <CalendarDays size={18} className="text-green-600" />}
+                {TIcon ? <TIcon size={18} className="text-emerald-600" /> : <CalendarDays size={18} className="text-emerald-600" />}
               </div>
             );
           })()}
           <div className="min-w-0">
-            <p className="font-semibold text-stone-900 text-sm truncate max-w-45">{event.title}</p>
+            <p className="font-semibold text-white text-sm truncate max-w-45">{event.title}</p>
             <p className="text-xs text-stone-400 truncate max-w-45">{event.location?.address}</p>
           </div>
         </div>
@@ -427,7 +478,7 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
         {(() => {
           const TIcon = TYPE_ICON[event.eventType];
           return (
-            <span className="inline-flex items-center gap-1.5 text-xs text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full font-medium">
+            <span className="inline-flex items-center gap-1.5 text-xs text-white bg-transparent px-2.5 py-1 rounded-full font-medium">
               {TIcon && <TIcon size={12} />}
               {TYPE_LABEL[event.eventType] || event.eventType}
             </span>
@@ -446,7 +497,7 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
       {/* Volunteers */}
       <td className="px-4 py-3.5">
         <div className="text-sm">
-          <span className="font-bold text-stone-800">{event.volunteerCount || 0}</span>
+          <span className="font-bold text-white">{event.volunteerCount || 0}</span>
           <span className="text-stone-400">/{event.maxVolunteers} volunteers</span>
         </div>
         {event.guestCount > 0 && (
@@ -480,17 +531,17 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
       <td className="px-4 py-3.5 relative">
         <div className="relative inline-block">
           <button onClick={() => available.length > 0 && setStatusMenuOpen(!statusMenuOpen)}
-            className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-full ${st.bg} ${st.text} ${available.length > 0 ? "cursor-pointer hover:opacity-80" : "cursor-default"} transition-opacity`}>
+            className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-full ${st.text} ${available.length > 0 ? "cursor-pointer hover:opacity-80" : "cursor-default"} transition-opacity`}>
             <span className={`w-1.5 h-1.5 rounded-full ${st.dot} ${event.status==="ongoing" ? "animate-pulse" : ""}`}/>
             {st.label}
             {available.length > 0 && <ChevronDown size={11} className="opacity-60" />}
           </button>
 
           {statusMenuOpen && available.length > 0 && (
-            <div className="absolute left-0 top-8 z-30 bg-white border border-stone-200 rounded-2xl shadow-xl py-1 min-w-35">
+            <div className="absolute left-0 top-8 z-30 bg-linear-to-br from-zinc-800 to-zinc-900 border border-zinc-700 rounded-2xl shadow-xl py-1 min-w-35">
               {available.map((s) => (
                 <button key={s} onClick={() => { setStatusMenuOpen(false); onStatusChange(event._id, s); }}
-                  className={`w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-stone-50 transition-colors flex items-center gap-2 ${
+                  className={`w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-zinc-600 transition-colors flex items-center gap-2 ${
                     s==="cancelled" ? "text-red-600" : s==="completed" ? "text-blue-600" : "text-green-600"
                   }`}>
                   {s==="ongoing"   && <Radio size={12} />}
@@ -529,25 +580,26 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
 /* ═══════════════════════════════════════
    SMALL HELPERS
 ═══════════════════════════════════════ */
-function StatCard({ icon: Icon, label, value, color }) {
-  const colors = {
-    stone:   "from-stone-50  to-stone-100/50  text-stone-700",
-    blue:    "from-blue-50   to-blue-100/50   text-blue-700",
-    green:   "from-green-50  to-green-100/50  text-green-700",
-    purple:  "from-purple-50 to-purple-100/50 text-purple-700",
-    amber:   "from-amber-50  to-amber-100/50  text-amber-700",
-    emerald: "from-emerald-50 to-emerald-100/50 text-emerald-700",
-    red:     "from-red-50    to-red-100/50    text-red-700",
-    teal:    "from-teal-50   to-teal-100/50   text-teal-700",
-  };
+const StatCard = ({ icon: Icon, label, value, color }) => {
   return (
-    <div className={`bg-linear-to-br ${colors[color] || colors.stone} border border-white rounded-2xl p-5 shadow-sm`}>
-      <Icon size={20} className="mb-2 opacity-70" />
-      <div className="text-2xl font-bold" style={{ fontFamily:"Fraunces,serif" }}>{value}</div>
-      <div className="text-xs font-medium opacity-70 mt-0.5">{label}</div>
+    <div className="flex flex-col justify-center items-center h-full group bg-linear-to-br from-zinc-800 to-zinc-900 border border-zinc-700 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+      
+      <div className="flex items-center justify-between mb-3">
+        <div className={`p-2 rounded-xl text-${color}-600`}>
+          <Icon size={18} />
+        </div>
+      </div>
+
+      <div className="text-2xl font-semibold text-white">
+        {value}
+      </div>
+
+      <div className="text-sm text-stone-500 mt-1">
+        {label}
+      </div>
     </div>
   );
-}
+};
 
 function ActionBtn({ onClick, title, icon: Icon, color, disabled, spinning }) {
   const colors = {
@@ -566,13 +618,13 @@ function ActionBtn({ onClick, title, icon: Icon, color, disabled, spinning }) {
 }
 
 function Th({ children }) {
-  return <th className="px-4 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wide whitespace-nowrap">{children}</th>;
+  return <th className="px-4 py-3 text-left text-xs border-b border-b-zinc-700 font-semibold text-stone-400 uppercase tracking-wide whitespace-nowrap">{children}</th>;
 }
 
 function PageBtn({ onClick, disabled, label }) {
   return (
     <button onClick={onClick} disabled={disabled}
-      className="w-9 h-9 rounded-xl bg-white border border-stone-200 text-stone-600 text-sm hover:bg-stone-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+      className="w-9 h-9 rounded-xl bg-linear-to-br from-zinc-800 to-zinc-900 border border-zinc-700 text-white text-sm hover:bg-zinc-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
       {label}
     </button>
   );

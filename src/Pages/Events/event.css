@@ -7,3 +7,12 @@
 [data-theme="light"] .border-gray-700 {
   border: none !important;
 }
+
+[data-theme="light"] .border-b-zinc-700 {
+  border-color: #7e7e80 !important;
+}
+
+[data-theme="light"] .divide-zinc-700 > :not([hidden]) ~ :not([hidden]) {
+  border-top-width: 1px !important;
+  border-top-color: rgba(126, 126, 128, 0.4) !important;
+}
