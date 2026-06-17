@@ -386,3 +386,8 @@ body {
 [data-theme="light"] .mix:hover {
   background-color: #f4f4f5 !important;
 }
+
+[data-theme="light"] .bg-zinc-500 {
+  background-color: #f4f4f5 !important;
+}
+

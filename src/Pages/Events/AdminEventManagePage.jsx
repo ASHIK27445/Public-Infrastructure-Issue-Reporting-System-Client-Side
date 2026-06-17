@@ -117,7 +117,7 @@ export default function AdminEventManagePage() {
     toast.warn(
       <div className="space-y-2">
         <p className="text-sm font-medium text-stone-800">Remove <span className="font-bold">{name}</span>?</p>
-        <p className="text-sm text-white">If they paid, they'll be refunded automatically.</p>
+        <p className="text-sm text-black">If they paid, they'll be refunded automatically.</p>
         <div className="flex gap-2">
           <button
             onClick={async () => {
@@ -139,7 +139,7 @@ export default function AdminEventManagePage() {
           </button>
           <button
             onClick={() => toast.dismiss()}
-            className="px-3 py-1 rounded-lg text-sm font-semibold bg-zinc-700 hover:bg-stone-200 text-white transition-colors"
+            className="px-3 py-1 rounded-lg text-sm font-semibold bg-zinc-700 hover:bg-stone-500 text-white transition-colors"
           >
             Cancel
           </button>
@@ -161,19 +161,19 @@ export default function AdminEventManagePage() {
         {/* Header skeleton */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="space-y-3">
-            <div className="h-3 bg-stone-200 rounded-full w-20" />
+            <div className="h-3 bg-zinc-800 rounded-full w-20" />
             <div className="flex items-center gap-3">
-              <div className="w-6 h-6 bg-stone-200 rounded-full" />
-              <div className="h-7 bg-stone-200 rounded-xl w-64" />
-              <div className="h-6 bg-stone-200 rounded-full w-20" />
+              <div className="w-6 h-6 bg-zinc-800 rounded-full" />
+              <div className="h-7 bg-zinc-800 rounded-xl w-64" />
+              <div className="h-6 bg-zinc-800 rounded-full w-20" />
             </div>
-            <div className="h-3 bg-stone-200 rounded-full w-80" />
+            <div className="h-3 bg-zinc-800 rounded-full w-80" />
           </div>
           <div className="flex gap-2">
-            <div className="h-9 bg-stone-200 rounded-xl w-28" />
-            <div className="h-9 bg-stone-200 rounded-xl w-20" />
-            <div className="h-9 bg-stone-200 rounded-xl w-28" />
-            <div className="h-9 bg-stone-200 rounded-xl w-24" />
+            <div className="h-9 bg-zinc-800 rounded-xl w-28" />
+            <div className="h-9 bg-zinc-800 rounded-xl w-20" />
+            <div className="h-9 bg-zinc-800 rounded-xl w-28" />
+            <div className="h-9 bg-zinc-800 rounded-xl w-24" />
           </div>
         </div>
 
@@ -181,18 +181,18 @@ export default function AdminEventManagePage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           {Array.from({ length: 7 }).map((_, i) => (
             <div key={i} className="bg-zinc-700 rounded-2xl p-3 space-y-2">
-              <div className="h-6 bg-stone-200 rounded-lg w-10 mx-auto" />
-              <div className="h-2.5 bg-stone-200 rounded-full w-14 mx-auto" />
+              <div className="h-6 bg-zinc-700 rounded-lg w-10 mx-auto" />
+              <div className="h-2.5 bg-zinc-700 rounded-full w-14 mx-auto" />
             </div>
           ))}
         </div>
 
         {/* Tabs + Table skeleton */}
-        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+        <div className="bg-zinc-700 rounded-2xl border border-zinc-700 overflow-hidden">
           {/* Tab bar */}
           <div className="flex gap-1 px-4 py-3 border-b border-zinc-700">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-8 bg-zinc-700 rounded-lg w-32" />
+              <div key={i} className="h-8 bg-zinc-500 rounded-lg w-32" />
             ))}
           </div>
 
@@ -200,18 +200,18 @@ export default function AdminEventManagePage() {
           <div className="p-6 space-y-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4">
-                <div className="w-8 h-8 bg-zinc-700 rounded-full shrink-0" />
+                <div className="w-8 h-8 bg-zinc-500 rounded-full shrink-0" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-3 bg-zinc-700 rounded-full w-40" />
-                  <div className="h-2.5 bg-zinc-700 rounded-full w-24" />
+                  <div className="h-3 bg-zinc-500 rounded-full w-40" />
+                  <div className="h-2.5 bg-zinc-500 rounded-full w-24" />
                 </div>
-                <div className="h-3 bg-zinc-700 rounded-full w-28" />
-                <div className="h-3 bg-zinc-700 rounded-full w-20" />
-                <div className="h-6 bg-zinc-700 rounded-full w-16" />
-                <div className="h-3 bg-zinc-700 rounded-full w-12" />
+                <div className="h-3 bg-zinc-500 rounded-full w-28" />
+                <div className="h-3 bg-zinc-500 rounded-full w-20" />
+                <div className="h-6 bg-zinc-500 rounded-full w-16" />
+                <div className="h-3 bg-zinc-500 rounded-full w-12" />
                 <div className="flex gap-1">
-                  <div className="w-7 h-7 bg-zinc-700 rounded-lg" />
-                  <div className="w-7 h-7 bg-zinc-700 rounded-lg" />
+                  <div className="w-7 h-7 bg-zinc-500 rounded-lg" />
+                  <div className="w-7 h-7 bg-zinc-500 rounded-lg" />
                 </div>
               </div>
             ))}
@@ -313,7 +313,7 @@ export default function AdminEventManagePage() {
             className={`flex items-center gap-2 px-5 py-3.5 lg:py-5 text-sm lg:text-base font-medium whitespace-nowrap border-b-2 transition-all ${
               activeTab===tab.id
                 ? "border-emerald-500 text-emerald-600 bg-zinc-700"
-                : "border-transparent text-white hover:text-white hover:bg-gray-700"
+                : "border-transparent text-white hover:text-white mix hover:bg-zinc-800"
             }`}>
             {tab.icon}
             <span>{tab.label}</span>
@@ -1424,7 +1424,7 @@ function ei() {
 }
 
 function Th({ children }) {
-  return <th className="px-4 py-2.5 text-left text-sm font-semibold text-stone-400 uppercase tracking-wide whitespace-nowrap">{children}</th>;
+  return <th className="px-4 py-2.5 text-left text-sm font-semibold text-white uppercase tracking-wide whitespace-nowrap">{children}</th>;
 }
 function Td({ children }) {
   return <td className="px-4 py-3 align-top">{children}</td>;
