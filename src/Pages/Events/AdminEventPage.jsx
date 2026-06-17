@@ -566,7 +566,7 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
         title="View public page"  icon={Eye}                              />
         <ActionBtn onClick={() => navigate(`/admin/events/${event._id}/manage`)} 
         title="Manage volunteers" icon={Settings2} color="blue"          />
-        <ActionBtn onClick={() => navigate(`/admin/events/edit/${event._id}`)}   
+        <ActionBtn onClick={() => navigate(`/dashboard/admin/events/edit/${event._id}`)}   
         title="Edit event"        icon={Pencil}    color="amber"         />
         <ActionBtn onClick={() => onDelete(event._id, event.title)}              
         title="Delete event" icon={deleting ? Loader2 : Trash2} color="red" 

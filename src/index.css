@@ -382,3 +382,7 @@ body {
 [data-theme='light'] .custom-text{
   color: whitesmoke !important;
 }
+
+[data-theme="light"] .mix:hover {
+  background-color: #f4f4f5 !important;
+}

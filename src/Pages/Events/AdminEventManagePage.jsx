@@ -30,7 +30,7 @@ const STATUS_NEXT = {
   completed:[], cancelled:[],
 };
 const PAYMENT_BADGE = {
-  "not-required": { bg:"bg-stone-100", text:"text-stone-500", label:"Free"     },
+  "not-required": { bg:"bg-zinc-700", text:"text-white", label:"Free"     },
   "pending":      { bg:"bg-amber-100", text:"text-amber-700", label:"Pending"  },
   "paid":         { bg:"bg-green-100", text:"text-green-700", label:"Paid"     },
   "refunded":     { bg:"bg-blue-100",  text:"text-blue-700",  label:"Refunded" },
@@ -91,7 +91,7 @@ export default function AdminEventManagePage() {
                 setStatusUpdating(false);
               }
             }}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold text-white transition-colors ${
+            className={`px-3 py-1 rounded-lg text-sm font-semibold text-white transition-colors ${
               isCancel ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
             }`}
           >
@@ -99,7 +99,7 @@ export default function AdminEventManagePage() {
           </button>
           <button
             onClick={() => toast.dismiss()}
-            className="px-3 py-1 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
+            className="px-3 py-1 rounded-lg text-sm font-semibold bg-zinc-700 hover:bg-stone-200 text-white transition-colors"
           >
             Dismiss
           </button>
@@ -117,7 +117,7 @@ export default function AdminEventManagePage() {
     toast.warn(
       <div className="space-y-2">
         <p className="text-sm font-medium text-stone-800">Remove <span className="font-bold">{name}</span>?</p>
-        <p className="text-xs text-stone-500">If they paid, they'll be refunded automatically.</p>
+        <p className="text-sm text-white">If they paid, they'll be refunded automatically.</p>
         <div className="flex gap-2">
           <button
             onClick={async () => {
@@ -133,13 +133,13 @@ export default function AdminEventManagePage() {
                 toast.error(err.response?.data?.message || "Remove failed");
               }
             }}
-            className="px-3 py-1 rounded-lg text-xs font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors"
+            className="px-3 py-1 rounded-lg text-sm font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors"
           >
             Yes, Remove
           </button>
           <button
             onClick={() => toast.dismiss()}
-            className="px-3 py-1 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
+            className="px-3 py-1 rounded-lg text-sm font-semibold bg-zinc-700 hover:bg-stone-200 text-white transition-colors"
           >
             Cancel
           </button>
@@ -180,7 +180,7 @@ export default function AdminEventManagePage() {
         {/* Stats bar skeleton */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           {Array.from({ length: 7 }).map((_, i) => (
-            <div key={i} className="bg-stone-100 rounded-2xl p-3 space-y-2">
+            <div key={i} className="bg-zinc-700 rounded-2xl p-3 space-y-2">
               <div className="h-6 bg-stone-200 rounded-lg w-10 mx-auto" />
               <div className="h-2.5 bg-stone-200 rounded-full w-14 mx-auto" />
             </div>
@@ -190,9 +190,9 @@ export default function AdminEventManagePage() {
         {/* Tabs + Table skeleton */}
         <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
           {/* Tab bar */}
-          <div className="flex gap-1 px-4 py-3 border-b border-stone-100">
+          <div className="flex gap-1 px-4 py-3 border-b border-zinc-700">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-8 bg-stone-100 rounded-lg w-32" />
+              <div key={i} className="h-8 bg-zinc-700 rounded-lg w-32" />
             ))}
           </div>
 
@@ -200,18 +200,18 @@ export default function AdminEventManagePage() {
           <div className="p-6 space-y-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4">
-                <div className="w-8 h-8 bg-stone-100 rounded-full shrink-0" />
+                <div className="w-8 h-8 bg-zinc-700 rounded-full shrink-0" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-3 bg-stone-100 rounded-full w-40" />
-                  <div className="h-2.5 bg-stone-100 rounded-full w-24" />
+                  <div className="h-3 bg-zinc-700 rounded-full w-40" />
+                  <div className="h-2.5 bg-zinc-700 rounded-full w-24" />
                 </div>
-                <div className="h-3 bg-stone-100 rounded-full w-28" />
-                <div className="h-3 bg-stone-100 rounded-full w-20" />
-                <div className="h-6 bg-stone-100 rounded-full w-16" />
-                <div className="h-3 bg-stone-100 rounded-full w-12" />
+                <div className="h-3 bg-zinc-700 rounded-full w-28" />
+                <div className="h-3 bg-zinc-700 rounded-full w-20" />
+                <div className="h-6 bg-zinc-700 rounded-full w-16" />
+                <div className="h-3 bg-zinc-700 rounded-full w-12" />
                 <div className="flex gap-1">
-                  <div className="w-7 h-7 bg-stone-100 rounded-lg" />
-                  <div className="w-7 h-7 bg-stone-100 rounded-lg" />
+                  <div className="w-7 h-7 bg-zinc-700 rounded-lg" />
+                  <div className="w-7 h-7 bg-zinc-700 rounded-lg" />
                 </div>
               </div>
             ))}
@@ -223,7 +223,7 @@ export default function AdminEventManagePage() {
 
   if (!data?.event) return (
     <Shell>
-      <div className="text-center py-20 text-stone-500">Event not found.</div>
+      <div className="text-center py-20 text-white">Event not found.</div>
     </Shell>
   );
 
@@ -236,18 +236,18 @@ export default function AdminEventManagePage() {
       <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
           <button onClick={() => navigate("/admin/events")}
-            className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-800 mb-3 transition-colors">
+            className="flex items-center gap-1.5 text-sm text-white hover:text-stone-800 mb-3 transition-colors">
             <ArrowLeft size={15} />
             All Events
           </button>
           <div className="flex items-center gap-3 flex-wrap">
-            {(() => { const TIcon = TYPE_ICON[event.eventType]; return TIcon ? <TIcon size={22} className="text-stone-600" /> : <CalendarDays size={22} className="text-stone-600" />; })()}
-            <h1 className="text-2xl font-bold text-stone-900" style={{ fontFamily:"Fraunces,serif" }}>
+            {(() => { const TIcon = TYPE_ICON[event.eventType]; return TIcon ? <TIcon size={22} className="text-white" /> : <CalendarDays size={22} className="text-white" />; })()}
+            <h1 className="text-2xl font-bold text-white" style={{ fontFamily:"Fraunces,serif" }}>
               {event.title}
             </h1>
             <StatusPill status={event.status} />
           </div>
-          <p className="text-stone-500 text-sm mt-1">
+          <p className="text-white text-sm mt-1">
             {format(new Date(event.date), "EEEE, dd MMM yyyy · h:mm a")} · {event.location?.address}
           </p>
         </div>
@@ -255,12 +255,12 @@ export default function AdminEventManagePage() {
         {/* Quick actions */}
         <div className="flex items-center gap-2 flex-wrap">
           <Link to={`/events/${event._id}`}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 text-white text-sm font-medium hover:bg-stone-50 transition-colors">
             <Globe size={14} /> Public Page
           </Link>
           <button
             onClick={() => setActiveTab("edit")}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 text-white text-sm font-medium hover:bg-stone-50 transition-colors">
             <Pencil size={14} /> Edit
           </button>
           <Link to={`/admin/events/${event._id}/checkin`}
@@ -299,26 +299,26 @@ export default function AdminEventManagePage() {
       </div>
 
       {/* ── Tabs ── */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
-        <div className="flex border-b border-stone-100 overflow-x-auto">
+      <div className="bg-linear-to-br from-zinc-800 to-zinc-900 rounded-2xl border border-zinc-800 shadow-sm overflow-hidden">
+        <div className="flex border-b border-zinc-700 overflow-x-auto">
         {[
-          { id:"volunteers", label:"Confirmed Volunteers", icon:<CheckCircle2 size={14} />, count: stats.confirmedCount },
-          { id:"waitlist",   label:"Waitlist",             icon:<Clock size={14} />,        count: stats.waitlistCount  },
-          { id:"donations",  label:"Donations",            icon:<Wallet size={14} />,       count: stats.donorCount, show: event.fundGoal > 0 },
-          { id:"free",       label:"Free Participants",    icon:<Ticket size={14} />,       count: stats.freeParticipantCount, show: event.isFreeParticipate },
-          { id:"edit",       label:"Edit Event",           icon:<Pencil size={14} />        },
-          { id:"spending",   label:"Spending",             icon:<BarChart2 size={14} />,    show: event.status === "completed" },
+          { id:"volunteers", label:"Confirmed Volunteers", icon:<CheckCircle2 size={18} />, count: stats.confirmedCount },
+          { id:"waitlist",   label:"Waitlist",             icon:<Clock size={18} />,        count: stats.waitlistCount  },
+          { id:"donations",  label:"Donations",            icon:<Wallet size={18} />,       count: stats.donorCount, show: event.fundGoal > 0 },
+          { id:"free",       label:"Free Participants",    icon:<Ticket size={18} />,       count: stats.freeParticipantCount, show: event.isFreeParticipate },
+          { id:"edit",       label:"Edit Event",           icon:<Pencil size={18} />        },
+          { id:"spending",   label:"Spending",             icon:<BarChart2 size={18} />,    show: event.status === "completed" },
         ].filter(t => t.show !== false).map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
+            className={`flex items-center gap-2 px-5 py-3.5 lg:py-5 text-sm lg:text-base font-medium whitespace-nowrap border-b-2 transition-all ${
               activeTab===tab.id
-                ? "border-green-500 text-green-600 bg-green-50/50"
-                : "border-transparent text-stone-500 hover:text-stone-700 hover:bg-stone-50"
+                ? "border-emerald-500 text-emerald-600 bg-zinc-700"
+                : "border-transparent text-white hover:text-white hover:bg-gray-700"
             }`}>
             {tab.icon}
             <span>{tab.label}</span>
             {tab.count > 0 && (
-              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${activeTab===tab.id ? "bg-green-100 text-green-700" : "bg-stone-100 text-stone-500"}`}>
+              <span className={`text-sm font-bold px-1.5 py-0.5 rounded-full ${activeTab===tab.id ? "bg-emerald-100 text-emerald-700" : "bg-zinc-700 text-white"}`}>
                 {tab.count}
               </span>
             )}
@@ -438,18 +438,18 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
           placeholder="Search by name, email, institution..."
           className="flex-1 min-w-50 px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100" />
         <button onClick={exportCSV}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-zinc-700 text-white text-sm font-medium hover:bg-stone-50 transition-colors">
           <Download size={14} />
           Export CSV
         </button>
-        <span className="text-xs text-stone-400">{filtered.length} shown</span>
+        <span className="text-sm text-white">{filtered.length} shown</span>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-stone-100">
+      <div className="overflow-x-auto rounded-2xl border border-zinc-700">
         <table className="w-full">
           <thead>
-            <tr className="bg-stone-50 border-b border-stone-100">
+            <tr className="bg-zinc-700 border-b border-zinc-700">
               {isWaitlist && <Th>#</Th>}
               <Th>Volunteer</Th>
               <Th>Contact</Th>
@@ -464,34 +464,34 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
           <tbody className="divide-y divide-stone-50">
             {filtered.map((v) => (
               <>
-                <tr key={v?._id} className="hover:bg-stone-50/60 transition-colors">
+                <tr key={v?._id} className="mix hover:bg-zinc-800 transition-colors">
                   {isWaitlist && (
                     <Td>
-                      <span className="w-7 h-7 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center">
+                      <span className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-sm font-bold flex items-center justify-center">
                         {v.waitlistPosition}
                       </span>
                     </Td>
                   )}
                   <Td>
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs shrink-0 overflow-hidden">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-sm shrink-0 overflow-hidden">
                         {v.userPhoto
                           ? <img src={v.userPhoto} alt={v.name} className="w-full h-full object-cover rounded-full" />
                           : v.name?.[0]?.toUpperCase()
                         }
                       </div>
                       <div>
-                        <p className="font-medium text-stone-800 text-sm">{v.name}</p>
-                        <p className="text-xs text-stone-400 capitalize">{v.role} · {v.ageGroup}</p>
+                        <p className="font-medium text-white text-sm">{v.name}</p>
+                        <p className="text-sm text-stone-400 capitalize">{v.role} · {v.ageGroup}</p>
                       </div>
                     </div>
                   </Td>
                   <Td>
-                    <p className="text-xs text-stone-700">{v.email}</p>
-                    <p className="text-xs text-stone-400">{v.phone}</p>
+                    <p className="text-sm text-white">{v.email}</p>
+                    <p className="text-sm text-stone-400">{v.phone}</p>
                   </Td>
                   <Td>
-                    <p className="text-xs text-stone-700">{v.institution || "—"}</p>
+                    <p className="text-sm text-white">{v.institution || "—"}</p>
                   </Td>
                   <Td>
                     <div className="flex flex-wrap gap-1">
@@ -499,7 +499,7 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
                         ? v.skills.slice(0,3).map((s) => (
                           <span key={s} className="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">{s}</span>
                         ))
-                        : <span className="text-xs text-stone-300">—</span>}
+                        : <span className="text-sm text-stone-300">—</span>}
                       {v.skills?.length > 3 && <span className="text-[10px] text-stone-400">+{v.skills.length-3}</span>}
                     </div>
                   </Td>
@@ -511,16 +511,16 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
                   {showAttended && (
                     <Td>
                       {v.attended ? (
-                        <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                        <span className="inline-flex items-center gap-1 text-sm bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
                           <CheckCircle2 size={11} /> Yes
                         </span>
                       ) : (
-                        <span className="text-xs text-stone-300">—</span>
+                        <span className="text-sm text-stone-300">—</span>
                       )}
                     </Td>
                   )}
                   <Td>
-                    <p className="text-xs text-stone-500">{format(new Date(v.createdAt),"dd MMM")}</p>
+                    <p className="text-sm text-white">{format(new Date(v.createdAt),"dd MMM")}</p>
                     <p className="text-[10px] text-stone-400">{formatDistanceToNow(new Date(v.createdAt), { addSuffix:true })}</p>
                   </Td>
                   <Td>
@@ -541,18 +541,18 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
 
                 {/* Expanded QR row */}
                 {expanded === v._id && !isWaitlist && (
-                  <tr key={`${v._id}-expanded`} className="bg-blue-50/30">
+                  <tr key={`${v._id}-expanded`} className="bg-zinc-700">
                     <td colSpan={99} className="px-6 py-4">
                       <div className="flex items-center gap-6 flex-wrap">
-                        <div className="bg-white rounded-2xl p-3 border border-stone-200 shadow-sm">
+                        <div className="bg-white rounded-2xl p-3 border border-zinc-800 shadow-sm">
                           <QRCodeCanvas value={v.qrToken} size={100} level="M" />
                         </div>
                         <div className="space-y-1">
-                          <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide">QR Token</p>
-                          <code className="text-xs font-mono bg-stone-100 px-2 py-1 rounded text-stone-600 break-all block max-w-xs">
+                          <p className="text-sm font-semibold text-white uppercase tracking-wide">QR Token</p>
+                          <code className="text-sm font-mono bg-transparent px-2 py-1 rounded text-white break-all block max-w-xs">
                             {v.qrToken}
                           </code>
-                          <p className="text-xs text-stone-400 mt-1">Used for attendance check-in at the event</p>
+                          <p className="text-sm text-stone-400 mt-1">Used for attendance check-in at the event</p>
                         </div>
                       </div>
                     </td>
@@ -579,7 +579,7 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
         <div className="flex justify-between items-end mb-3">
           <div>
             <p className="text-2xl font-bold text-emerald-700">৳{(totalDonated||0).toLocaleString()}</p>
-            <p className="text-xs text-emerald-600">{donations.length} donations · Goal: ৳{fundGoal.toLocaleString()}</p>
+            <p className="text-sm text-emerald-600">{donations.length} donations · Goal: ৳{fundGoal.toLocaleString()}</p>
           </div>
           <p className="text-3xl font-bold text-emerald-200">{fundPercent}%</p>
         </div>
@@ -592,10 +592,10 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
       {donations.length === 0 ? (
         <div className="text-center py-12 text-stone-400 text-sm">No donations yet</div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-stone-100">
+        <div className="overflow-x-auto rounded-2xl border border-zinc-700">
           <table className="w-full">
             <thead>
-              <tr className="bg-stone-50 border-b border-stone-100">
+              <tr className="bg-stone-50 border-b border-zinc-700">
                 <Th>Donor</Th>
                 <Th>Email</Th>
                 <Th>Amount</Th>
@@ -608,7 +608,7 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
                 <tr key={d._id} className="hover:bg-stone-50/50">
                   <Td>
                     <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs overflow-hidden">
+                    <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-sm overflow-hidden">
                       {d.anonymous
                         ? "?"
                         : d.userPhoto
@@ -621,14 +621,14 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
                       </span>
                     </div>
                   </Td>
-                  <Td><span className="text-xs text-stone-500">{d.anonymous ? "—" : (d.donorEmail || "—")}</span></Td>
+                  <Td><span className="text-sm text-white">{d.anonymous ? "—" : (d.donorEmail || "—")}</span></Td>
                   <Td><span className="font-bold text-emerald-700 text-sm">৳{d.amount.toLocaleString()}</span></Td>
                   <Td>
-                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${d.anonymous ? "bg-stone-100 text-stone-600" : "bg-green-100 text-green-700"}`}>
+                    <span className={`text-sm font-medium px-2 py-1 rounded-full ${d.anonymous ? "bg-zinc-700 text-stone-600" : "bg-green-100 text-green-700"}`}>
                       {d.anonymous ? "Yes" : "No"}
                     </span>
                   </Td>
-                  <Td><span className="text-xs text-stone-500">{format(new Date(d.createdAt),"dd MMM yyyy, h:mm a")}</span></Td>
+                  <Td><span className="text-sm text-white">{format(new Date(d.createdAt),"dd MMM yyyy, h:mm a")}</span></Td>
                 </tr>
               ))}
             </tbody>
@@ -662,7 +662,7 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
     toast.warn(
       <div className="space-y-2">
         <p className="text-sm font-medium text-stone-800">Remove <span className="font-bold">{name}</span>?</p>
-        <p className="text-xs text-stone-500">This free participant will be permanently removed.</p>
+        <p className="text-sm text-white">This free participant will be permanently removed.</p>
         <div className="flex gap-2">
           <button
             onClick={async () => {
@@ -677,13 +677,13 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
                 toast.error(err.response?.data?.message || "Remove failed");
               }
             }}
-            className="px-3 py-1 rounded-lg text-xs font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors"
+            className="px-3 py-1 rounded-lg text-sm font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors"
           >
             Yes, Remove
           </button>
           <button
             onClick={() => toast.dismiss()}
-            className="px-3 py-1 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
+            className="px-3 py-1 rounded-lg text-sm font-semibold bg-gray-700 text-white hover:bg-gray-800 transition-colors"
           >
             Cancel
           </button>
@@ -726,19 +726,19 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
         <input type="text" value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, email, phone..."
-          className="flex-1 min-w-50 px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100" />
+          className="flex-1 min-w-50 px-3 py-2 rounded-xl border border-zinc-700 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100" />
         <button onClick={exportCSV}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-zinc-700 text-white text-sm font-medium hover:mix transition-colors">
           <Download size={14} />
           Export CSV
         </button>
-        <span className="text-xs text-stone-400">{filtered.length} shown</span>
+        <span className="text-sm text-white">{filtered.length} shown</span>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-stone-100">
+      <div className="overflow-x-auto rounded-2xl border border-zinc-700">
         <table className="w-full">
           <thead>
-            <tr className="bg-stone-50 border-b border-stone-100">
+            <tr className="mix border-b border-zinc-700">
               <Th>#</Th>
               <Th>Name</Th>
               <Th>Contact</Th>
@@ -750,42 +750,42 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
           <tbody className="divide-y divide-stone-50">
             {filtered.map((p, i) => (
               <>
-                <tr key={p._id} className="hover:bg-stone-50/60 transition-colors">
+                <tr key={p._id} className="mix hover:bg-zinc-800 transition-colors">
                   <Td>
-                    <span className="w-6 h-6 rounded-full bg-stone-100 text-stone-500 text-xs font-bold flex items-center justify-center">
+                    <span className="w-6 h-6 rounded-full bg-zinc-700 text-white text-sm font-bold flex items-center justify-center">
                       {i + 1}
                     </span>
                   </Td>
                   <Td>
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-xs shrink-0">
+                      <div className="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 font-bold text-sm shrink-0">
                         {p.name?.[0]?.toUpperCase()}
                       </div>
-                      <p className="text-sm font-medium text-stone-800">{p.name}</p>
+                      <p className="text-sm font-medium text-white">{p.name}</p>
                     </div>
                   </Td>
                   <Td>
-                    <p className="text-xs text-stone-700">{p.email}</p>
-                    <p className="text-xs text-stone-400">{p.phone}</p>
+                    <p className="text-sm text-white">{p.email}</p>
+                    <p className="text-sm text-stone-400">{p.phone}</p>
                   </Td>
                   <Td>
                     {p.attended ? (
-                      <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                      <span className="inline-flex items-center gap-1 text-sm bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
                         <CheckCircle2 size={11} /> Yes
                       </span>
                     ) : (
-                      <span className="text-xs text-stone-300">—</span>
+                      <span className="text-sm text-stone-300">—</span>
                     )}
                   </Td>
                   <Td>
-                    <p className="text-xs text-stone-500">{format(new Date(p.createdAt), "dd MMM")}</p>
+                    <p className="text-sm text-white">{format(new Date(p.createdAt), "dd MMM")}</p>
                     <p className="text-[10px] text-stone-400">{formatDistanceToNow(new Date(p.createdAt), { addSuffix: true })}</p>
                   </Td>
                   <Td>
                     <div className="flex gap-1">
                       <button onClick={() => setExpanded(expanded === p._id ? null : p._id)}
                         title="View QR"
-                        className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-800 hover:bg-blue-50 hover:text-blue-600 transition-all">
+                        className="w-7 h-7 flex items-center justify-center rounded-lg text-white hover:bg-white hover:text-blue-600 transition-all">
                         <QrCode size={14} />
                       </button>
                       <button onClick={() => handleRemove(p._id, p.name)}
@@ -798,18 +798,18 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
                 </tr>
 
                 {expanded === p._id && (
-                  <tr key={`${p._id}-expanded`} className="bg-blue-50/30">
+                  <tr key={`${p._id}-expanded`} className="bg-zinc-800">
                     <td colSpan={99} className="px-6 py-4">
                       <div className="flex items-center gap-6 flex-wrap">
-                        <div className="bg-white rounded-2xl p-3 border border-stone-200 shadow-sm">
+                        <div className="bg-white rounded-2xl p-3 border border-zinc-800 shadow-sm">
                           <QRCodeCanvas value={p.qrToken} size={100} level="M" />
                         </div>
                         <div className="space-y-1">
-                          <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide">QR Token</p>
-                          <code className="text-xs font-mono bg-stone-100 px-2 py-1 rounded text-stone-600 break-all block max-w-xs">
+                          <p className="text-sm font-semibold text-white uppercase tracking-wide">QR Token</p>
+                          <code className="text-sm font-mono bg-zinc-700 px-2 py-1 rounded text-white break-all block max-w-xs">
                             {p.qrToken}
                           </code>
-                          <p className="text-xs text-stone-400 mt-1">Used for attendance check-in at the event</p>
+                          <p className="text-sm text-stone-400 mt-1">Used for attendance check-in at the event</p>
                         </div>
                       </div>
                     </td>
@@ -996,18 +996,18 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
 
         <EditSection icon={Image} title="Cover Preview" subtitle="Banner image">
           {form.coverImage ? (
-            <div className="relative rounded-xl overflow-hidden border border-stone-200 h-36 bg-stone-100">
+            <div className="relative rounded-xl overflow-hidden border border-zinc-700 h-36 bg-zinc-700">
               <img src={form.coverImage} alt="Cover"
                 className="w-full h-full object-cover"
                 onError={(e) => { e.target.style.display = "none"; }} />
-              <span className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm flex items-center gap-1">
+              <span className="absolute bottom-2 right-2 bg-zinc-800 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm flex items-center gap-1">
                 <Eye size={10} /> Preview
               </span>
             </div>
           ) : (
-            <div className="h-36 rounded-xl border-2 border-dashed border-stone-200 flex flex-col items-center justify-center text-stone-300 gap-2">
+            <div className="h-36 rounded-xl border-2 border-dashed border-zinc-700 flex flex-col items-center justify-center gap-2">
               <EyeOff size={28} />
-              <span className="text-xs">No image URL set</span>
+              <span className="text-sm">No image URL set</span>
             </div>
           )}
         </EditSection>
@@ -1022,7 +1022,7 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
           {form.equipmentList && (
             <div className="flex flex-wrap gap-1.5 mt-2">
               {form.equipmentList.split(",").map(s => s.trim()).filter(Boolean).map((item, i) => (
-                <span key={i} className="text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full font-medium">
+                <span key={i} className="text-[10px] bg-zinc-700 text-white px-2 py-0.5 rounded-full font-medium">
                   {item}
                 </span>
               ))}
@@ -1065,7 +1065,7 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
             />
 
             {form.hasEventLogs && (
-              <div className="space-y-2 mt-2">
+              <div className="space-y-2 mt-2 text-black">
                 {form.eventLogs.map((log, i) => (
                   <div key={i} className="flex gap-2 items-start">
                     <div className="flex flex-col gap-1.5 flex-1">
@@ -1104,7 +1104,7 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
                     </div>
                     <button
                       onClick={() => setF("eventLogs", form.eventLogs.filter((_, idx) => idx !== i))}
-                      className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-red-50 text-stone-400 hover:text-red-500 transition-all mt-1 shrink-0">
+                      className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-zinc-800 text-stone-400 hover:text-red-500 transition-all mt-1 shrink-0">
                       <X size={14} />
                     </button>
                   </div>
@@ -1114,13 +1114,13 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setF("eventLogs", [...form.eventLogs, { time: "", title: "", description: "" }])}
-                    className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-stone-300 text-stone-500 text-xs font-medium hover:bg-stone-50 transition-colors justify-center">
+                    className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-zinc-800 text-white text-sm font-medium mix hover:bg-white hover:text-black transition-colors justify-center">
                     <Plus size={13} /> Add Timeline Entry
                   </button>
                   {form.eventLogs.length > 0 && (
                     <button
                       onClick={() => setF("eventLogs", [])}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-red-200 text-red-400 text-xs font-medium hover:bg-red-50 transition-colors justify-center shrink-0">
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-red-200 text-red-400 text-sm font-medium hover:bg-red-50 transition-colors justify-center shrink-0">
                       <Trash2 size={13} /> Remove All
                     </button>
                   )}
@@ -1194,7 +1194,7 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
                         <div className={`w-8 h-4 rounded-full transition-colors ${guest.isMainGuest ? "bg-amber-500" : "bg-stone-300"}`} />
                         <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${guest.isMainGuest ? "translate-x-4" : ""}`} />
                       </div>
-                      <span className="text-xs font-medium text-stone-600">Chief / Main Guest</span>
+                      <span className="text-sm font-medium text-stone-600">Chief / Main Guest</span>
                     </label>
                   </div>
                 ))}
@@ -1203,13 +1203,13 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setF("specialGuests", [...form.specialGuests, { name: "", designation: "", organization: "", photo: "", isMainGuest: false }])}
-                    className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-stone-300 text-stone-500 text-xs font-medium hover:bg-stone-50 transition-colors justify-center">
+                    className="flex-1 flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-stone-300 text-white text-sm font-medium hover:bg-stone-50 transition-colors justify-center">
                     <Plus size={13} /> Add Guest
                   </button>
                   {form.specialGuests.length > 0 && (
                     <button
                       onClick={() => setF("specialGuests", [])}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-red-200 text-red-400 text-xs font-medium hover:bg-red-50 transition-colors justify-center shrink-0">
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-red-200 text-red-400 text-sm font-medium hover:bg-red-50 transition-colors justify-center shrink-0">
                       <Trash2 size={14} /> Remove All
                     </button>
                   )}
@@ -1221,8 +1221,8 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
       </div>
 
       {/* ── Save bar ── */}
-      <div className="flex items-center justify-between py-3 border-t border-stone-100">
-        <p className="text-xs text-stone-400">
+      <div className="flex items-center justify-between py-3 border-t border-zinc-700">
+        <p className="text-sm text-stone-400">
           Last updated: {format(new Date(event.updatedAt || event.createdAt), "dd MMM yyyy, h:mm a")}
         </p>
         <button onClick={handleSave} disabled={saving}
@@ -1240,15 +1240,23 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
 /* ── Section wrapper ── */
 function EditSection({ icon: Icon, title, subtitle, children }) {
   return (
-    <div className="rounded-2xl border border-stone-100 overflow-hidden">
-      <div className="flex items-center gap-2.5 px-4 py-3 border-b border-stone-100 bg-stone-50">
-        <Icon size={15} className="text-stone-400 shrink-0" />
+    <div className="rounded-2xl border border-zinc-700 overflow-hidden">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-700 bg-zinc-700">
+        
+        <div className="w-7 h-7 flex items-center justify-center rounded-md bg-zinc-700">
+          <Icon size={15} className="text-white" />
+        </div>
+
         <div>
-          <p className="text-sm font-semibold text-stone-800">{title}</p>
-          {subtitle && <p className="text-[11px] text-stone-400 leading-tight">{subtitle}</p>}
+          <p className="text-sm font-semibold text-white">{title}</p>
+          {subtitle && (
+            <p className="text-[11px] text-stone-400 leading-tight">
+              {subtitle}
+            </p>
+          )}
         </div>
       </div>
-      <div className="p-4 bg-white">{children}</div>
+      <div className="p-4 bg-zinc-700 text-black">{children}</div>
     </div>
   );
 }
@@ -1256,14 +1264,14 @@ function EditSection({ icon: Icon, title, subtitle, children }) {
 /* ── Toggle ── */
 function Toggle({ label, desc, checked, onChange }) {
   return (
-    <label className="flex items-center gap-3 cursor-pointer bg-stone-50 hover:bg-stone-100 transition-colors px-3 py-2 rounded-xl border border-stone-200">
-      <div className="relative shrink-0">
+    <label className="flex items-center gap-3 cursor-pointer bg-zinc-700 mix hover:bg-zinc-800 transition-colors px-3 py-2 rounded-xl border border-zinc-700">
+      <div className="relative shrink-0 border border-white rounded-full">
         <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="sr-only" />
         <div className={`w-8 h-4 rounded-full transition-colors ${checked ? "bg-green-500" : "bg-stone-300"}`} />
         <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${checked ? "translate-x-4" : ""}`} />
       </div>
       <div>
-        <p className="text-xs font-semibold text-stone-700">{label}</p>
+        <p className="text-sm font-semibold text-white">{label}</p>
         <p className="text-[10px] text-stone-400">{desc}</p>
       </div>
     </label>
@@ -1342,7 +1350,7 @@ function SpendingTab({ eventId, fundRaised, spendingBreakdown, onSaved, token })
 
       <div className="flex gap-3">
         <button onClick={addItem}
-          className="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors flex items-center gap-2">
+          className="px-4 py-2.5 rounded-xl border border-stone-200 text-white text-sm font-medium hover:bg-stone-50 transition-colors flex items-center gap-2">
           <Plus size={14} /> Add Item
         </button>
         <button onClick={handleSave} disabled={saving}
@@ -1351,7 +1359,7 @@ function SpendingTab({ eventId, fundRaised, spendingBreakdown, onSaved, token })
         </button>
       </div>
 
-      <p className="text-xs text-stone-400">
+      <p className="text-sm text-stone-400">
         This breakdown will be publicly visible to donors on the event page.
       </p>
     </div>
@@ -1363,7 +1371,7 @@ function SpendingTab({ eventId, fundRaised, spendingBreakdown, onSaved, token })
 ═══════════════════════════════════════ */
 function Shell({ children }) {
   return (
-    <div className="min-h-screen bg-[#f5f4f0] py-8 px-4" style={{ fontFamily:"'DM Sans',sans-serif" }}>
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 py-8 px-4" style={{ fontFamily:"'DM Sans',sans-serif" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@700&display=swap');`}</style>
       <div className="max-w-7xl mx-auto">{children}</div>
     </div>
@@ -1374,13 +1382,13 @@ function StatusPill({ status }) {
   const s = {
     upcoming:  { bg:"bg-green-100",  text:"text-green-700"  },
     ongoing:   { bg:"bg-blue-100",   text:"text-blue-700"   },
-    completed: { bg:"bg-stone-100",  text:"text-stone-600"  },
+    completed: { bg:"bg-zinc-700",  text:"text-stone-600"  },
     cancelled: { bg:"bg-red-100",    text:"text-red-700"    },
     draft:     { bg:"bg-yellow-100", text:"text-yellow-700" },
   };
   const c = s[status] || s.upcoming;
   return (
-    <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${c.bg} ${c.text} capitalize`}>
+    <span className={`inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-full ${c.bg} ${c.text} capitalize`}>
       {status === "ongoing" && <Radio size={10} className="animate-pulse" />}
       {status === "ongoing" ? "Live" : status}
     </span>
@@ -1388,24 +1396,24 @@ function StatusPill({ status }) {
 }
 
 function MiniStat({ label, value, color }) {
-  const colors = { green:"bg-green-50 text-green-700", amber:"bg-amber-50 text-amber-700", blue:"bg-blue-50 text-blue-700", purple:"bg-purple-50 text-purple-700", orange:"bg-orange-50 text-orange-700", emerald:"bg-emerald-50 text-emerald-700", stone:"bg-stone-50 text-stone-600", violet: "bg-violet-50 text-violet-700" };
+  const colors = { green:"bg-green-50 text-green-600", amber:"bg-amber-50 text-amber-600", blue:"bg-blue-50 text-blue-600", purple:"bg-purple-50 text-purple-600", orange:"bg-orange-50 text-orange-600", emerald:"bg-emerald-50 text-emerald-600", stone:"bg-stone-50 text-stone-600", violet: "bg-violet-50 text-violet-600" };
   return (
-    <div className={`rounded-2xl p-3 text-center ${colors[color]||colors.stone}`}>
-      <p className="text-xl font-bold">{value}</p>
-      <p className="text-[10px] font-medium opacity-70 mt-0.5 leading-tight">{label}</p>
+    <div className={`bg-linear-to-br from-zinc-800 to-zinc-900 border-zinc-700 rounded-2xl p-3 text-center ${colors[color]||colors.stone}`}>
+      <p className="text-xl lg:text-2xl font-bold">{value}</p>
+      <p className="text-[10px] lg:text-sm font-medium opacity-70 mt-0.5 leading-tight">{label}</p>
     </div>
   );
 }
 
 function PaymentBadge({ status }) {
   const b = PAYMENT_BADGE[status] || PAYMENT_BADGE["not-required"];
-  return <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${b.bg} ${b.text}`}>{b.label}</span>;
+  return <span className={`text-sm font-medium px-2.5 py-1 rounded-full ${b.bg} ${b.text}`}>{b.label}</span>;
 }
 
 function EField({ label, children }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-stone-700 mb-1.5">{label}</label>
+      <label className="block text-sm font-medium text-white mb-1.5">{label}</label>
       {children}
     </div>
   );
@@ -1416,7 +1424,7 @@ function ei() {
 }
 
 function Th({ children }) {
-  return <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-400 uppercase tracking-wide whitespace-nowrap">{children}</th>;
+  return <th className="px-4 py-2.5 text-left text-sm font-semibold text-stone-400 uppercase tracking-wide whitespace-nowrap">{children}</th>;
 }
 function Td({ children }) {
   return <td className="px-4 py-3 align-top">{children}</td>;

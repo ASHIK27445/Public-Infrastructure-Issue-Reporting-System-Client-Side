@@ -122,13 +122,6 @@ export const router = createBrowserRouter([
             {
                 path: '/event-payment-success', Component: EventPaymentVerify
             },
-            {
-                path: '/admin/events/edit/:id', element: <PrivateRouter><AdminEventManagePage /></PrivateRouter>
-            },
-
-            {
-                path: '/admin/waitlist-feed', element: <PrivateRouter><AdminWaitlistFeed /> </PrivateRouter>
-            }
         ]
     },
     {
@@ -197,6 +190,12 @@ export const router = createBrowserRouter([
             {
                 path: 'admin/events', Component: AdminEventsPage
             },
+            {
+                path: 'admin/events/edit/:id', Component: AdminEventManagePage
+            },
+            {
+                path: 'admin/waitlist-feed', Component: AdminWaitlistFeed
+            }
 
         ]
     },
