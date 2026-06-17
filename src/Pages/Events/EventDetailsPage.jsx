@@ -247,433 +247,435 @@ export default function EventDetailPage() {
         Back to Events
       </button>
 
-<div className={`grid grid-cols-1 lg:grid-cols-4 gap-6`}>
+      <div className={`grid grid-cols-1 ${(event.hasEventLogs && event.eventLogs?.length) || (Array.isArray(event.specialGuests) && event.specialGuests.length > 0) > 0 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
 
-  {/* ════ MAIN CONTENT ════ */}
-  <div className="space-y-5 lg:col-span-2 lg:order-2 order-1">
+        {/* ════ MAIN CONTENT ════ */}
+        <div className={`space-y-5 ${(event.hasEventLogs && event.eventLogs?.length) || (Array.isArray(event.specialGuests) && event.specialGuests.length > 0) > 0 ? 'lg:col-span-2 lg:order-2 order-1' : 'lg:col-span-2'}`}>
 
-    {/* ── Hero card ── */}
-    <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm">
-      {event.coverImage ? (
-        <div className="relative h-56 md:h-72 overflow-hidden">
-          <img src={event.coverImage} alt={event.title}
-            className="w-full h-full object-cover"
-            onError={(e) => { e.target.closest(".relative").className = `relative h-56 md:h-72 ${colorCls.bg} flex items-center justify-center`; e.target.replaceWith(Object.assign(document.createElement("span"), { className:"text-8xl opacity-20 select-none", textContent: typeMeta.emoji })); }} />
-          <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
-          <div className="absolute top-4 right-4"><StatusBadge status={event.status} /></div>
-          {isUpcoming && (
-            <div className="absolute bottom-4 left-4">
-              <CountdownPill daysLeft={daysLeft} hoursLeft={hoursLeft} />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className={`h-56 md:h-72 ${colorCls.bg} flex items-center justify-center relative`}>
-          <span className="text-8xl opacity-20 select-none">{typeMeta.emoji}</span>
-          <div className="absolute top-4 right-4"><StatusBadge status={event.status} /></div>
-          {isUpcoming && (
-            <div className="absolute bottom-4 left-4">
-              <CountdownPill daysLeft={daysLeft} hoursLeft={hoursLeft} />
-            </div>
-          )}
-        </div>
-      )}
+          {/* ── Hero card ── */}
+          <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm">
+            {event.coverImage ? (
+              <div className="relative h-56 md:h-72 overflow-hidden">
+                <img src={event.coverImage} alt={event.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { e.target.closest(".relative").className = `relative h-56 md:h-72 ${colorCls.bg} flex items-center justify-center`; e.target.replaceWith(Object.assign(document.createElement("span"), { className:"text-8xl opacity-20 select-none", textContent: typeMeta.emoji })); }} />
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
+                <div className="absolute top-4 right-4"><StatusBadge status={event.status} /></div>
+                {isUpcoming && (
+                  <div className="absolute bottom-4 left-4">
+                    <CountdownPill daysLeft={daysLeft} hoursLeft={hoursLeft} />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className={`h-56 md:h-72 ${colorCls.bg} flex items-center justify-center relative`}>
+                <span className="text-8xl opacity-20 select-none">{typeMeta.emoji}</span>
+                <div className="absolute top-4 right-4"><StatusBadge status={event.status} /></div>
+                {isUpcoming && (
+                  <div className="absolute bottom-4 left-4">
+                    <CountdownPill daysLeft={daysLeft} hoursLeft={hoursLeft} />
+                  </div>
+                )}
+              </div>
+            )}
 
-      <div className="p-6 md:p-8">
-        <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ring-1 ${colorCls.bg} ${colorCls.text} ${colorCls.ring}`}>
-            {typeMeta.emoji} {typeMeta.label}
-          </span>
-          {event.linkedIssueId && (
-            <Link to={`/detailIssues/${event.linkedIssueId._id}`}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ring-1 bg-indigo-50 text-indigo-700 ring-indigo-200 hover:bg-indigo-100 transition-colors">
-              🔗 Linked: {event.linkedIssueId.title}
-            </Link>
-          )}
-        </div>
+            <div className="p-6 md:p-8">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ring-1 ${colorCls.bg} ${colorCls.text} ${colorCls.ring}`}>
+                  {typeMeta.emoji} {typeMeta.label}
+                </span>
+                {event.linkedIssueId && (
+                  <Link to={`/detailIssues/${event.linkedIssueId._id}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ring-1 bg-indigo-50 text-indigo-700 ring-indigo-200 hover:bg-indigo-100 transition-colors">
+                    🔗 Linked: {event.linkedIssueId.title}
+                  </Link>
+                )}
+              </div>
 
-        <h1 className="text-2xl md:text-3xl font-bold text-stone-900 leading-tight mb-4"
-          style={{ fontFamily: "Fraunces, serif" }}>
-          {event.title}
-        </h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-stone-900 leading-tight mb-4"
+                style={{ fontFamily: "Fraunces, serif" }}>
+                {event.title}
+              </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-          <InfoChip icon="🗓️" label="Date & Time"
-            value={format(eventDate, "EEEE, dd MMM yyyy")}
-            sub={format(eventDate, "h:mm a") + (event.endDate ? ` – ${format(new Date(event.endDate),"h:mm a")}` : "")} />
-          <InfoChip icon="📍" label="Location" value={event.location?.address}
-            sub={event.location?.lat ? `${event.location.lat}, ${event.location.lng}` : null} />
-          {event.organizerContact && (
-            <InfoChip icon="📞" label="Organizer" value={event.createdBy?.name || "Admin"} sub={event.organizerContact} />
-          )}
-          {event.registrationFee > 0 && (
-            <InfoChip icon="💳" label="Registration Fee" value={`৳${event.registrationFee}`} sub="Refunded if event cancelled" />
-          )}
-        </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                <InfoChip icon="🗓️" label="Date & Time"
+                  value={format(eventDate, "EEEE, dd MMM yyyy")}
+                  sub={format(eventDate, "h:mm a") + (event.endDate ? ` – ${format(new Date(event.endDate),"h:mm a")}` : "")} />
+                <InfoChip icon="📍" label="Location" value={event.location?.address}
+                  sub={event.location?.lat ? `${event.location.lat}, ${event.location.lng}` : null} />
+                {event.organizerContact && (
+                  <InfoChip icon="📞" label="Organizer" value={event.createdBy?.name || "Admin"} sub={event.organizerContact} />
+                )}
+                {event.registrationFee > 0 && (
+                  <InfoChip icon="💳" label="Registration Fee" value={`৳${event.registrationFee}`} sub="Refunded if event cancelled" />
+                )}
+              </div>
 
-        {event.pinnedAnnouncement && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-5 flex gap-3">
-            <span className="text-xl shrink-0">📌</span>
-            <div>
-              <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-1">Pinned Announcement</p>
-              <p className="text-sm text-yellow-800 leading-relaxed">{event.pinnedAnnouncement}</p>
+              {event.pinnedAnnouncement && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-5 flex gap-3">
+                  <span className="text-xl shrink-0">📌</span>
+                  <div>
+                    <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-1">Pinned Announcement</p>
+                    <p className="text-sm text-yellow-800 leading-relaxed">{event.pinnedAnnouncement}</p>
+                  </div>
+                </div>
+              )}
+
+              <ReactionBar
+                eventId={event._id}
+                initialReaction={userReaction}
+                interestedCount={event.interestedCount}
+                goingCount={event.goingCount}
+                currentUserId={currentUserId}
+                onRefresh={fetchDetail}
+              />
             </div>
           </div>
-        )}
 
-        <ReactionBar
-          eventId={event._id}
-          initialReaction={userReaction}
-          interestedCount={event.interestedCount}
-          goingCount={event.goingCount}
-          currentUserId={currentUserId}
-          onRefresh={fetchDetail}
-        />
-      </div>
-    </div>
-
-    {/* ── Tabs ── */}
-    <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
-      <div className="flex border-b border-stone-100 overflow-x-auto">
-        {[
-          { id: "about",      label: "About",     icon: "📋" },
-          { id: "volunteers", label: "Volunteers", icon: "👥", count: volunteerCount },
-          { id: "donors",     label: "Donors",     icon: "💰", count: donations?.length, show: event.fundGoal > 0 },
-          { id: "comments",   label: "Discussion", icon: "💬", count: comments?.length },
-        ].filter(t => t.show !== false).map((tab) => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
-              activeTab === tab.id
-                ? "border-green-500 text-green-600 bg-green-50/50"
-                : "border-transparent text-stone-500 hover:text-stone-700 hover:bg-stone-50"
-            }`}>
-            <span>{tab.icon}</span>
-            <span>{tab.label}</span>
-            {tab.count > 0 && (
-              <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${
-                activeTab === tab.id ? "bg-green-100 text-green-700" : "bg-stone-100 text-stone-500"
-              }`}>{tab.count}</span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      <div className="p-6">
-        {activeTab === "about" && (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3">About This Event</h3>
-              <p className="text-stone-700 leading-relaxed text-[15px] whitespace-pre-line">{event.description}</p>
+          {/* ── Tabs ── */}
+          <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+            <div className="flex border-b border-stone-100 overflow-x-auto">
+              {[
+                { id: "about",      label: "About",     icon: "📋" },
+                { id: "volunteers", label: "Volunteers", icon: "👥", count: volunteerCount },
+                { id: "donors",     label: "Donors",     icon: "💰", count: donations?.length, show: event.fundGoal > 0 },
+                { id: "comments",   label: "Discussion", icon: "💬", count: comments?.length },
+              ].filter(t => t.show !== false).map((tab) => (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
+                    activeTab === tab.id
+                      ? "border-green-500 text-green-600 bg-green-50/50"
+                      : "border-transparent text-stone-500 hover:text-stone-700 hover:bg-stone-50"
+                  }`}>
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                  {tab.count > 0 && (
+                    <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${
+                      activeTab === tab.id ? "bg-green-100 text-green-700" : "bg-stone-100 text-stone-500"
+                    }`}>{tab.count}</span>
+                  )}
+                </button>
+              ))}
             </div>
 
-            {event.equipmentList?.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3">📦 Bring With You</h3>
-                <div className="flex flex-wrap gap-2">
-                  {event.equipmentList.map((item) => (
-                    <span key={item} className="flex items-center gap-1.5 bg-stone-100 text-stone-700 text-sm px-3 py-1.5 rounded-full">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                      {item}
-                    </span>
-                  ))}
+            <div className="p-6">
+              {activeTab === "about" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3">About This Event</h3>
+                    <p className="text-stone-700 leading-relaxed text-[15px] whitespace-pre-line">{event.description}</p>
+                  </div>
+
+                  {event.equipmentList?.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3">📦 Bring With You</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {event.equipmentList.map((item) => (
+                          <span key={item} className="flex items-center gap-1.5 bg-stone-100 text-stone-700 text-sm px-3 py-1.5 rounded-full">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {event.location?.lat && event.location?.lng && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3">📍 Location</h3>
+                      <div className="rounded-2xl overflow-hidden border border-stone-200 h-48">
+                        <iframe
+                          title="Event location"
+                          src={`https://www.openstreetmap.org/export/embed.html?bbox=${event.location.lng - 0.01},${event.location.lat - 0.01},${parseFloat(event.location.lng) + 0.01},${parseFloat(event.location.lat) + 0.01}&layer=mapnik&marker=${event.location.lat},${event.location.lng}`}
+                          className="w-full h-full border-0"
+                          loading="lazy"
+                        />
+                      </div>
+                      <a href={`https://www.google.com/maps?q=${event.location.lat},${event.location.lng}`}
+                        target="_blank" rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs text-green-600 hover:text-green-700 mt-2 font-medium">
+                        Open in Google Maps →
+                      </a>
+                    </div>
+                  )}
+
+                  {event.createdBy && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3">👤 Organizer</h3>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-sm">
+                          {event.createdBy.name?.[0]?.toUpperCase() || "A"}
+                        </div>
+                        <div>
+                          <p className="font-medium text-stone-800 text-sm">{event.createdBy.name}</p>
+                          {event.organizerContact && (
+                            <p className="text-xs text-stone-400">{event.organizerContact}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "volunteers" && (
+                <VolunteersTab
+                  confirmedCount={event?.volunteerCount || 0}
+                  waitlistCount={waitlistCount || 0}
+                  maxVolunteers={event.maxVolunteers}
+                  spotsPercent={spotsPercent}
+                  spotsLeft={spotsLeft}
+                  eventId={event._id}
+                  isAdmin={isAdmin}
+                />
+              )}
+
+              {activeTab === "donors" && event.fundGoal > 0 && (
+                <DonorsTab
+                  donations={donations}
+                  fundRaised={event.fundRaised}
+                  fundGoal={event.fundGoal}
+                  fundPercent={fundPercent}
+                  spendingBreakdown={event.spendingBreakdown}
+                />
+              )}
+
+              {activeTab === "comments" && (
+                <CommentsTab
+                  eventId={event._id}
+                  comments={comments}
+                  currentUserId={currentUserId}
+                  isAdmin={isAdmin}
+                  token={token}
+                  inputRef={commentInputRef}
+                  onCommentAdded={fetchDetail}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ════ SIDEBARS WRAPPER — mobile: 2-col grid, desktop: contents ════ */}
+        <div className={` ${(event.hasEventLogs && event.eventLogs?.length) || (Array.isArray(event.specialGuests) && event.specialGuests.length > 0) > 0 ? 'grid grid-cols-2 gap-6 lg:contents order-2 lg:order-0' : 'space-y-5'}`}>
+
+          {/* ════ LEFT SIDEBAR ════ */}
+          {((event.hasEventLogs && event.eventLogs?.length) || (Array.isArray(event.specialGuests) && event.specialGuests.length > 0) > 0) && (
+          <div className="space-y-4 lg:order-1">
+
+            {/* Event Timeline */}
+            {event.hasEventLogs && event.eventLogs?.length > 0 && (
+              <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+                <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
+                  Event Timeline
+                </h3>
+                <div className="relative pl-4">
+                  <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-stone-200 rounded-full" />
+                  <div className="space-y-4">
+                    {event.eventLogs
+                      .slice()
+                      .sort((a, b) => (a.time || "").localeCompare(b.time || ""))
+                      .map((log, i) => (
+                        <div key={i} className="relative">
+                          <div className="absolute -left-4 w-2 h-2 rounded-full bg-green-400 border-2 border-white mt-1.5 -translate-x-[3px]" />
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                              {log.time && (
+                                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full font-mono">
+                                  {log.time}
+                                </span>
+                              )}
+                              <p className="text-xs font-semibold text-stone-800">{log.title}</p>
+                            </div>
+                            {log.description && (
+                              <p className="text-[10px] text-stone-400 leading-relaxed">{log.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               </div>
             )}
 
-            {event.location?.lat && event.location?.lng && (
-              <div>
-                <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3">📍 Location</h3>
-                <div className="rounded-2xl overflow-hidden border border-stone-200 h-48">
-                  <iframe
-                    title="Event location"
-                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${event.location.lng - 0.01},${event.location.lat - 0.01},${parseFloat(event.location.lng) + 0.01},${parseFloat(event.location.lat) + 0.01}&layer=mapnik&marker=${event.location.lat},${event.location.lng}`}
-                    className="w-full h-full border-0"
-                    loading="lazy"
-                  />
+            {/* Special Guests */}
+            {event.hasSpecialGuests && event.specialGuests?.length > 0 && (
+              <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+                <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
+                  Special Guests
+                </h3>
+                <div className="space-y-3">
+                  {[...event.specialGuests]
+                    .sort((a, b) => (b.isMainGuest ? 1 : 0) - (a.isMainGuest ? 1 : 0))
+                    .map((guest, i) => (
+                      <div key={i} className={`flex items-center gap-3 rounded-xl p-3 border ${
+                        guest.isMainGuest ? "bg-amber-50 border-amber-200" : "bg-stone-50 border-stone-100"
+                      }`}>
+                        <div className="w-10 h-10 rounded-full shrink-0 overflow-hidden border-2 border-white shadow-sm bg-stone-200 flex items-center justify-center">
+                          {guest.photo ? (
+                            <img src={guest.photo} alt={guest.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => { e.target.style.display = "none"; }} />
+                          ) : (
+                            <span className="text-stone-600 font-bold text-sm">
+                              {guest.name?.[0]?.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="text-xs font-semibold text-stone-800 truncate">{guest.name}</p>
+                            {guest.isMainGuest && (
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-amber-200 text-amber-800 rounded-full">
+                                Chief
+                              </span>
+                            )}
+                          </div>
+                          {guest.designation && (
+                            <p className="text-[10px] text-stone-500 truncate">{guest.designation}</p>
+                          )}
+                          {guest.organization && (
+                            <p className="text-[10px] text-stone-400 truncate">{guest.organization}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                 </div>
-                <a href={`https://www.google.com/maps?q=${event.location.lat},${event.location.lng}`}
+              </div>
+            )}
+          </div>)}
+
+          {/* ════ RIGHT SIDEBAR ════ */}
+          
+          <div className="space-y-4 lg:order-3">
+
+            {userRegistration && (
+              <UserRegistrationCard
+                registration={userRegistration}
+                event={event}
+                isFree={!event.registrationFee}
+              />
+            )}
+
+            {!userRegistration && !isCancelled && !isCompleted && (
+              <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+                <h3 className="font-bold text-stone-900 mb-1" style={{ fontFamily:"Fraunces,serif" }}>
+                  {spotsLeft > 0 ? "Join This Event" : "Join Waitlist"}
+                </h3>
+                <p className="text-xs text-stone-400 mb-4">
+                  {spotsLeft > 0
+                    ? `${spotsLeft} spots remaining out of ${event.maxVolunteers}`
+                    : `All ${event.maxVolunteers} spots filled. ${waitlistCount || 0} on waitlist.`}
+                </p>
+                <div className="mb-4">
+                  <div className="flex justify-between text-xs text-stone-400 mb-1.5">
+                    <span>{volunteerCount || 0} joined</span>
+                    <span>{event.maxVolunteers} max</span>
+                  </div>
+                  <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full transition-all duration-700 ${
+                      spotsLeft <= 0 ? "bg-red-400" : spotsPercent >= 80 ? "bg-amber-400" : "bg-green-400"
+                    }`} style={{ width: `${spotsPercent}%` }} />
+                  </div>
+                </div>
+                {event.registrationFee > 0 && (
+                  <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2 mb-4">
+                    <span>💳</span>
+                    <span>Registration fee: <strong>৳{event.registrationFee}</strong></span>
+                  </div>
+                )}
+                <Link to={`/events/${event._id}/register`}
+                  className={`block w-full text-center py-3 rounded-2xl font-semibold text-sm transition-colors ${
+                    spotsLeft > 0
+                      ? "bg-green-500 hover:bg-green-600 text-white"
+                      : "bg-amber-500 hover:bg-amber-600 text-white"
+                  }`}>
+                  {spotsLeft > 0 ? "🙋 Register as Volunteer" : "⏳ Join Waitlist"}
+                </Link>
+                {!currentUserId && (
+                  <p className="text-xs text-center text-stone-400 mt-2">
+                    <Link to="/login" className="text-green-600 hover:underline">Login</Link> to register faster
+                  </p>
+                )}
+              </div>
+            )}
+
+            {event.fundGoal > 0 && !isCancelled && (
+              <div ref={donateRef} className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">💚</span>
+                  <h3 className="font-bold text-stone-900 text-sm" style={{ fontFamily:"Fraunces,serif" }}>Support This Event</h3>
+                </div>
+                <p className="text-xs text-stone-500 mb-4 leading-relaxed">
+                  Can't make it? Donate to help fund equipment and supplies.
+                </p>
+                <div className="mb-4">
+                  <div className="flex justify-between text-xs text-stone-500 mb-1.5">
+                    <span className="font-semibold text-stone-700">৳{(event.fundRaised || 0).toLocaleString()} raised</span>
+                    <span>{fundPercent}%</span>
+                  </div>
+                  <div className="h-2.5 bg-stone-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-linear-to-r from-emerald-400 to-teal-500 rounded-full transition-all"
+                      style={{ width: `${fundPercent}%` }} />
+                  </div>
+                  <p className="text-xs text-stone-400 mt-1.5">Goal: ৳{event.fundGoal.toLocaleString()}</p>
+                </div>
+                <DonationForm user={user} eventId={event._id} onDonated={fetchDetail} />
+              </div>
+            )}
+
+            <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">Event Stats</h3>
+              <div className="space-y-3">
+                <StatRow icon="👋" label="Interested" value={event.interestedCount || 0} />
+                <StatRow icon="✅" label="Going"      value={event.goingCount      || 0} />
+                <StatRow icon="🙋" label="Volunteers" value={volunteerCount || 0} />
+                <StatRow icon="⏳" label="Waitlisted" value={waitlistCount  || 0} />
+                {event.fundGoal > 0 && (
+                  <StatRow icon="💰" label="Donations" value={`৳${(event.fundRaised||0).toLocaleString()}`} />
+                )}
+                <StatRow icon="💬" label="Comments"  value={comments?.length || 0} />
+              </div>
+            </div>
+
+            {isAdmin && (
+              <AdminQuickActions event={event} onRefresh={fetchDetail} token={token} />
+            )}
+
+            {data?.registrationInfo?.filter(r => r.role === "guest").length > 0 && (
+              <GuestSection guests={data.registrationInfo.filter(r => r.role === "guest")} />
+            )}
+
+            {data?.registrationInfo?.filter(r => r.role === "volunteer").length > 0 && (
+              <VolunteerSection volunteers={data.registrationInfo.filter(r => r.role === "volunteer")} />
+            )}
+
+            {event?.isFreeParticipate && (
+              <FreeParticipantsSection
+                participants={freeParticipants}
+                eventId={event._id}
+                hasFreeParticipate={event?.isFreeParticipate}
+              />
+            )}
+
+            <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Share Event</h3>
+              <div className="flex gap-2">
+                <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied!"); }}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition-colors">
+                  🔗 Copy Link
+                </button>
+                <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
                   target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-green-600 hover:text-green-700 mt-2 font-medium">
-                  Open in Google Maps →
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium transition-colors">
+                  📘 Facebook
                 </a>
               </div>
-            )}
-
-            {event.createdBy && (
-              <div>
-                <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3">👤 Organizer</h3>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-sm">
-                    {event.createdBy.name?.[0]?.toUpperCase() || "A"}
-                  </div>
-                  <div>
-                    <p className="font-medium text-stone-800 text-sm">{event.createdBy.name}</p>
-                    {event.organizerContact && (
-                      <p className="text-xs text-stone-400">{event.organizerContact}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
-        )}
 
-        {activeTab === "volunteers" && (
-          <VolunteersTab
-            confirmedCount={event?.volunteerCount || 0}
-            waitlistCount={waitlistCount || 0}
-            maxVolunteers={event.maxVolunteers}
-            spotsPercent={spotsPercent}
-            spotsLeft={spotsLeft}
-            eventId={event._id}
-            isAdmin={isAdmin}
-          />
-        )}
+        </div>{/* end sidebars wrapper */}
 
-        {activeTab === "donors" && event.fundGoal > 0 && (
-          <DonorsTab
-            donations={donations}
-            fundRaised={event.fundRaised}
-            fundGoal={event.fundGoal}
-            fundPercent={fundPercent}
-            spendingBreakdown={event.spendingBreakdown}
-          />
-        )}
-
-        {activeTab === "comments" && (
-          <CommentsTab
-            eventId={event._id}
-            comments={comments}
-            currentUserId={currentUserId}
-            isAdmin={isAdmin}
-            token={token}
-            inputRef={commentInputRef}
-            onCommentAdded={fetchDetail}
-          />
-        )}
       </div>
-    </div>
-  </div>
-
-  {/* ════ SIDEBARS WRAPPER — mobile: 2-col grid, desktop: contents ════ */}
-  <div className="grid grid-cols-2 gap-6 lg:contents order-2 lg:order-none">
-
-    {/* ════ LEFT SIDEBAR ════ */}
-    <div className="space-y-4 lg:order-1">
-
-      {/* Event Timeline */}
-      {event.hasEventLogs && event.eventLogs?.length > 0 && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
-          <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
-            Event Timeline
-          </h3>
-          <div className="relative pl-4">
-            <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-stone-200 rounded-full" />
-            <div className="space-y-4">
-              {event.eventLogs
-                .slice()
-                .sort((a, b) => (a.time || "").localeCompare(b.time || ""))
-                .map((log, i) => (
-                  <div key={i} className="relative">
-                    <div className="absolute -left-4 w-2 h-2 rounded-full bg-green-400 border-2 border-white mt-1.5 -translate-x-[3px]" />
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        {log.time && (
-                          <span className="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full font-mono">
-                            {log.time}
-                          </span>
-                        )}
-                        <p className="text-xs font-semibold text-stone-800">{log.title}</p>
-                      </div>
-                      {log.description && (
-                        <p className="text-[10px] text-stone-400 leading-relaxed">{log.description}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Special Guests */}
-      {event.hasSpecialGuests && event.specialGuests?.length > 0 && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
-          <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
-            Special Guests
-          </h3>
-          <div className="space-y-3">
-            {[...event.specialGuests]
-              .sort((a, b) => (b.isMainGuest ? 1 : 0) - (a.isMainGuest ? 1 : 0))
-              .map((guest, i) => (
-                <div key={i} className={`flex items-center gap-3 rounded-xl p-3 border ${
-                  guest.isMainGuest ? "bg-amber-50 border-amber-200" : "bg-stone-50 border-stone-100"
-                }`}>
-                  <div className="w-10 h-10 rounded-full shrink-0 overflow-hidden border-2 border-white shadow-sm bg-stone-200 flex items-center justify-center">
-                    {guest.photo ? (
-                      <img src={guest.photo} alt={guest.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => { e.target.style.display = "none"; }} />
-                    ) : (
-                      <span className="text-stone-600 font-bold text-sm">
-                        {guest.name?.[0]?.toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <p className="text-xs font-semibold text-stone-800 truncate">{guest.name}</p>
-                      {guest.isMainGuest && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 bg-amber-200 text-amber-800 rounded-full">
-                          Chief
-                        </span>
-                      )}
-                    </div>
-                    {guest.designation && (
-                      <p className="text-[10px] text-stone-500 truncate">{guest.designation}</p>
-                    )}
-                    {guest.organization && (
-                      <p className="text-[10px] text-stone-400 truncate">{guest.organization}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
-    </div>
-
-    {/* ════ RIGHT SIDEBAR ════ */}
-    <div className="space-y-4 lg:order-3">
-
-      {userRegistration && (
-        <UserRegistrationCard
-          registration={userRegistration}
-          event={event}
-          isFree={!event.registrationFee}
-        />
-      )}
-
-      {!userRegistration && !isCancelled && !isCompleted && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
-          <h3 className="font-bold text-stone-900 mb-1" style={{ fontFamily:"Fraunces,serif" }}>
-            {spotsLeft > 0 ? "Join This Event" : "Join Waitlist"}
-          </h3>
-          <p className="text-xs text-stone-400 mb-4">
-            {spotsLeft > 0
-              ? `${spotsLeft} spots remaining out of ${event.maxVolunteers}`
-              : `All ${event.maxVolunteers} spots filled. ${waitlistCount || 0} on waitlist.`}
-          </p>
-          <div className="mb-4">
-            <div className="flex justify-between text-xs text-stone-400 mb-1.5">
-              <span>{volunteerCount || 0} joined</span>
-              <span>{event.maxVolunteers} max</span>
-            </div>
-            <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all duration-700 ${
-                spotsLeft <= 0 ? "bg-red-400" : spotsPercent >= 80 ? "bg-amber-400" : "bg-green-400"
-              }`} style={{ width: `${spotsPercent}%` }} />
-            </div>
-          </div>
-          {event.registrationFee > 0 && (
-            <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2 mb-4">
-              <span>💳</span>
-              <span>Registration fee: <strong>৳{event.registrationFee}</strong></span>
-            </div>
-          )}
-          <Link to={`/events/${event._id}/register`}
-            className={`block w-full text-center py-3 rounded-2xl font-semibold text-sm transition-colors ${
-              spotsLeft > 0
-                ? "bg-green-500 hover:bg-green-600 text-white"
-                : "bg-amber-500 hover:bg-amber-600 text-white"
-            }`}>
-            {spotsLeft > 0 ? "🙋 Register as Volunteer" : "⏳ Join Waitlist"}
-          </Link>
-          {!currentUserId && (
-            <p className="text-xs text-center text-stone-400 mt-2">
-              <Link to="/login" className="text-green-600 hover:underline">Login</Link> to register faster
-            </p>
-          )}
-        </div>
-      )}
-
-      {event.fundGoal > 0 && !isCancelled && (
-        <div ref={donateRef} className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xl">💚</span>
-            <h3 className="font-bold text-stone-900 text-sm" style={{ fontFamily:"Fraunces,serif" }}>Support This Event</h3>
-          </div>
-          <p className="text-xs text-stone-500 mb-4 leading-relaxed">
-            Can't make it? Donate to help fund equipment and supplies.
-          </p>
-          <div className="mb-4">
-            <div className="flex justify-between text-xs text-stone-500 mb-1.5">
-              <span className="font-semibold text-stone-700">৳{(event.fundRaised || 0).toLocaleString()} raised</span>
-              <span>{fundPercent}%</span>
-            </div>
-            <div className="h-2.5 bg-stone-100 rounded-full overflow-hidden">
-              <div className="h-full bg-linear-to-r from-emerald-400 to-teal-500 rounded-full transition-all"
-                style={{ width: `${fundPercent}%` }} />
-            </div>
-            <p className="text-xs text-stone-400 mt-1.5">Goal: ৳{event.fundGoal.toLocaleString()}</p>
-          </div>
-          <DonationForm user={user} eventId={event._id} onDonated={fetchDetail} />
-        </div>
-      )}
-
-      <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
-        <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">Event Stats</h3>
-        <div className="space-y-3">
-          <StatRow icon="👋" label="Interested" value={event.interestedCount || 0} />
-          <StatRow icon="✅" label="Going"      value={event.goingCount      || 0} />
-          <StatRow icon="🙋" label="Volunteers" value={volunteerCount || 0} />
-          <StatRow icon="⏳" label="Waitlisted" value={waitlistCount  || 0} />
-          {event.fundGoal > 0 && (
-            <StatRow icon="💰" label="Donations" value={`৳${(event.fundRaised||0).toLocaleString()}`} />
-          )}
-          <StatRow icon="💬" label="Comments"  value={comments?.length || 0} />
-        </div>
-      </div>
-
-      {isAdmin && (
-        <AdminQuickActions event={event} onRefresh={fetchDetail} token={token} />
-      )}
-
-      {data?.registrationInfo?.filter(r => r.role === "guest").length > 0 && (
-        <GuestSection guests={data.registrationInfo.filter(r => r.role === "guest")} />
-      )}
-
-      {data?.registrationInfo?.filter(r => r.role === "volunteer").length > 0 && (
-        <VolunteerSection volunteers={data.registrationInfo.filter(r => r.role === "volunteer")} />
-      )}
-
-      {event?.isFreeParticipate && (
-        <FreeParticipantsSection
-          participants={freeParticipants}
-          eventId={event._id}
-          hasFreeParticipate={event?.isFreeParticipate}
-        />
-      )}
-
-      <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
-        <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Share Event</h3>
-        <div className="flex gap-2">
-          <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied!"); }}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition-colors">
-            🔗 Copy Link
-          </button>
-          <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
-            target="_blank" rel="noreferrer"
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium transition-colors">
-            📘 Facebook
-          </a>
-        </div>
-      </div>
-    </div>
-
-  </div>{/* end sidebars wrapper */}
-
-</div>
     </Shell>
   );
 }
