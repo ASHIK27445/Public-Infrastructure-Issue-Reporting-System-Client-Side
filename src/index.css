@@ -391,3 +391,8 @@ body {
   background-color: #f4f4f5 !important;
 }
 
+[data-theme="light"] .grayBG:hover {
+  background-color: #4f4f53 !important;
+  color: white !important;
+}
+

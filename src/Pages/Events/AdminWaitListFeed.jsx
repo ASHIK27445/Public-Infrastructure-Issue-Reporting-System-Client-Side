@@ -154,7 +154,7 @@ export default function AdminWaitlistFeed() {
 
                   {/* Right: Button */}
                   <button
-                    onClick={() => navigate(`/admin/events/${w.event?._id}/manage`)}
+                    onClick={() => navigate(`/dashboard/admin/events/${w.event?._id}/manage`)}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600
                                text-white text-sm font-medium transition-colors shrink-0"
                   >

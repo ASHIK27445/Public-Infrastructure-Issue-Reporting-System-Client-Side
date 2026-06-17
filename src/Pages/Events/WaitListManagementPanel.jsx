@@ -113,7 +113,7 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
             <button
               onClick={exportCSV}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-700
-                         bg-transparent text-zinc-300 text-sm hover:bg-zinc-800 transition-colors"
+                         bg-transparent text-white text-sm grayBG hover:bg-zinc-800 transition-colors"
             >
               <Download className="w-4 h-4" />
               Export CSV
@@ -184,7 +184,7 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-zinc-800/60 border-b border-zinc-800">
+                  <tr className="bg-zinc-800 border-b border-zinc-800">
                     {tab === "waitlist" && <Th>#</Th>}
                     <Th>Name</Th>
                     <Th>Contact</Th>
