@@ -54,6 +54,7 @@ import FreeParticipateRegistration from "../Pages/Events/FreeParticipateRegistra
 import AdminEventsPage from "../Pages/Events/AdminEventPage"
 import AdminEventManagePage from "../Pages/Events/AdminEventManagePAge"
 import CertificateVerifyPage from "../Pages/Events/CertificateVerifyPage"
+import MyCertificatesPage from "../Pages/Events/MyCertificatePage"
 
 export const router = createBrowserRouter([
     {
@@ -116,6 +117,12 @@ export const router = createBrowserRouter([
             {
                 path: '/event-payment-success', Component: EventPaymentVerify
             },
+            {
+                path: '/events', Component: EventsFeed
+            },
+            {
+                path: '/events/:id', Component: EventDetailPage
+            }
         ]
     },
     {
@@ -197,12 +204,6 @@ export const router = createBrowserRouter([
         path: '*', Component: ErrorPage
     },
     {
-        path: '/onlytest', Component: CertificateVerifyPage
-    },
-    {
-        path: '/events', Component: EventsFeed
-    },
-    {
-        path: '/events/:id', Component: EventDetailPage
+        path: '/onlytest', Component: MyCertificatesPage
     }
 ])
