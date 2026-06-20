@@ -4,6 +4,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { format, formatDistanceToNow } from "date-fns";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import { use } from "react";
+import { AuthContext } from "../AuthProvider/AuthContext";
 
 /* ═══════════════════════════════════════
    MAIN PAGE
@@ -21,6 +23,7 @@ export default function AdminCertificatesPage() {
   const [search,      setSearch]      = useState("");
   const [resending,   setResending]   = useState(null);  // certId being resent
   const axiosSecure = useAxiosSecure()
+  const {user} = use(AuthContext)
 
   const token   = localStorage.getItem("token");
   const headers = { Authorization: `Bearer ${token}` };
@@ -29,24 +32,28 @@ export default function AdminCertificatesPage() {
   const fetchAll = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const [statusRes, certsRes, eventRes] = await Promise.all([
-        axiosSecure.get('/admin/events/${id}/certificates/status'),
-        axios.get(`${import.meta.env.VITE_API_URL}/admin/events/${id}/certificates`,        { headers }),
-        axios.get(`${import.meta.env.VITE_API_URL}/events/${id}/detail`,                   { headers }),
+      const [statusRes, certsRes, eventRes] = await Promise.allSettled([
+        axiosSecure.get(`/admin/events/${id}/certificates/status`),
+        axiosSecure.get(`/admin/events/${id}/certificates`),
+        axiosSecure.get(`/admin/event/${id}/detail`)
       ]);
-      setStatus(statusRes.data);
-      setCerts(certsRes.data.certificates || []);
-      setEventInfo(eventRes.data?.event || null);
+
+      if (statusRes.status === "fulfilled") setStatus(statusRes.value.data);
+      if (certsRes.status === "fulfilled")  setCerts(certsRes.value.data.certificates || []);
+      if (eventRes.status === "fulfilled")  setEventInfo(eventRes.value.data?.event || null);
+
     } catch {
       if (!silent) toast.error("Could not load certificate data");
     } finally {
       if (!silent) setLoading(false);
     }
-  }, [id]);
-  console.log(setStatus)
+  }, [id, axiosSecure]);
+    // console.log(eventInfo,certs, status)
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
-
+  useEffect(() => {
+    if (!user) return
+    fetchAll()
+  }, [id, user])
   /* ── Generate certificates ── */
   const handleGenerate = async () => {
     const remaining = (status?.attendedCount || 0) - (status?.certCount || 0);
@@ -56,10 +63,8 @@ export default function AdminCertificatesPage() {
 
     setGenerating(true);
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/admin/events/${id}/certificates/generate`,
-        {}, { headers }
-      );
+      const res = await axiosSecure.post(
+        `/admin/events/${id}/certificates/generate`,{})
       toast.success(res.data.message);
 
       // Poll every 5s for up to 3 minutes

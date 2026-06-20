@@ -212,6 +212,6 @@ export const router = createBrowserRouter([
         path: '/onlytest', Component: MyCertificatesPage
     },
     {
-        path: '/cert', Component: AdminCertificatesPage
+        path: '/cert/:id', Component: AdminCertificatesPage
     }
 ])
