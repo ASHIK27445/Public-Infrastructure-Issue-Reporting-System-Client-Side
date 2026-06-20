@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Html5Qrcode } from "html5-qrcode";
 import { format, formatDistanceToNow } from "date-fns";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 /* ═══════════════════════════════════════
    MAIN PAGE
@@ -32,13 +33,11 @@ export default function QRCheckinPage() {
   const scannerRef   = useRef(null);
   const html5QrRef   = useRef(null);
   const resultTimerRef = useRef(null);
-
-  const token   = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
+  const axiosSecure = useAxiosSecure()
 
   /* ── Fetch event info ── */
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/events/${id}/detail`, { headers })
+    axiosSecure.get(`/admin/event/${id}/detail`)
       .then((r) => setEvent(r.data?.event))
       .catch(() => toast.error("Could not load event"))
       .finally(() => setLoading(false));
@@ -47,9 +46,8 @@ export default function QRCheckinPage() {
   /* ── Fetch live stats ── */
   const fetchStats = useCallback(async () => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/events/${id}/checkin/stats`, { headers }
-      );
+      const res = await axiosSecure.get(
+        `/events/${id}/checkin/stats`);
       setStatsData(res.data);
     } catch { /* silent */ }
   }, [id]);
@@ -140,11 +138,9 @@ export default function QRCheckinPage() {
     }
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/${id}/checkin`,
-        { qrToken: decodedText },
-        { headers }
-      );
+      const res = await axiosSecure.post(
+        `/events/${id}/checkin`,
+        { qrToken: decodedText })
       setScanResult({ ...res.data, type: "success" });
       fetchStats();
     } catch (err) {
@@ -176,11 +172,8 @@ export default function QRCheckinPage() {
     setManualLoading(true);
     setManualResult(null);
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/${id}/checkin/manual`,
-        { email: manualEmail.trim() },
-        { headers }
-      );
+      const res = await axiosSecure.post(`/events/${id}/checkin/manual`,
+        { email: manualEmail.trim()})
       setManualResult({ ...res.data, type: "success" });
       setManualEmail("");
       fetchStats();
@@ -203,10 +196,7 @@ export default function QRCheckinPage() {
   const handleUndo = async (regId, name) => {
     if (!window.confirm(`Undo check-in for ${name}?`)) return;
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_API_URL}/events/${id}/checkin/${regId}`,
-        { headers }
-      );
+      await axiosSecure.delete(`/events/${id}/checkin/${regId}`)
       toast.success(`Check-in undone for ${name}`);
       fetchStats();
     } catch { toast.error("Undo failed"); }

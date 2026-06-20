@@ -241,7 +241,7 @@ const mockUndoCheckin = (eventId, registrationId) => {
 /* ═══════════════════════════════════════
    MAIN PAGE
 ═══════════════════════════════════════ */
-export default function QRCheckinPage() {
+export default function QRCheckinPageDemo() {
   const { id }   = useParams();
   const navigate = useNavigate();
 

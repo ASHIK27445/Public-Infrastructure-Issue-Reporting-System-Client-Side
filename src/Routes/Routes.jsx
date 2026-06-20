@@ -48,7 +48,7 @@ import VideoScupping from "../Pages/Others/VideoScupping"
 import EventDetailPage from "../Pages/Events/EventDetailsPage"
 import EventsFeed from "../Pages/Events/Eventfeeds"
 import EventPaymentVerify from "../Pages/Events/EventPaymentVerify"
-import QRCheckinPage from "../Pages/Events/QRCheckingPageDemo"
+import QRCheckinPage from "../Pages/Events/QRCheckingPage"
 import AdminWaitlistFeed from "../Pages/Events/AdminWaitListFeed"
 import FreeParticipateRegistration from "../Pages/Events/FreeParticipateRegistration"
 import AdminEventsPage from "../Pages/Events/AdminEventPage"
@@ -56,6 +56,7 @@ import AdminEventManagePage from "../Pages/Events/AdminEventManagePAge"
 import CertificateVerifyPage from "../Pages/Events/CertificateVerifyPage"
 import MyCertificatesPage from "../Pages/Events/MyCertificatePage"
 import AdminCertificatesPage from "../Pages/Events/AdminCertificatePage"
+import QRCheckinPageDemo from "../Pages/Events/QRCheckingPageDemo"
 
 export const router = createBrowserRouter([
     {
@@ -197,6 +198,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'admin/waitlist-feed', Component: AdminWaitlistFeed
+            },
+            {
+                path: 'admin/event/:id/qr/checkin', Component: QRCheckinPage
             }
 
         ]

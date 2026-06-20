@@ -263,10 +263,25 @@ export default function AdminEventManagePage() {
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 text-white text-sm font-medium hover:bg-stone-50 transition-colors">
             <Pencil size={14} /> Edit
           </button>
-          <Link to={`/admin/events/${event._id}/checkin`}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors">
-            <ScanQrCode size={14} /> QR Check-in
-          </Link>
+          <button
+            onClick={() => {
+              if (event.status !== "ongoing") {
+                return toast.warning(
+                  "QR Check-in is only available for ongoing events."
+                );
+              }
+
+              navigate(`/dashboard/admin/event/${event._id}/qr/checkin`);
+            }}
+            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-medium transition-colors ${
+              event.status === "ongoing"
+                ? "bg-blue-500 hover:bg-blue-600"
+                : "bg-gray-500 cursor-not-allowed"
+            }`}
+          >
+            <ScanQrCode size={14} />
+            QR Check-in
+          </button>
           {available.map((s) => (
             <button key={s} onClick={() => handleStatusChange(s)} disabled={statusUpdating}
               className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 ${
