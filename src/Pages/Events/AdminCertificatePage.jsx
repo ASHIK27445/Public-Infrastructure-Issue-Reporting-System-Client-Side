@@ -27,6 +27,7 @@ export default function AdminCertificatesPage() {
   const [sigUrl,       setSigUrl]       = useState("");
   const [sigValid,     setSigValid]     = useState(null); // null | true | false
   const [sigChecking,  setSigChecking]  = useState(false);
+  const [resendModal, setResendModal] = useState(null)
   const {user} = use(AuthContext)
 
   const token   = localStorage.getItem("token");
@@ -94,13 +95,11 @@ export default function AdminCertificatesPage() {
 
   /* ── Resend one email ── */
   const handleResend = async (certId, email) => {
-    if (!window.confirm(`Resend certificate email to ${email}?`)) return;
+    setResendModal(null)
     setResending(certId);
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/admin/events/${id}/certificates/${certId}/resend`,
-        {}, { headers }
-      );
+      await axiosSecure.post(
+        `/admin/events/${id}/certificates/${certId}/resend`,{overrideEmail: email})
       toast.success(`Certificate resent to ${email}`);
       fetchAll(true);
     } catch (err) {
@@ -377,7 +376,7 @@ export default function AdminCertificatesPage() {
                     key={cert._id || cert.certId}
                     cert={cert}
                     eventId={id}
-                    onResend={handleResend}
+                    onResendClick={(cert) => setResendModal(cert)}
                     resending={resending === cert.certId}
                   />
                 ))}
@@ -404,12 +403,23 @@ export default function AdminCertificatesPage() {
         )}
       </div>
 
+      {/* signature url model show */}
       {showSigModal && (
         <SignatureModal
           onConfirm={handleGenerate}
           onClose={() => setShowSigModal(false)}
         />
       )}
+
+      {/* resent with custom email modal */}
+      {resendModal && (
+      <ResendEmailModal
+        cert={resendModal}
+        onConfirm={handleResend}
+        onClose={() => setResendModal(null)}
+        sending={resending === resendModal.certId}
+      />
+    )}
 
     </Shell>
   );
@@ -418,7 +428,7 @@ export default function AdminCertificatesPage() {
 /* ═══════════════════════════════════════
    CERTIFICATE ROW (table row)
 ═══════════════════════════════════════ */
-function CertRow({ cert, eventId, onResend, resending }) {
+function CertRow({ cert, eventId, onResendClick, resending }) {
   return (
     <tr className="hover:bg-stone-50/60 transition-colors">
       {/* Recipient */}
@@ -512,7 +522,7 @@ function CertRow({ cert, eventId, onResend, resending }) {
 
           {/* Resend email */}
           <button
-            onClick={() => onResend(cert.certId, cert.recipientEmail)}
+            onClick={() => onResendClick(cert)}
             disabled={resending}
             title="Resend certificate email"
             className="w-8 h-8 flex items-center justify-center rounded-lg text-stone-400 hover:bg-amber-50 hover:text-amber-600 transition-all text-sm disabled:opacity-40 disabled:cursor-not-allowed">
@@ -672,6 +682,45 @@ function SignatureModal({ onConfirm, onClose }) {
             onClick={() => onConfirm(valid === true ? url : "")}
             className="flex-1 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors shadow-sm">
             🏅 Generate Certificates
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResendEmailModal({ cert, onConfirm, onClose, sending }) {
+  const [email, setEmail] = useState(cert.recipientEmail);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-bold text-stone-800" style={{ fontFamily:"Fraunces,serif" }}>
+            📧 Resend Certificate
+          </h2>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-400">✕</button>
+        </div>
+
+        <p className="text-xs text-stone-400 mb-3">{cert.recipientName} · {cert.certId}</p>
+
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100 mb-4"
+        />
+
+        <div className="flex gap-2">
+          <button onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50">
+            Cancel
+          </button>
+          <button
+            onClick={() => onConfirm(cert.certId, email)}
+            disabled={!email.trim() || sending}
+            className="flex-1 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2">
+            {sending ? <><MiniSpinner/> Sending...</> : "Send"}
           </button>
         </div>
       </div>
