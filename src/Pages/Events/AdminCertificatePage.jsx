@@ -23,6 +23,10 @@ export default function AdminCertificatesPage() {
   const [search,      setSearch]      = useState("");
   const [resending,   setResending]   = useState(null);  // certId being resent
   const axiosSecure = useAxiosSecure()
+  const [showSigModal, setShowSigModal] = useState(false);
+  const [sigUrl,       setSigUrl]       = useState("");
+  const [sigValid,     setSigValid]     = useState(null); // null | true | false
+  const [sigChecking,  setSigChecking]  = useState(false);
   const {user} = use(AuthContext)
 
   const token   = localStorage.getItem("token");
@@ -55,7 +59,8 @@ export default function AdminCertificatesPage() {
     fetchAll()
   }, [id, user])
   /* ── Generate certificates ── */
-  const handleGenerate = async () => {
+  const handleGenerate = async (signatureUrl = "") => {
+    setShowSigModal(false)
     const remaining = (status?.attendedCount || 0) - (status?.certCount || 0);
     if (!window.confirm(
       `Generate ${remaining > 0 ? remaining : status?.attendedCount} certificate(s) for attended volunteers?\n\nEmails will be sent automatically after generation.`
@@ -64,7 +69,7 @@ export default function AdminCertificatesPage() {
     setGenerating(true);
     try {
       const res = await axiosSecure.post(
-        `/admin/events/${id}/certificates/generate`,{})
+        `/admin/events/${id}/certificates/generate`,{signatureUrl})
       toast.success(res.data.message);
 
       // Poll every 5s for up to 3 minutes
@@ -260,7 +265,7 @@ export default function AdminCertificatesPage() {
                 {" "}Certificates are generated as PDF files and emailed automatically.
               </p>
               <div className="flex items-center gap-3 flex-wrap">
-                <button onClick={handleGenerate} disabled={generating || polling}
+                <button onClick={()=> {setShowSigModal(true)}} disabled={generating || polling}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-semibold text-sm transition-colors disabled:opacity-60 shadow-sm">
                   {generating
                     ? <><Spinner/> Starting...</>
@@ -398,6 +403,14 @@ export default function AdminCertificatesPage() {
           </div>
         )}
       </div>
+
+      {showSigModal && (
+        <SignatureModal
+          onConfirm={handleGenerate}
+          onClose={() => setShowSigModal(false)}
+        />
+      )}
+
     </Shell>
   );
 }
@@ -560,5 +573,108 @@ function MiniSpinner() {
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
     </svg>
+  );
+}
+
+function SignatureModal({ onConfirm, onClose }) {
+  const [url,      setUrl]      = useState("");
+  const [valid,    setValid]    = useState(null);   // null | true | false
+  const [checking, setChecking] = useState(false);
+
+  const checkImage = (src) => {
+    if (!src.trim()) { setValid(null); return; }
+    setChecking(true);
+    const img = new Image();
+    img.onload  = () => { setValid(true);  setChecking(false); };
+    img.onerror = () => { setValid(false); setChecking(false); };
+    img.src = src;
+  };
+
+  const handleChange = (e) => {
+    setUrl(e.target.value);
+    setValid(null);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h2 className="text-lg font-bold text-stone-800" style={{ fontFamily:"Fraunces,serif" }}>
+              ✍️ Signature
+            </h2>
+            <p className="text-xs text-stone-400 mt-0.5">
+              Paste an image URL to add your signature to the certificate
+            </p>
+          </div>
+          <button onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition-colors">
+            ✕
+          </button>
+        </div>
+
+        {/* URL Input */}
+        <div className="mb-4">
+          <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5 block">
+            Signature Image URL
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={url}
+              onChange={handleChange}
+              placeholder="https://example.com/signature.png"
+              className="flex-1 px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100"
+            />
+            <button
+              onClick={() => checkImage(url)}
+              disabled={!url.trim() || checking}
+              className="px-3 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 text-sm font-medium transition-colors disabled:opacity-40">
+              {checking ? <MiniSpinner/> : "Check"}
+            </button>
+          </div>
+        </div>
+
+        {/* Preview */}
+        {valid === true && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl">
+            <p className="text-xs text-green-600 font-semibold mb-2">✅ Valid image — preview:</p>
+            <div className="bg-white rounded-lg p-3 flex items-center justify-center border border-green-100 min-h-[80px]">
+              <img src={url} alt="Signature preview"
+                className="max-h-[70px] max-w-full object-contain"/>
+            </div>
+          </div>
+        )}
+
+        {valid === false && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+            <p className="text-xs text-red-600 font-semibold">
+              ❌ Invalid image URL — signature will be skipped
+            </p>
+          </div>
+        )}
+
+        {/* Info note */}
+        <p className="text-xs text-stone-400 mb-5 leading-relaxed">
+          Leave empty to generate certificates without a signature.
+          PNG with transparent background works best.
+        </p>
+
+        {/* Buttons */}
+        <div className="flex gap-2">
+          <button onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50 transition-colors">
+            Cancel
+          </button>
+          <button
+            onClick={() => onConfirm(valid === true ? url : "")}
+            className="flex-1 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors shadow-sm">
+            🏅 Generate Certificates
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
