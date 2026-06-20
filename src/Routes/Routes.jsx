@@ -55,6 +55,7 @@ import AdminEventsPage from "../Pages/Events/AdminEventPage"
 import AdminEventManagePage from "../Pages/Events/AdminEventManagePAge"
 import CertificateVerifyPage from "../Pages/Events/CertificateVerifyPage"
 import MyCertificatesPage from "../Pages/Events/MyCertificatePage"
+import AdminCertificatesPage from "../Pages/Events/AdminCertificatePage"
 
 export const router = createBrowserRouter([
     {
@@ -205,5 +206,8 @@ export const router = createBrowserRouter([
     },
     {
         path: '/onlytest', Component: MyCertificatesPage
+    },
+    {
+        path: '/cert', Component: AdminCertificatesPage
     }
 ])
