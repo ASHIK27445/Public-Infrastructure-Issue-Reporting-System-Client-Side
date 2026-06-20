@@ -1,9 +1,242 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { toast } from "react-toastify";
+import { useParams, Link, useNavigate } from "react-router";
 import { Html5Qrcode } from "html5-qrcode";
 import { format, formatDistanceToNow } from "date-fns";
+
+/* ═══════════════════════════════════════
+   DEMO DATA & MOCK API
+═══════════════════════════════════════ */
+const DEMO_EVENT = {
+  _id: "evt_001",
+  title: "Community Cleanup Drive 2026",
+  date: new Date("2026-06-15T09:00:00"),
+  location: "City Park, Downtown",
+  organizer: "Green Earth Foundation"
+};
+
+const DEMO_VOLUNTEERS = [
+  {
+    _id: "vol_001",
+    name: "Alice Johnson",
+    email: "alice@email.com",
+    role: "team_lead",
+    institution: "MIT",
+    skills: ["leadership", "environment"],
+    qrToken: "qr_alice_001",
+    paymentStatus: "paid"
+  },
+  {
+    _id: "vol_002",
+    name: "Bob Smith",
+    email: "bob@email.com",
+    role: "volunteer",
+    institution: "Stanford",
+    skills: ["logistics"],
+    qrToken: "qr_bob_002",
+    paymentStatus: "paid"
+  },
+  {
+    _id: "vol_003",
+    name: "Charlie Brown",
+    email: "charlie@email.com",
+    role: "photographer",
+    institution: "UCLA",
+    skills: ["photography", "social_media"],
+    qrToken: "qr_charlie_003",
+    paymentStatus: "pending"
+  },
+  {
+    _id: "vol_004",
+    name: "Diana Prince",
+    email: "diana@email.com",
+    role: "first_aid",
+    institution: "Harvard",
+    skills: ["medical", "cpr"],
+    qrToken: "qr_diana_004",
+    paymentStatus: "paid"
+  },
+  {
+    _id: "vol_005",
+    name: "Ethan Hunt",
+    email: "ethan@email.com",
+    role: "volunteer",
+    institution: "Yale",
+    skills: ["security"],
+    qrToken: "qr_ethan_005",
+    paymentStatus: "paid"
+  }
+];
+
+// Simulates the backend state
+let mockDatabase = {
+  event: DEMO_EVENT,
+  volunteers: [...DEMO_VOLUNTEERS],
+  checkins: {} // { volunteerId: checkinData }
+};
+
+// Helper to reset database (useful for testing)
+const resetMockDatabase = () => {
+  mockDatabase.checkins = {};
+  mockDatabase.volunteers = [...DEMO_VOLUNTEERS];
+};
+
+// Mock API functions
+const mockGetEventDetail = (eventId) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ data: { event: mockDatabase.event } });
+    }, 500);
+  });
+};
+
+const mockGetCheckinStats = (eventId) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const total = mockDatabase.volunteers.length;
+      const attendedIds = Object.keys(mockDatabase.checkins);
+      const attended = attendedIds.length;
+      const pending = total - attended;
+      const percentage = total > 0 ? Math.round((attended / total) * 100) : 0;
+      
+      const attendedVolunteers = attendedIds.map(id => {
+        const vol = mockDatabase.volunteers.find(v => v._id === id);
+        return {
+          ...vol,
+          attendedAt: mockDatabase.checkins[id].attendedAt
+        };
+      }).sort((a, b) => new Date(b.attendedAt) - new Date(a.attendedAt));
+      
+      const pendingVolunteers = mockDatabase.volunteers.filter(
+        v => !mockDatabase.checkins[v._id]
+      );
+      
+      const waitlisted = 0; // For demo purposes
+
+      resolve({
+        data: {
+          stats: { total, attended, pending, percentage, waitlisted },
+          recent: attendedVolunteers,
+          pending: pendingVolunteers
+        }
+      });
+    }, 300);
+  });
+};
+
+const mockCheckinByQR = (eventId, qrToken) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const volunteer = mockDatabase.volunteers.find(v => v.qrToken === qrToken);
+      
+      if (!volunteer) {
+        return reject({
+          response: {
+            data: {
+              success: false,
+              message: "Invalid QR code. No volunteer found.",
+              code: "INVALID_QR"
+            }
+          }
+        });
+      }
+      
+      if (mockDatabase.checkins[volunteer._id]) {
+        return reject({
+          response: {
+            data: {
+              success: false,
+              message: `${volunteer.name} is already checked in.`,
+              code: "ALREADY_CHECKED_IN",
+              volunteer: {
+                ...volunteer,
+                attendedAt: mockDatabase.checkins[volunteer._id].attendedAt
+              }
+            }
+          }
+        });
+      }
+      
+      const attendedAt = new Date().toISOString();
+      mockDatabase.checkins[volunteer._id] = { attendedAt, method: 'qr' };
+      
+      resolve({
+        data: {
+          success: true,
+          message: `Welcome, ${volunteer.name}! Check-in confirmed.`,
+          volunteer: {
+            ...volunteer,
+            attendedAt
+          }
+        }
+      });
+    }, 800);
+  });
+};
+
+const mockManualCheckin = (eventId, email) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const volunteer = mockDatabase.volunteers.find(v => 
+        v.email.toLowerCase() === email.toLowerCase()
+      );
+      
+      if (!volunteer) {
+        return reject({
+          response: {
+            data: {
+              success: false,
+              message: "No volunteer found with this email address.",
+              code: "NOT_FOUND"
+            }
+          }
+        });
+      }
+      
+      if (mockDatabase.checkins[volunteer._id]) {
+        return reject({
+          response: {
+            data: {
+              success: false,
+              message: `${volunteer.name} is already checked in.`,
+              code: "ALREADY_CHECKED_IN",
+              volunteer: {
+                ...volunteer,
+                attendedAt: mockDatabase.checkins[volunteer._id].attendedAt
+              }
+            }
+          }
+        });
+      }
+      
+      const attendedAt = new Date().toISOString();
+      mockDatabase.checkins[volunteer._id] = { attendedAt, method: 'manual' };
+      
+      resolve({
+        data: {
+          success: true,
+          message: `Manual check-in successful for ${volunteer.name}.`,
+          volunteer: {
+            ...volunteer,
+            attendedAt
+          }
+        }
+      });
+    }, 600);
+  });
+};
+
+const mockUndoCheckin = (eventId, registrationId) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (mockDatabase.checkins[registrationId]) {
+        delete mockDatabase.checkins[registrationId];
+        resolve({ data: { success: true } });
+      } else {
+        reject({ response: { data: { message: "Check-in not found" } } });
+      }
+    }, 300);
+  });
+};
 
 /* ═══════════════════════════════════════
    MAIN PAGE
@@ -33,71 +266,78 @@ export default function QRCheckinPage() {
   const html5QrRef   = useRef(null);
   const resultTimerRef = useRef(null);
 
-  const token   = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
-
   /* ── Fetch event info ── */
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/events/${id}/detail`, { headers })
+    mockGetEventDetail(id)
       .then((r) => setEvent(r.data?.event))
       .catch(() => toast.error("Could not load event"))
       .finally(() => setLoading(false));
+    
+    // Reset demo data on mount
+    resetMockDatabase();
   }, [id]);
 
   /* ── Fetch live stats ── */
   const fetchStats = useCallback(async () => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/events/${id}/checkin/stats`, { headers }
-      );
+      const res = await mockGetCheckinStats(id);
       setStatsData(res.data);
     } catch { /* silent */ }
   }, [id]);
 
   useEffect(() => {
     fetchStats();
-    // Auto-refresh stats every 15 seconds
-    const interval = setInterval(fetchStats, 15000);
+    // Auto-refresh stats every 5 seconds for demo
+    const interval = setInterval(fetchStats, 5000);
     return () => clearInterval(interval);
   }, [fetchStats]);
 
   /* ════════════════════════════════════
      SCANNER LIFECYCLE
   ════════════════════════════════════ */
-  const startScanner = useCallback(async () => {
-    if (html5QrRef.current) return; // already running
-    setCameraError(null);
-    setScannerReady(false);
+    const startScanner = useCallback(async () => {
+        if (html5QrRef.current) return;
+        setCameraError(null);
+        setScannerReady(false);
 
-    try {
-      const html5Qr = new Html5Qrcode("qr-reader");
-      html5QrRef.current = html5Qr;
+        // Wait for DOM to render the qr-reader element
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const qrReaderElement = document.getElementById("qr-reader");
+        if (!qrReaderElement) {
+        setCameraError("Scanner element not found. Please try again.");
+        return;
+        }
 
-      await html5Qr.start(
-        { facingMode: "environment" }, // rear camera
-        {
-          fps:            10,
-          qrbox:          { width: 260, height: 260 },
-          aspectRatio:    1.0,
-          disableFlip:    false,
-        },
-        onScanSuccess,
-        () => {} // ignore scan errors (noise)
-      );
-      setScanning(true);
-      setScannerReady(true);
-    } catch (err) {
-      console.error("Camera error:", err);
-      setCameraError(
-        err.name === "NotAllowedError"
-          ? "Camera permission denied. Please allow camera access and try again."
-          : err.name === "NotFoundError"
-          ? "No camera found on this device."
-          : `Camera error: ${err.message}`
-      );
-      html5QrRef.current = null;
-    }
-  }, [id]);
+        try {
+        const html5Qr = new Html5Qrcode("qr-reader");
+        html5QrRef.current = html5Qr;
+
+        await html5Qr.start(
+            { facingMode: "environment" }, // rear camera
+            {
+            fps:            10,
+            qrbox:          { width: 260, height: 260 },
+            aspectRatio:    1.0,
+            disableFlip:    false,
+            },
+            onScanSuccess,
+            () => {} // ignore scan errors (noise)
+        );
+        setScanning(true);
+        setScannerReady(true);
+        } catch (err) {
+        console.error("Camera error:", err);
+        setCameraError(
+            err.name === "NotAllowedError"
+            ? "Camera permission denied. Please allow camera access and try again."
+            : err.name === "NotFoundError"
+            ? "No camera found on this device."
+            : `Camera error: ${err.message}`
+        );
+        html5QrRef.current = null;
+        }
+    }, [id]);
 
   const stopScanner = useCallback(async () => {
     if (html5QrRef.current) {
@@ -112,9 +352,13 @@ export default function QRCheckinPage() {
   }, []);
 
   // Auto-start scanner when on scanner tab
-  useEffect(() => {
+useEffect(() => {
     if (activeTab === "scanner") {
-      startScanner();
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        startScanner();
+      }, 150);
+      return () => clearTimeout(timer);
     } else {
       stopScanner();
     }
@@ -140,11 +384,7 @@ export default function QRCheckinPage() {
     }
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/${id}/checkin`,
-        { qrToken: decodedText },
-        { headers }
-      );
+      const res = await mockCheckinByQR(id, decodedText);
       setScanResult({ ...res.data, type: "success" });
       fetchStats();
     } catch (err) {
@@ -176,15 +416,11 @@ export default function QRCheckinPage() {
     setManualLoading(true);
     setManualResult(null);
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/${id}/checkin/manual`,
-        { email: manualEmail.trim() },
-        { headers }
-      );
+      const res = await mockManualCheckin(id, manualEmail.trim());
       setManualResult({ ...res.data, type: "success" });
       setManualEmail("");
       fetchStats();
-      toast.success(res.data.message);
+      toastDemo(`${res.data.volunteer.name} checked in successfully!`);
     } catch (err) {
       const errData = err.response?.data;
       setManualResult({
@@ -203,13 +439,10 @@ export default function QRCheckinPage() {
   const handleUndo = async (regId, name) => {
     if (!window.confirm(`Undo check-in for ${name}?`)) return;
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_API_URL}/events/${id}/checkin/${regId}`,
-        { headers }
-      );
-      toast.success(`Check-in undone for ${name}`);
+      await mockUndoCheckin(id, regId);
+      toastDemo(`Check-in undone for ${name}`);
       fetchStats();
-    } catch { toast.error("Undo failed"); }
+    } catch { toastDemo("Undo failed"); }
   };
 
   /* ─────────────────── RENDER ─────────────────── */
@@ -301,6 +534,19 @@ export default function QRCheckinPage() {
         ════════════════════════════════════ */}
         {activeTab === "scanner" && (
           <div className="space-y-4">
+            {/* Demo QR Codes Reference */}
+            <div className="bg-blue-950/30 border border-blue-900/50 rounded-2xl p-4">
+              <p className="text-blue-300 text-xs font-medium mb-2">🎯 Demo QR Codes (scan to test):</p>
+              <div className="space-y-1 text-xs text-blue-400/80">
+                <p>• Alice: <code className="text-white bg-blue-900/50 px-2 py-0.5 rounded">qr_alice_001</code></p>
+                <p>• Bob: <code className="text-white bg-blue-900/50 px-2 py-0.5 rounded">qr_bob_002</code></p>
+                <p>• Charlie: <code className="text-white bg-blue-900/50 px-2 py-0.5 rounded">qr_charlie_003</code></p>
+                <p>• Diana: <code className="text-white bg-blue-900/50 px-2 py-0.5 rounded">qr_diana_004</code></p>
+                <p>• Ethan: <code className="text-white bg-blue-900/50 px-2 py-0.5 rounded">qr_ethan_005</code></p>
+              </div>
+              <p className="text-blue-500/60 text-[10px] mt-2">Generate QR codes containing these tokens to test the scanner</p>
+            </div>
+
             {/* Camera permission error */}
             {cameraError && (
               <div className="bg-red-900/40 border border-red-700 rounded-2xl p-5 text-center">
@@ -388,7 +634,7 @@ export default function QRCheckinPage() {
                               Previously checked in {formatDistanceToNow(new Date(scanResult.volunteer.attendedAt), { addSuffix:true })}
                             </p>
                           )}
-                          {scanResult.skills?.length > 0 && (
+                          {scanResult.volunteer.skills?.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-1">
                               {scanResult.volunteer.skills?.map((s) => (
                                 <span key={s} className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full">{s}</span>
@@ -453,6 +699,14 @@ export default function QRCheckinPage() {
               <p className="text-gray-500 text-sm mb-5">
                 Use when QR code is unavailable or camera doesn't work.
               </p>
+
+              {/* Demo emails reference */}
+              <div className="bg-blue-950/30 border border-blue-900/50 rounded-xl p-3 mb-4">
+                <p className="text-blue-300 text-xs font-medium mb-1">📧 Demo emails for testing:</p>
+                <p className="text-blue-400/70 text-xs">
+                  alice@email.com · bob@email.com · charlie@email.com · diana@email.com · ethan@email.com
+                </p>
+              </div>
 
               <form onSubmit={handleManualCheckin} className="space-y-4">
                 <div>
@@ -677,4 +931,16 @@ function DarkSpinner() {
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
     </svg>
   );
+}
+
+// Simple toast function (replaces react-toastify)
+function toastDemo(message) {
+  // Create a simple toast notification
+  const toast = document.createElement('div');
+  toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-3 rounded-xl shadow-lg text-sm z-50 animate-bounce';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
 }
