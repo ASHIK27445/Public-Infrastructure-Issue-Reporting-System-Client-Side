@@ -352,18 +352,18 @@ export default function QRCheckinPageDemo() {
   }, []);
 
   // Auto-start scanner when on scanner tab
-useEffect(() => {
-    if (activeTab === "scanner") {
-      // Small delay to ensure DOM is ready
-      const timer = setTimeout(() => {
-        startScanner();
-      }, 150);
-      return () => clearTimeout(timer);
-    } else {
-      stopScanner();
-    }
-    return () => { stopScanner(); };
-  }, [activeTab]);
+  useEffect(() => {
+      if (activeTab === "scanner") {
+        // Small delay to ensure DOM is ready
+        const timer = setTimeout(() => {
+          startScanner();
+        }, 150);
+        return () => clearTimeout(timer);
+      } else {
+        stopScanner();
+      }
+      return () => { stopScanner(); };
+    }, [activeTab]);
 
   // Cleanup on unmount
   useEffect(() => {

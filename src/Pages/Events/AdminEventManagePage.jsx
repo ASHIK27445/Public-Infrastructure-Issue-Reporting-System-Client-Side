@@ -271,7 +271,7 @@ export default function AdminEventManagePage() {
                 );
               }
 
-              navigate(`/dashboard/admin/event/${event._id}/qr/checkin`);
+              navigate(`/event/${event._id}/qr/checkin`);
             }}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-medium transition-colors ${
               event.status === "ongoing"

@@ -124,7 +124,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/events/:id', Component: EventDetailPage
-            }
+            },
         ]
     },
     {
@@ -198,9 +198,6 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'admin/waitlist-feed', Component: AdminWaitlistFeed
-            },
-            {
-                path: 'admin/event/:id/qr/checkin', Component: QRCheckinPage
             }
 
         ]
@@ -209,9 +206,12 @@ export const router = createBrowserRouter([
         path: '*', Component: ErrorPage
     },
     {
-        path: '/onlytest', Component: MyCertificatesPage
+        path: '/onlytest', element: <PrivateRouter><MyCertificatesPage/></PrivateRouter>
     },
     {
         path: '/cert/:id', Component: AdminCertificatesPage
+    },
+    {
+        path: '/event/:id/qr/checkin', element: <PrivateRouter><QRCheckinPage /></PrivateRouter>
     }
 ])

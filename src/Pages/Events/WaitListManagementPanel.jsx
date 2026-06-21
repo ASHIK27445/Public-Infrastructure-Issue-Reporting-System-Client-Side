@@ -219,7 +219,7 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
 
                       {/* Contact */}
                       <Td>
-                        <p className="text-xs text-zinc-300">{v.email}</p>
+                        <p className="text-xs text-white">{v.email}</p>
                         <p className="text-xs text-zinc-500 mt-0.5">{v.phone}</p>
                       </Td>
 

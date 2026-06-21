@@ -5,39 +5,69 @@ import { toast } from "react-toastify";
 import { Html5Qrcode } from "html5-qrcode";
 import { format, formatDistanceToNow } from "date-fns";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import {
+  ArrowLeft,
+  Camera,
+  QrCode,
+  User,
+  Clock,
+  Users,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  RefreshCw,
+  Mail,
+  Calendar,
+  MapPin,
+  Award,
+  ChevronRight,
+  UserCheck,
+  UserX,
+  Loader2,
+  Scan,
+  Smartphone,
+  Check,
+  X,
+  RotateCcw,
+  Eye,
+  EyeOff,
+  List,
+  UserPlus,
+} from "lucide-react";
 
 /* ═══════════════════════════════════════
    MAIN PAGE
 ═══════════════════════════════════════ */
 export default function QRCheckinPage() {
-  const { id }   = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  const [event,      setEvent]      = useState(null);
-  const [statsData,  setStatsData]  = useState(null);
-  const [loading,    setLoading]    = useState(true);
-  const [activeTab,  setActiveTab]  = useState("scanner"); // scanner | manual | recent | pending
+  const [event, setEvent] = useState(null);
+  const [statsData, setStatsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("scanner");
 
   // Scanner states
-  const [scanning,       setScanning]       = useState(false);
-  const [scanResult,     setScanResult]     = useState(null); // { success, message, volunteer, code }
-  const [processing,     setProcessing]     = useState(false);
-  const [scannerReady,   setScannerReady]   = useState(false);
-  const [cameraError,    setCameraError]    = useState(null);
+  const [scanning, setScanning] = useState(false);
+  const [scanResult, setScanResult] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [scannerReady, setScannerReady] = useState(false);
+  const [cameraError, setCameraError] = useState(null);
 
   // Manual check-in
-  const [manualEmail,    setManualEmail]    = useState("");
-  const [manualLoading,  setManualLoading]  = useState(false);
-  const [manualResult,   setManualResult]   = useState(null);
+  const [manualEmail, setManualEmail] = useState("");
+  const [manualLoading, setManualLoading] = useState(false);
+  const [manualResult, setManualResult] = useState(null);
 
-  const scannerRef   = useRef(null);
-  const html5QrRef   = useRef(null);
+  const scannerRef = useRef(null);
+  const html5QrRef = useRef(null);
   const resultTimerRef = useRef(null);
-  const axiosSecure = useAxiosSecure()
+  const axiosSecure = useAxiosSecure();
 
   /* ── Fetch event info ── */
   useEffect(() => {
-    axiosSecure.get(`/admin/event/${id}/detail`)
+    axiosSecure
+      .get(`/admin/event/${id}/detail`)
       .then((r) => setEvent(r.data?.event))
       .catch(() => toast.error("Could not load event"))
       .finally(() => setLoading(false));
@@ -46,15 +76,15 @@ export default function QRCheckinPage() {
   /* ── Fetch live stats ── */
   const fetchStats = useCallback(async () => {
     try {
-      const res = await axiosSecure.get(
-        `/events/${id}/checkin/stats`);
+      const res = await axiosSecure.get(`/events/${id}/checkin/stats`);
       setStatsData(res.data);
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }, [id]);
 
   useEffect(() => {
     fetchStats();
-    // Auto-refresh stats every 15 seconds
     const interval = setInterval(fetchStats, 15000);
     return () => clearInterval(interval);
   }, [fetchStats]);
@@ -63,24 +93,32 @@ export default function QRCheckinPage() {
      SCANNER LIFECYCLE
   ════════════════════════════════════ */
   const startScanner = useCallback(async () => {
-    if (html5QrRef.current) return; // already running
+    if (html5QrRef.current) return;
     setCameraError(null);
     setScannerReady(false);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const qrReaderElement = document.getElementById("qr-reader");
+    if (!qrReaderElement) {
+      setCameraError("Scanner element not found. Please try again.");
+      return;
+    }
 
     try {
       const html5Qr = new Html5Qrcode("qr-reader");
       html5QrRef.current = html5Qr;
 
       await html5Qr.start(
-        { facingMode: "environment" }, // rear camera
+        { facingMode: "environment" },
         {
-          fps:            10,
-          qrbox:          { width: 260, height: 260 },
-          aspectRatio:    1.0,
-          disableFlip:    false,
+          fps: 10,
+          qrbox: { width: 260, height: 260 },
+          aspectRatio: 1.0,
+          disableFlip: false,
         },
         onScanSuccess,
-        () => {} // ignore scan errors (noise)
+        () => {}
       );
       setScanning(true);
       setScannerReady(true);
@@ -102,68 +140,79 @@ export default function QRCheckinPage() {
       try {
         await html5QrRef.current.stop();
         html5QrRef.current.clear();
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       html5QrRef.current = null;
     }
     setScanning(false);
     setScannerReady(false);
   }, []);
 
-  // Auto-start scanner when on scanner tab
   useEffect(() => {
     if (activeTab === "scanner") {
-      startScanner();
+      const timer = setTimeout(() => {
+        startScanner();
+      }, 150);
+      return () => clearTimeout(timer);
     } else {
       stopScanner();
     }
-    return () => { stopScanner(); };
-  }, [activeTab]);
+  }, [activeTab, startScanner, stopScanner]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopScanner();
       if (resultTimerRef.current) clearTimeout(resultTimerRef.current);
     };
-  }, []);
+  }, [stopScanner]);
 
   /* ── QR scan success handler ── */
-  const onScanSuccess = useCallback(async (decodedText) => {
-    if (processing) return; // prevent double-scan
-    setProcessing(true);
+  const onScanSuccess = useCallback(
+    async (decodedText) => {
+      if (processing) return;
+      setProcessing(true);
 
-    // Pause scanner briefly to avoid re-trigger
-    if (html5QrRef.current) {
-      try { await html5QrRef.current.pause(true); } catch { /* ignore */ }
-    }
-
-    try {
-      const res = await axiosSecure.post(
-        `/events/${id}/checkin`,
-        { qrToken: decodedText })
-      setScanResult({ ...res.data, type: "success" });
-      fetchStats();
-    } catch (err) {
-      const errData = err.response?.data;
-      setScanResult({
-        success:   false,
-        type:      errData?.code === "ALREADY_CHECKED_IN" ? "warning" : "error",
-        message:   errData?.message || "Check-in failed",
-        code:      errData?.code,
-        volunteer: errData?.volunteer,
-      });
-    } finally {
-      setProcessing(false);
-      // Auto-clear result and resume scanner after 4 seconds
-      if (resultTimerRef.current) clearTimeout(resultTimerRef.current);
-      resultTimerRef.current = setTimeout(async () => {
-        setScanResult(null);
-        if (html5QrRef.current) {
-          try { await html5QrRef.current.resume(); } catch { /* ignore */ }
+      if (html5QrRef.current) {
+        try {
+          await html5QrRef.current.pause(true);
+        } catch {
+          /* ignore */
         }
-      }, 4000);
-    }
-  }, [id, processing, fetchStats]);
+      }
+
+      try {
+        const res = await axiosSecure.post(`/events/${id}/checkin`, {
+          qrToken: decodedText,
+        });
+        setScanResult({ ...res.data, type: "success" });
+        fetchStats();
+      } catch (err) {
+        const errData = err.response?.data;
+        setScanResult({
+          success: false,
+          type: errData?.code === "ALREADY_CHECKED_IN" ? "warning" : "error",
+          message: errData?.message || "Check-in failed",
+          code: errData?.code,
+          volunteer: errData?.volunteer,
+        });
+      } finally {
+        setProcessing(false);
+        if (resultTimerRef.current) clearTimeout(resultTimerRef.current);
+        resultTimerRef.current = setTimeout(async () => {
+          setScanResult(null);
+          if (html5QrRef.current) {
+            try {
+              await html5QrRef.current.resume();
+            } catch {
+              /* ignore */
+            }
+          }
+        }, 4000);
+      }
+    },
+    [id, processing, fetchStats]
+  );
 
   /* ── Manual check-in ── */
   const handleManualCheckin = async (e) => {
@@ -172,8 +221,9 @@ export default function QRCheckinPage() {
     setManualLoading(true);
     setManualResult(null);
     try {
-      const res = await axiosSecure.post(`/events/${id}/checkin/manual`,
-        { email: manualEmail.trim()})
+      const res = await axiosSecure.post(`/events/${id}/checkin/manual`, {
+        email: manualEmail.trim(),
+      });
       setManualResult({ ...res.data, type: "success" });
       setManualEmail("");
       fetchStats();
@@ -182,9 +232,9 @@ export default function QRCheckinPage() {
       const errData = err.response?.data;
       setManualResult({
         success: false,
-        type:    errData?.code === "ALREADY_CHECKED_IN" ? "warning" : "error",
+        type: errData?.code === "ALREADY_CHECKED_IN" ? "warning" : "error",
         message: errData?.message || "Check-in failed",
-        code:    errData?.code,
+        code: errData?.code,
         volunteer: errData?.volunteer,
       });
     } finally {
@@ -196,89 +246,144 @@ export default function QRCheckinPage() {
   const handleUndo = async (regId, name) => {
     if (!window.confirm(`Undo check-in for ${name}?`)) return;
     try {
-      await axiosSecure.delete(`/events/${id}/checkin/${regId}`)
+      await axiosSecure.delete(`/events/${id}/checkin/${regId}`);
       toast.success(`Check-in undone for ${name}`);
       fetchStats();
-    } catch { toast.error("Undo failed"); }
+    } catch {
+      toast.error("Undo failed");
+    }
   };
 
   /* ─────────────────── RENDER ─────────────────── */
-  if (loading) return (
-    <Shell dark>
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-12 h-12 border-[3px] border-green-400 border-t-transparent rounded-full animate-spin" />
-      </div>
-    </Shell>
-  );
+  if (loading)
+    return (
+      <Shell>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        </div>
+      </Shell>
+    );
 
-  const attended   = statsData?.stats?.attended   || 0;
-  const total      = statsData?.stats?.total       || 0;
-  const pending    = statsData?.stats?.pending     || 0;
-  const percentage = statsData?.stats?.percentage  || 0;
+  const attended = statsData?.stats?.attended || 0;
+  const total = statsData?.stats?.total || 0;
+  const pending = statsData?.stats?.pending || 0;
+  const percentage = statsData?.stats?.percentage || 0;
 
   return (
-    <Shell dark>
-      {/* ── Top bar ── */}
-      <div className="sticky top-0 z-20 bg-gray-950/95 backdrop-blur-sm border-b border-gray-800 px-4 py-3">
+    <Shell>
+      {/* ── Header ── */}
+      <div className="sticky top-0 z-20 bg-linear-to-br from-zinc-900 to-zinc-800   backdrop-blur-sm border-b border-gray-100 px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
-          <button onClick={() => { stopScanner(); navigate(`/admin/events/${id}/manage`); }}
-            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
-            </svg>
-            Back
+          <button
+            onClick={() => {
+              stopScanner();
+              navigate(`/dashboard/admin/events/${id}/manage`);
+            }}
+            className="flex items-center gap-2 text-sm text-white hover:cursor-pointer transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            <span className="font-medium">Back</span>
           </button>
+
           <div className="text-center flex-1 min-w-0">
-            <p className="text-white font-semibold text-sm truncate">{event?.title || "Event Check-in"}</p>
-            <p className="text-gray-400 text-xs">{event ? format(new Date(event.date), "dd MMM yyyy · h:mm a") : ""}</p>
+            <p className="font-semibold text-white text-sm truncate">
+              {event?.title || "Event Check-in"}
+            </p>
+            <p className="text-gray-500 text-xs flex items-center justify-center gap-2">
+              <Calendar className="w-3 h-3" />
+              {event ? format(new Date(event.date), "dd MMM yyyy · h:mm a") : ""}
+            </p>
           </div>
+
           <div className="text-right">
-            <p className="text-green-400 font-bold text-lg leading-none">{attended}<span className="text-gray-500 text-sm font-normal">/{total}</span></p>
+            <p className="text-blue-600 font-bold text-lg leading-none">
+              {attended}
+              <span className="text-gray-400 text-sm font-normal">
+                /{total}
+              </span>
+            </p>
             <p className="text-gray-500 text-xs">checked in</p>
           </div>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-5">
-
-        {/* ── Live progress bar ── */}
-        <div className="mb-5">
+        {/* ── Progress ── */}
+        <div className="mb-6">
           <div className="flex justify-between text-xs text-gray-500 mb-2">
-            <span className="text-green-400 font-medium">{attended} attended</span>
-            <span>{percentage}% · {pending} remaining</span>
+            <span className="text-blue-600 font-medium">
+              {attended} attended
+            </span>
+            <span>
+              {percentage}% · {pending} remaining
+            </span>
           </div>
-          <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full transition-all duration-700"
+              className="h-full bg-linear-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-700"
               style={{ width: `${percentage}%` }}
             />
           </div>
         </div>
 
-        {/* ── Stats cards ── */}
-        <div className="grid grid-cols-3 gap-3 mb-5">
-          <DarkStatCard label="Attended"  value={attended}   color="green"  />
-          <DarkStatCard label="Remaining" value={pending}    color="amber"  />
-          <DarkStatCard label="Waitlist"  value={statsData?.stats?.waitlisted || 0} color="gray" />
+        {/* ── Stats ── */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <StatCard
+            icon={CheckCircle}
+            label="Attended"
+            value={attended}
+            color="blue"
+          />
+          <StatCard
+            icon={Clock}
+            label="Remaining"
+            value={pending}
+            color="amber"
+          />
+          <StatCard
+            icon={Users}
+            label="Waitlist"
+            value={statsData?.stats?.waitlisted || 0}
+            color="gray"
+          />
         </div>
 
-        {/* ── Tab bar ── */}
-        <div className="flex gap-1 bg-gray-900 rounded-2xl p-1 mb-5">
+        {/* ── Tabs ── */}
+        <div className="flex gap-1 bg-zinc-800 rounded-xl p-1 mb-6">
           {[
-            { id:"scanner", label:"📷 Scanner" },
-            { id:"manual",  label:"⌨️ Manual"  },
-            { id:"recent",  label:"✅ Recent",  count: statsData?.recent?.length },
-            { id:"pending", label:"⏳ Pending", count: pending },
+            { id: "scanner", label: "Scan", icon: Scan },
+            { id: "manual", label: "Manual", icon: UserPlus },
+            {
+              id: "recent",
+              label: "Recent",
+              icon: CheckCircle,
+              count: statsData?.recent?.length,
+            },
+            {
+              id: "pending",
+              label: "Pending",
+              icon: Clock,
+              count: pending,
+            },
           ].map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 activeTab === tab.id
-                  ? "bg-green-500 text-white shadow-sm"
-                  : "text-gray-400 hover:text-gray-200"
-              }`}>
-              <span>{tab.label}</span>
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              <span className="hidden sm:inline">{tab.label}</span>
               {tab.count > 0 && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${activeTab===tab.id ? "bg-white/20" : "bg-gray-700 text-gray-400"}`}>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full ${
+                    activeTab === tab.id
+                      ? "bg-blue-50 text-blue-600"
+                      : "bg-gray-200 text-gray-600"
+                  }`}
+                >
                   {tab.count}
                 </span>
               )}
@@ -291,143 +396,152 @@ export default function QRCheckinPage() {
         ════════════════════════════════════ */}
         {activeTab === "scanner" && (
           <div className="space-y-4">
-            {/* Camera permission error */}
             {cameraError && (
-              <div className="bg-red-900/40 border border-red-700 rounded-2xl p-5 text-center">
-                <div className="text-4xl mb-3">📷</div>
-                <p className="text-red-300 text-sm mb-4">{cameraError}</p>
-                <button onClick={startScanner}
-                  className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-medium transition-colors">
+              <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+                <Camera className="w-12 h-12 text-red-400 mx-auto mb-3" />
+                <p className="text-red-600 text-sm mb-4">{cameraError}</p>
+                <button
+                  onClick={startScanner}
+                  className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
                   Try Again
                 </button>
               </div>
             )}
 
-            {/* QR Scanner viewport */}
             {!cameraError && (
-              <div className="relative rounded-3xl overflow-hidden bg-gray-900 border border-gray-800">
-                {/* Scanner div — html5-qrcode mounts here */}
+              <div className="relative rounded-xl overflow-hidden bg-zinc-700 border border-zinc-700">
                 <div id="qr-reader" className="w-full" style={{ minHeight: "320px" }} />
 
-                {/* Overlay frame */}
                 {scannerReady && !scanResult && (
                   <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     <div className="relative w-64 h-64">
-                      {/* Corner frames */}
-                      {["top-0 left-0","top-0 right-0","bottom-0 left-0","bottom-0 right-0"].map((pos, i) => (
-                        <div key={i} className={`absolute w-8 h-8 border-green-400 ${pos} ${
-                          i<2 ? "border-t-2" : "border-b-2"
-                        } ${
-                          i%2===0 ? "border-l-2" : "border-r-2"
-                        }`} />
-                      ))}
-                      {/* Scan line animation */}
-                      <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-green-400 to-transparent animate-[scanline_2s_ease-in-out_infinite]" />
+                      {["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"].map(
+                        (pos, i) => (
+                          <div
+                            key={i}
+                            className={`absolute w-8 h-8 border-blue-400 ${pos} ${
+                              i < 2 ? "border-t-2" : "border-b-2"
+                            } ${i % 2 === 0 ? "border-l-2" : "border-r-2"}`}
+                          />
+                        )
+                      )}
+                      <div className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-transparent via-blue-400 to-transparent animate-scanline" />
                     </div>
                   </div>
                 )}
 
-                {/* Loading overlay */}
                 {!scannerReady && !cameraError && (
-                  <div className="absolute inset-0 bg-gray-900 flex flex-col items-center justify-center">
-                    <div className="w-10 h-10 border-[3px] border-green-500 border-t-transparent rounded-full animate-spin mb-3" />
+                  <div className="absolute inset-0 bg-zinc-700 flex flex-col items-center justify-center">
+                    <Loader2 className="w-10 h-10 text-blue-400 animate-spin mb-3" />
                     <p className="text-gray-400 text-sm">Starting camera...</p>
                   </div>
                 )}
 
-                {/* Processing overlay */}
                 {processing && (
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                    <div className="w-10 h-10 border-[3px] border-green-400 border-t-transparent rounded-full animate-spin" />
+                  <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">
+                    <Loader2 className="w-10 h-10 text-white animate-spin" />
                   </div>
                 )}
 
-                {/* RESULT OVERLAY */}
                 {scanResult && (
-                  <div className={`absolute inset-0 flex items-center justify-center p-6 ${
-                    scanResult.type === "success"  ? "bg-green-900/95"
-                    : scanResult.type === "warning"? "bg-amber-900/95"
-                    : "bg-red-900/95"
-                  }`}>
-                    <div className="text-center w-full">
-                      <div className={`text-7xl mb-4 ${scanResult.type==="success" ? "animate-bounce" : ""}`}>
-                        {scanResult.type==="success" ? "✅" : scanResult.type==="warning" ? "⚠️" : "❌"}
+                  <div
+                    className={`absolute inset-0 flex items-center justify-center p-6 ${
+                      scanResult.type === "success"
+                        ? "bg-green-500/95"
+                        : scanResult.type === "warning"
+                        ? "bg-amber-500/95"
+                        : "bg-red-500/95"
+                    }`}
+                  >
+                    <div className="text-center w-full text-white">
+                      <div className="text-7xl mb-4">
+                        {scanResult.type === "success" ? (
+                          <CheckCircle className="w-20 h-20 mx-auto" />
+                        ) : scanResult.type === "warning" ? (
+                          <AlertCircle className="w-20 h-20 mx-auto" />
+                        ) : (
+                          <XCircle className="w-20 h-20 mx-auto" />
+                        )}
                       </div>
-                      <p className={`text-xl font-bold mb-2 ${
-                        scanResult.type==="success" ? "text-green-300"
-                        : scanResult.type==="warning" ? "text-amber-300"
-                        : "text-red-300"
-                      }`}>
-                        {scanResult.type==="success" ? "Check-in Successful!" : scanResult.type==="warning" ? "Already Checked In" : "Check-in Failed"}
+                      <p className="text-xl font-bold mb-2">
+                        {scanResult.type === "success"
+                          ? "Check-in Successful!"
+                          : scanResult.type === "warning"
+                          ? "Already Checked In"
+                          : "Check-in Failed"}
                       </p>
 
                       {scanResult.volunteer && (
-                        <div className="bg-white/10 rounded-2xl p-4 mt-3 text-left space-y-1.5">
-                          <p className="text-white font-semibold text-lg">{scanResult.volunteer.name}</p>
-                          <p className="text-gray-300 text-sm capitalize">
-                            {scanResult.volunteer.role}
-                            {scanResult.volunteer.institution ? ` · ${scanResult.volunteer.institution}` : ""}
+                        <div className="bg-white/10 rounded-xl p-4 mt-3 text-left space-y-1.5">
+                          <p className="font-semibold text-lg">
+                            {scanResult.volunteer.name}
                           </p>
-                          {scanResult.type==="success" && scanResult.volunteer.attendedAt && (
-                            <p className="text-green-300 text-xs">
-                              Checked in at {format(new Date(scanResult.volunteer.attendedAt), "h:mm:ss a")}
-                            </p>
-                          )}
-                          {scanResult.type==="warning" && scanResult.volunteer.attendedAt && (
-                            <p className="text-amber-300 text-xs">
-                              Previously checked in {formatDistanceToNow(new Date(scanResult.volunteer.attendedAt), { addSuffix:true })}
-                            </p>
-                          )}
-                          {scanResult.skills?.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {scanResult.volunteer.skills?.map((s) => (
-                                <span key={s} className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full">{s}</span>
-                              ))}
-                            </div>
-                          )}
+                          <p className="text-sm text-white/80 capitalize">
+                            {scanResult.volunteer.role}
+                            {scanResult.volunteer.institution
+                              ? ` · ${scanResult.volunteer.institution}`
+                              : ""}
+                          </p>
+                          {scanResult.type === "success" &&
+                            scanResult.volunteer.attendedAt && (
+                              <p className="text-xs text-green-200">
+                                Checked in at{" "}
+                                {format(
+                                  new Date(scanResult.volunteer.attendedAt),
+                                  "h:mm:ss a"
+                                )}
+                              </p>
+                            )}
+                          {scanResult.type === "warning" &&
+                            scanResult.volunteer.attendedAt && (
+                              <p className="text-xs text-amber-200">
+                                Previously checked in{" "}
+                                {formatDistanceToNow(
+                                  new Date(scanResult.volunteer.attendedAt),
+                                  { addSuffix: true }
+                                )}
+                              </p>
+                            )}
                         </div>
                       )}
 
-                      {scanResult.type==="error" && !scanResult.volunteer && (
-                        <p className="text-red-300 text-sm mt-2">{scanResult.message}</p>
-                      )}
-
-                      <p className="text-gray-400 text-xs mt-4">Scanner resuming automatically...</p>
+                      <p className="text-xs text-white/70 mt-4">
+                        Scanner resuming automatically...
+                      </p>
                     </div>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Scanner controls */}
             <div className="flex gap-3">
               {!scanning ? (
-                <button onClick={startScanner}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-semibold text-sm transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9V5a2 2 0 012-2h4M3 15v4a2 2 0 002 2h4M15 3h4a2 2 0 012 2v4M15 21h4a2 2 0 002-2v-4"/>
-                  </svg>
+                <button
+                  onClick={startScanner}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors"
+                >
+                  <Camera className="w-5 h-5" />
                   Start Camera
                 </button>
               ) : (
-                <button onClick={stopScanner}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold text-sm transition-colors">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <rect x="6" y="6" width="12" height="12" rx="2"/>
-                  </svg>
+                <button
+                  onClick={stopScanner}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium text-sm transition-colors"
+                >
+                  <X className="w-5 h-5" />
                   Stop Camera
                 </button>
               )}
-              <button onClick={fetchStats}
-                className="px-4 py-3 rounded-2xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium transition-colors flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                </svg>
-                Refresh
+              <button
+                onClick={fetchStats}
+                className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <RefreshCw className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-center text-xs text-gray-600">
+            <p className="text-center text-xs text-gray-400">
               Point camera at volunteer's QR code · Auto-confirms in real time
             </p>
           </div>
@@ -437,72 +551,109 @@ export default function QRCheckinPage() {
             MANUAL CHECK-IN TAB
         ════════════════════════════════════ */}
         {activeTab === "manual" && (
-          <div className="space-y-5">
-            <div className="bg-gray-900 rounded-3xl border border-gray-800 p-6">
-              <h2 className="text-white font-semibold mb-1">Manual Check-in</h2>
-              <p className="text-gray-500 text-sm mb-5">
-                Use when QR code is unavailable or camera doesn't work.
-              </p>
+          <div className="bg-linear-to-br from-zinc-900 to-zinc-800 border border-zinc-700 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-1">
+              <UserPlus className="w-5 h-5 text-blue-500" />
+              <h2 className="font-semibold text-white">Manual Check-in</h2>
+            </div>
+            <p className="text-gray-500 text-sm mb-5">
+              Use when QR code is unavailable or camera doesn't work.
+            </p>
 
-              <form onSubmit={handleManualCheckin} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">
-                    Volunteer Email Address
-                  </label>
+            <form onSubmit={handleManualCheckin} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-white uppercase tracking-wide mb-2">
+                  Volunteer Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white" />
                   <input
                     type="email"
                     value={manualEmail}
-                    onChange={(e) => { setManualEmail(e.target.value); setManualResult(null); }}
+                    onChange={(e) => {
+                      setManualEmail(e.target.value);
+                      setManualResult(null);
+                    }}
                     placeholder="volunteer@email.com"
-                    className="w-full px-4 py-3 rounded-2xl bg-gray-800 border border-gray-700 text-white
-                               placeholder:text-gray-600 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 text-sm"
+                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 text-white placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm"
                     autoComplete="off"
                     autoFocus
                   />
                 </div>
+              </div>
 
-                <button type="submit" disabled={manualLoading || !manualEmail.trim()}
-                  className="w-full py-3 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-semibold
-                             text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                  {manualLoading ? <><DarkSpinner/> Checking in...</> : "✅ Check In Volunteer"}
-                </button>
-              </form>
+              <button
+                type="submit"
+                disabled={manualLoading || !manualEmail.trim()}
+                className="w-full py-3 rounded-lg bg-linear-to-br from-emerald-500 to-teal-500 hover:cursor-pointer text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {manualLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Checking in...
+                  </>
+                ) : (
+                  <>
+                    <UserCheck className="w-4 h-4 text-white" />
+                    Check In Volunteer
+                  </>
+                )}
+              </button>
+            </form>
 
-              {/* Manual result */}
-              {manualResult && (
-                <div className={`mt-4 rounded-2xl p-4 ${
-                  manualResult.type==="success"  ? "bg-green-900/50 border border-green-700"
-                  : manualResult.type==="warning"? "bg-amber-900/50 border border-amber-700"
-                  : "bg-red-900/50 border border-red-700"
-                }`}>
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">
-                      {manualResult.type==="success" ? "✅" : manualResult.type==="warning" ? "⚠️" : "❌"}
-                    </span>
-                    <div>
-                      <p className={`font-semibold text-sm ${
-                        manualResult.type==="success" ? "text-green-300"
-                        : manualResult.type==="warning" ? "text-amber-300"
-                        : "text-red-300"
-                      }`}>
-                        {manualResult.message}
-                      </p>
-                      {manualResult.volunteer && (
-                        <div className="mt-2 space-y-0.5">
-                          <p className="text-white text-sm font-medium">{manualResult.volunteer.name}</p>
-                          <p className="text-gray-400 text-xs capitalize">{manualResult.volunteer.role}</p>
-                          {manualResult.volunteer.attendedAt && (
-                            <p className="text-gray-400 text-xs">
-                              at {format(new Date(manualResult.volunteer.attendedAt), "h:mm:ss a")}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </div>
+            {manualResult && (
+              <div
+                className={`mt-4 rounded-lg p-4 ${
+                  manualResult.type === "success"
+                    ? "bg-linear-to-br from-zinc-900 to-zinc-800  border border-green-200"
+                    : manualResult.type === "warning"
+                    ? "bg-amber-50 border border-amber-200"
+                    : "bg-red-50 border border-red-200"
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  {manualResult.type === "success" ? (
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  ) : manualResult.type === "warning" ? (
+                    <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5" />
+                  ) : (
+                    <XCircle className="w-5 h-5 text-red-500 mt-0.5" />
+                  )}
+                  <div>
+                    <p
+                      className={`font-medium text-sm ${
+                        manualResult.type === "success"
+                          ? "text-green-700"
+                          : manualResult.type === "warning"
+                          ? "text-amber-700"
+                          : "text-red-700"
+                      }`}
+                    >
+                      {manualResult.message}
+                    </p>
+                    {manualResult.volunteer && (
+                      <div className="mt-2 space-y-0.5">
+                        <p className="text-white text-sm font-medium">
+                          {manualResult.volunteer.name}
+                        </p>
+                        <p className="text-gray-500 text-xs capitalize">
+                          {manualResult.volunteer.role}
+                        </p>
+                        {manualResult.volunteer.attendedAt && (
+                          <p className="text-gray-400 text-xs">
+                            at{" "}
+                            {format(
+                              new Date(manualResult.volunteer.attendedAt),
+                              "h:mm:ss a"
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -512,47 +663,61 @@ export default function QRCheckinPage() {
         {activeTab === "recent" && (
           <div className="space-y-3">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-white font-semibold">Recent Check-ins</h2>
-              <button onClick={fetchStats}
-                className="text-xs text-green-400 hover:text-green-300 flex items-center gap-1">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                </svg>
+              <h2 className="font-semibold text-white">Recent Check-ins</h2>
+              <button
+                onClick={fetchStats}
+                className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
                 Refresh
               </button>
             </div>
 
             {!statsData?.recent?.length ? (
-              <div className="text-center py-16 text-gray-600">
-                <div className="text-4xl mb-3">🎫</div>
+              <div className="text-center py-12 text-gray-400">
+                <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p className="text-sm">No check-ins yet</p>
               </div>
             ) : (
               statsData.recent.map((v, i) => (
-                <CheckinCard key={v._id || i} volunteer={v} type="recent" onUndo={handleUndo} />
+                <CheckinCard
+                  key={v._id || i}
+                  volunteer={v}
+                  type="recent"
+                  onUndo={handleUndo}
+                />
               ))
             )}
           </div>
         )}
 
         {/* ════════════════════════════════════
-            PENDING (NOT YET CHECKED IN) TAB
+            PENDING TAB
         ════════════════════════════════════ */}
         {activeTab === "pending" && (
           <div className="space-y-3">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-white font-semibold">Not Yet Checked In</h2>
-              <span className="text-xs text-amber-400 font-medium">{pending} remaining</span>
+              <h2 className="font-semibold text-white">
+                Not Yet Checked In
+              </h2>
+              <span className="text-xs text-amber-600 font-medium">
+                {pending} remaining
+              </span>
             </div>
 
             {!statsData?.pending?.length ? (
-              <div className="text-center py-16 text-gray-600">
-                <div className="text-4xl mb-3">🎉</div>
-                <p className="text-sm text-green-400 font-medium">Everyone has checked in!</p>
+              <div className="text-center py-12">
+                <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                <p className="text-sm text-green-600 font-medium">
+                  Everyone has checked in!
+                </p>
               </div>
             ) : (
               statsData.pending.map((v, i) => (
-                <CheckinCard key={v._id || i} volunteer={v} type="pending"
+                <CheckinCard
+                  key={v._id || i}
+                  volunteer={v}
+                  type="pending"
                   onManualCheckin={(email) => {
                     setManualEmail(email);
                     setActiveTab("manual");
@@ -564,15 +729,14 @@ export default function QRCheckinPage() {
         )}
       </div>
 
-      {/* Scanline animation CSS */}
       <style>{`
         @keyframes scanline {
-          0%   { transform: translateY(0); opacity: 1; }
-          50%  { transform: translateY(260px); opacity: 0.5; }
+          0% { transform: translateY(0); opacity: 1; }
+          50% { transform: translateY(260px); opacity: 0.5; }
           100% { transform: translateY(0); opacity: 1; }
         }
-        #qr-reader video { border-radius: 24px !important; }
-        #qr-reader__scan_region { border-radius: 24px !important; }
+        #qr-reader video { border-radius: 12px !important; }
+        #qr-reader__scan_region { border-radius: 12px !important; }
         #qr-reader__dashboard { display: none !important; }
       `}</style>
     </Shell>
@@ -580,52 +744,70 @@ export default function QRCheckinPage() {
 }
 
 /* ═══════════════════════════════════════
-   CHECK-IN CARD (recent / pending)
+   CHECK-IN CARD
 ═══════════════════════════════════════ */
 function CheckinCard({ volunteer, type, onUndo, onManualCheckin }) {
   return (
-    <div className={`rounded-2xl border p-4 flex items-center gap-3 ${
-      type==="recent"
-        ? "bg-green-950/40 border-green-900"
-        : "bg-gray-900 border-gray-800"
-    }`}>
-      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${
-        type==="recent" ? "bg-green-900 text-green-300" : "bg-gray-800 text-gray-400"
-      }`}>
+    <div
+      className={`rounded-lg border p-4 flex items-center gap-3 transition-all ${
+        type === "recent"
+          ? "bg-linear-to-br from-zinc-900 to-zinc-800  border-zinc-700"
+          : "bg-linear-to-br from-zinc-900 to-zinc-800  border-gray-200 hover:border-blue-200"
+      }`}
+    >
+      <div
+        className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm shrink-0 ${
+          type === "recent"
+            ? "bg-green-100 text-blue-700"
+            : "bg-gray-100 text-gray-600"
+        }`}
+      >
         {volunteer.name?.[0]?.toUpperCase() || "?"}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-white text-sm truncate">{volunteer.name}</p>
+        <p className="font-medium text-white text-sm truncate">
+          {volunteer.name}
+        </p>
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-gray-500 capitalize">{volunteer.role}</span>
+          <span className="text-xs text-gray-500 capitalize">
+            {volunteer.role}
+          </span>
           {volunteer.institution && (
-            <span className="text-xs text-gray-600 truncate">· {volunteer.institution}</span>
+            <span className="text-xs text-gray-400 truncate">
+              · {volunteer.institution}
+            </span>
           )}
-          {type==="pending" && volunteer.paymentStatus === "pending" && (
-            <span className="text-[10px] bg-amber-900/50 text-amber-400 px-2 py-0.5 rounded-full">
-              ⚠️ Payment pending
+          {type === "pending" && volunteer.paymentStatus === "pending" && (
+            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+              Payment pending
             </span>
           )}
         </div>
-        {type==="recent" && volunteer.attendedAt && (
-          <p className="text-xs text-green-500 mt-0.5">
+        {type === "recent" && volunteer.attendedAt && (
+          <p className="text-xs text-blue-600 mt-0.5">
             {format(new Date(volunteer.attendedAt), "h:mm:ss a")} ·{" "}
-            {formatDistanceToNow(new Date(volunteer.attendedAt), { addSuffix: true })}
+            {formatDistanceToNow(new Date(volunteer.attendedAt), {
+              addSuffix: true,
+            })}
           </p>
         )}
       </div>
 
-      {type==="recent" && onUndo && volunteer._id && (
-        <button onClick={() => onUndo(volunteer._id, volunteer.name)}
+      {type === "recent" && onUndo && volunteer._id && (
+        <button
+          onClick={() => onUndo(volunteer._id, volunteer.name)}
           title="Undo check-in"
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-600 hover:bg-red-900/40 hover:text-red-400 transition-all text-sm">
-          ↩
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-all"
+        >
+          <RotateCcw className="w-4 h-4" />
         </button>
       )}
-      {type==="pending" && onManualCheckin && (
-        <button onClick={() => onManualCheckin(volunteer.email)}
-          className="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-green-900/50 text-gray-400 hover:text-green-400 text-xs font-medium transition-all">
+      {type === "pending" && onManualCheckin && (
+        <button
+          onClick={() => onManualCheckin(volunteer.email)}
+          className="px-3 py-1.5 rounded-lg bg-linear-to-br from-zinc-900 to-zinc-800  hover:cursor-pointer text-blue-600 text-xs font-medium transition-all"
+        >
           Check In
         </button>
       )}
@@ -634,37 +816,31 @@ function CheckinCard({ volunteer, type, onUndo, onManualCheckin }) {
 }
 
 /* ═══════════════════════════════════════
-   SMALL HELPERS
+   HELPERS
 ═══════════════════════════════════════ */
-function Shell({ children, dark }) {
+function Shell({ children }) {
   return (
-    <div className={`min-h-screen ${dark ? "bg-gray-950" : "bg-[#f5f4f0]"}`}
-      style={{ fontFamily:"'DM Sans',sans-serif" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap');`}</style>
+    <div className="min-h-screen bg-linear-to-br from-zinc-900 to-zinc-800 " style={{ fontFamily: "Inter, sans-serif" }}>
+      <style>
+        {`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');`}
+      </style>
       {children}
     </div>
   );
 }
 
-function DarkStatCard({ label, value, color }) {
+function StatCard({ icon: Icon, label, value, color }) {
   const colors = {
-    green:  "from-green-950/80  to-green-900/30  border-green-900/50  text-green-400",
-    amber:  "from-amber-950/80  to-amber-900/30  border-amber-900/50  text-amber-400",
-    gray:   "from-gray-900      to-gray-800/30   border-gray-800      text-gray-400",
+    blue: "bg-blue-50 border-blue-200 text-blue-700",
+    amber: "bg-amber-50 border-amber-200 text-amber-700",
+    gray: "bg-gray-50 border-gray-200 text-gray-500",
   };
+
   return (
-    <div className={`bg-gradient-to-br ${colors[color]||colors.gray} border rounded-2xl p-4 text-center`}>
+    <div className={`bg-linear-to-br from-zinc-900 to-zinc-800  border rounded-xl p-4 text-center ${colors[color]}`}>
+      <Icon className="w-5 h-5 mx-auto mb-1 opacity-70" />
       <p className="text-2xl font-bold">{value}</p>
       <p className="text-xs opacity-70 mt-0.5">{label}</p>
     </div>
-  );
-}
-
-function DarkSpinner() {
-  return (
-    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-    </svg>
   );
 }
