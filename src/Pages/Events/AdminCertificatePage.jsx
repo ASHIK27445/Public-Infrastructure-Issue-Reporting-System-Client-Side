@@ -6,6 +6,26 @@ import { format, formatDistanceToNow } from "date-fns";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import { use } from "react";
 import { AuthContext } from "../AuthProvider/AuthContext";
+import { 
+  ArrowLeft, 
+  RefreshCw, 
+  Download, 
+  Search, 
+  X, 
+  ChevronRight,
+  Loader2,
+  CheckCircle2,
+  Clock,
+  Mail,
+  Users,
+  Award,
+  Eye,
+  FileDown,
+  Send,
+  AlertCircle,
+  Sparkles,
+  FilePlusCorner
+} from "lucide-react";
 
 /* ═══════════════════════════════════════
    MAIN PAGE
@@ -53,12 +73,12 @@ export default function AdminCertificatesPage() {
       if (!silent) setLoading(false);
     }
   }, [id, axiosSecure]);
-    // console.log(eventInfo,certs, status)
 
   useEffect(() => {
     if (!user) return
     fetchAll()
   }, [id, user])
+
   /* ── Generate certificates ── */
   const handleGenerate = async (signatureUrl = "") => {
     setShowSigModal(false)
@@ -160,7 +180,7 @@ export default function AdminCertificatesPage() {
   if (loading) return (
     <Shell>
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-10 h-10 border-[3px] border-green-500 border-t-transparent rounded-full animate-spin"/>
+        <Loader2 className="w-10 h-10 text-white animate-spin" />
       </div>
     </Shell>
   );
@@ -170,10 +190,8 @@ export default function AdminCertificatesPage() {
     <Shell>
       {/* ── Back button ── */}
       <button onClick={() => navigate(`/admin/events/${id}/manage`)}
-        className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-800 mb-6 transition-colors group">
-        <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
-        </svg>
+        className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white mb-6 transition-colors group">
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
         Back to Event Management
       </button>
 
@@ -181,19 +199,19 @@ export default function AdminCertificatesPage() {
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-3 mb-1 flex-wrap">
-            <span className="text-3xl">🏅</span>
-            <h1 className="text-2xl font-bold text-stone-900" style={{ fontFamily:"Fraunces,serif" }}>
+            <Award className="w-8 h-8 text-white" />
+            <h1 className="text-2xl font-bold text-white">
               Certificates
             </h1>
             {polling && (
-              <span className="inline-flex items-center gap-1.5 text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full font-medium animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"/>
+              <span className="inline-flex items-center gap-1.5 text-xs bg-white/10 text-white/90 px-3 py-1.5 rounded-full font-medium animate-pulse border border-white/10">
+                <Loader2 className="w-3 h-3 animate-spin" />
                 Generating...
               </span>
             )}
           </div>
           {eventInfo && (
-            <p className="text-stone-500 text-sm">
+            <p className="text-zinc-400 text-sm">
               {eventInfo.title} · {format(new Date(eventInfo.date), "dd MMM yyyy")}
             </p>
           )}
@@ -202,17 +220,13 @@ export default function AdminCertificatesPage() {
         {/* Action buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           <button onClick={() => fetchAll()}
-            className="px-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors flex items-center gap-1.5">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
+            className="px-4 py-2.5 rounded-xl border border-zinc-700 bg-linear-to-b from-zinc-950 to-zinc-900 text-white text-sm font-medium hover:cursor-pointer transition-colors flex items-center gap-1.5">
+            <RefreshCw className="w-4 h-4" />
             Refresh
           </button>
           <button onClick={exportCSV} disabled={certs.length === 0}
-            className="px-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors flex items-center gap-1.5 disabled:opacity-40">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-            </svg>
+            className="px-4 py-2.5 rounded-xl border border-zinc-700 bg-linear-to-b from-zinc-950 to-zinc-900 text-white text-sm font-medium hover:cursor-pointer transition-colors flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
+            <Download className="w-4 h-4" />
             Export CSV
           </button>
         </div>
@@ -220,26 +234,26 @@ export default function AdminCertificatesPage() {
 
       {/* ── Stats cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <StatCard icon="✅" label="Attended"     value={status?.attendedCount || 0} color="blue"   />
-        <StatCard icon="🏅" label="Certs Made"   value={status?.certCount     || 0} color="green"  />
-        <StatCard icon="⏳" label="Pending"      value={status?.pending       || 0} color="amber"  />
-        <StatCard icon="📧" label="Emails Sent"  value={status?.emailSentCount|| 0} color="purple" />
+        <StatCard icon={<Users className="w-5 h-5" />} label="Attended" value={status?.attendedCount || 0} color="blue" />
+        <StatCard icon={<Award className="w-5 h-5" />} label="Certs Made" value={status?.certCount || 0} color="green" />
+        <StatCard icon={<Clock className="w-5 h-5" />} label="Pending" value={status?.pending || 0} color="amber" />
+        <StatCard icon={<Mail className="w-5 h-5" />} label="Emails Sent" value={status?.emailSentCount || 0} color="purple" />
       </div>
 
       {/* ── Progress bar ── */}
       {status?.attendedCount > 0 && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-6 shadow-sm">
+        <div className="border border-zinc-700 rounded-2xl p-4 mb-6 shadow-sm bg-linear-to-b from-zinc-950 to-zinc-900">
           <div className="flex justify-between text-sm mb-2">
-            <span className="font-medium text-stone-700">Certificate generation progress</span>
-            <span className="font-bold text-green-600">{certPercent}%</span>
+            <span className="font-medium text-white">Certificate generation progress</span>
+            <span className="font-bold text-green-400">{certPercent}%</span>
           </div>
-          <div className="h-3 bg-stone-100 rounded-full overflow-hidden">
+          <div className="h-3 bg-zinc-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-700"
+              className="h-full bg-linear-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-700"
               style={{ width: `${certPercent}%` }}
             />
           </div>
-          <p className="text-xs text-stone-400 mt-2">
+          <p className="text-xs text-zinc-500 mt-2">
             {status.certCount} of {status.attendedCount} certificates generated
             {status.emailSentCount > 0 && ` · ${status.emailSentCount} emails sent`}
           </p>
@@ -248,33 +262,33 @@ export default function AdminCertificatesPage() {
 
       {/* ── Generate CTA (if not all done) ── */}
       {!allGenerated && (status?.attendedCount || 0) > 0 && (
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50/50 border border-green-200 rounded-2xl p-6 mb-6">
+        <div className="bg-linear-to-b from-zinc-950 to-zinc-900 border border-zinc-700 rounded-2xl p-6 mb-6">
           <div className="flex items-start gap-4 flex-wrap">
-            <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center text-2xl shrink-0">
-              🚀
+            <div className="w-12 h-12 bg-zinc-800 rounded-2xl flex items-center justify-center text-2xl shrink-0">
+              <FilePlusCorner className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-green-800 mb-1">
+              <h3 className="font-bold text-white mb-1">
                 {status?.certCount === 0 ? "Ready to Generate Certificates" : "Some Certificates Pending"}
               </h3>
-              <p className="text-green-700 text-sm mb-4 leading-relaxed">
-                <strong>{status?.attendedCount}</strong> volunteers attended this event.
+              <p className="text-zinc-400 text-sm mb-4 leading-relaxed">
+                <strong className="text-white">{status?.attendedCount}</strong> volunteers attended this event.
                 {status?.certCount > 0 && ` ${status.certCount} certificates already generated.`}
                 {status?.pending > 0 && ` ${status.pending} remaining.`}
                 {" "}Certificates are generated as PDF files and emailed automatically.
               </p>
               <div className="flex items-center gap-3 flex-wrap">
                 <button onClick={()=> {setShowSigModal(true)}} disabled={generating || polling}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-semibold text-sm transition-colors disabled:opacity-60 shadow-sm">
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-zinc-900 rounded-2xl font-semibold text-sm transition-colors hover:bg-zinc-200 disabled:opacity-60 shadow-sm">
                   {generating
-                    ? <><Spinner/> Starting...</>
+                    ? <><Loader2 className="w-4 h-4 animate-spin"/> Starting...</>
                     : polling
-                    ? <><Spinner/> Generating ({status?.certCount || 0}/{status?.attendedCount})...</>
+                    ? <><Loader2 className="w-4 h-4 animate-spin"/> Generating ({status?.certCount || 0}/{status?.attendedCount})...</>
                     : `🏅 Generate ${status?.pending > 0 ? `${status.pending} Remaining` : `All ${status?.attendedCount}`} Certificates`
                   }
                 </button>
                 {polling && (
-                  <p className="text-xs text-green-600 font-medium animate-pulse">
+                  <p className="text-xs text-zinc-400 font-medium animate-pulse">
                     This may take a few minutes. Page updates automatically.
                   </p>
                 )}
@@ -286,13 +300,13 @@ export default function AdminCertificatesPage() {
 
       {/* ── All done banner ── */}
       {allGenerated && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
-          <span className="text-2xl">🎉</span>
+        <div className="bg-linear-to-b from-zinc-950 to-zinc-900 border border-zinc-700 rounded-2xl p-4 mb-6 flex items-center gap-3">
+          <CheckCircle2 className="w-6 h-6 text-green-400" />
           <div>
-            <p className="font-semibold text-green-800 text-sm">
+            <p className="font-semibold text-white text-sm">
               All {status?.certCount} certificates generated!
             </p>
-            <p className="text-green-600 text-xs mt-0.5">
+            <p className="text-zinc-400 text-xs mt-0.5">
               {allEmailed
                 ? "All emails sent successfully."
                 : `${emailPending} email(s) still pending — use Resend button for individual certs.`}
@@ -303,40 +317,36 @@ export default function AdminCertificatesPage() {
 
       {/* ── Event not completed warning ── */}
       {eventInfo && eventInfo.status !== "completed" && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
-          <span className="text-xl">⚠️</span>
-          <p className="text-amber-800 text-sm">
-            Certificates can only be generated for <strong>completed</strong> events.
-            Current status: <strong>{eventInfo.status}</strong>.
+        <div className="bg-linear-to-b from-zinc-950 to-zinc-900 border border-zinc-700 rounded-2xl p-4 mb-6 flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-400" />
+          <p className="text-white text-sm">
+            Certificates can only be generated for <strong className="text-white">completed</strong> events.
+            Current status: <strong className="text-white">{eventInfo.status}</strong>.
           </p>
         </div>
       )}
 
       {/* ── Certificates table ── */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+      <div className="border border-zinc-700 rounded-2xl shadow-sm overflow-hidden bg-linear-to-b from-zinc-950 to-zinc-900">
         {/* Table header */}
-        <div className="p-4 border-b border-stone-100 flex items-center gap-3 flex-wrap">
-          <div className="relative flex-1 min-w-[200px]">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400"
-              fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <circle cx="11" cy="11" r="8" strokeWidth="2"/>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35"/>
-            </svg>
+        <div className="p-4 border-b border-zinc-700 flex items-center gap-3 flex-wrap">
+          <div className="relative flex-1 min-w-50">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, email, cert ID..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-zinc-700 bg-zinc-900/50 text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
             />
           </div>
           {search && (
             <button onClick={() => setSearch("")}
-              className="px-3 py-2 text-xs text-stone-500 hover:text-stone-700 border border-stone-200 rounded-xl hover:bg-stone-50 transition-colors">
-              ✕ Clear
+              className="px-3 py-2 text-xs text-zinc-400 hover:text-white border border-zinc-700 rounded-xl hover:bg-zinc-800 transition-colors">
+              <X className="w-3 h-3" />
             </button>
           )}
-          <span className="text-xs text-stone-400 ml-auto">
+          <span className="text-xs text-zinc-500 ml-auto">
             {filtered.length} / {certs.length} shown
           </span>
         </div>
@@ -344,23 +354,23 @@ export default function AdminCertificatesPage() {
         {/* Empty state */}
         {certs.length === 0 ? (
           <div className="text-center py-20">
-            <div className="text-5xl mb-4">🏅</div>
-            <p className="text-stone-500 text-sm mb-1">No certificates generated yet</p>
-            <p className="text-stone-400 text-xs">
+            <Award className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
+            <p className="text-zinc-400 text-sm mb-1">No certificates generated yet</p>
+            <p className="text-zinc-500 text-xs">
               {status?.attendedCount > 0
                 ? "Click the Generate button above to create certificates."
                 : "No volunteers attended this event yet."}
             </p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-stone-400 text-sm">
-            No results for &quot;{search}&quot;
+          <div className="text-center py-12 text-zinc-500 text-sm">
+            No results for "{search}"
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-stone-50 border-b border-stone-100">
+                <tr className="border-b border-zinc-700 bg-linear-to-b from-zinc-950 to-zinc-900">
                   <Th>Recipient</Th>
                   <Th>Certificate ID</Th>
                   <Th>Role</Th>
@@ -370,7 +380,7 @@ export default function AdminCertificatesPage() {
                   <Th>Actions</Th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-50">
+              <tbody className="divide-y divide-zinc-700/50">
                 {filtered.map((cert) => (
                   <CertRow
                     key={cert._id || cert.certId}
@@ -387,16 +397,14 @@ export default function AdminCertificatesPage() {
 
         {/* Table footer */}
         {certs.length > 0 && (
-          <div className="px-5 py-3 border-t border-stone-100 flex items-center justify-between">
-            <p className="text-xs text-stone-400">
+          <div className="px-5 py-3 border-t border-zinc-700 flex items-center justify-between">
+            <p className="text-xs text-zinc-500">
               {certs.filter((c) => c.emailSent).length} of {certs.length} emails sent ·{" "}
               {certs.filter((c) => c.pdfUrl).length} PDFs uploaded
             </p>
             <button onClick={() => fetchAll(true)}
-              className="text-xs text-green-600 hover:text-green-700 font-medium flex items-center gap-1">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-              </svg>
+              className="text-xs text-blue-600 hover:cursor-pointer font-medium flex items-center gap-1">
+              <RefreshCw className="w-3.5 h-3.5" />
               Refresh
             </button>
           </div>
@@ -430,23 +438,23 @@ export default function AdminCertificatesPage() {
 ═══════════════════════════════════════ */
 function CertRow({ cert, eventId, onResendClick, resending }) {
   return (
-    <tr className="hover:bg-stone-50/60 transition-colors">
+    <tr className="hover:bg-zinc-800/10 transition-colors">
       {/* Recipient */}
       <td className="px-4 py-3.5">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs shrink-0">
+          <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-white font-bold text-xs shrink-0">
             {cert.recipientName?.[0]?.toUpperCase() || "?"}
           </div>
           <div>
-            <p className="text-sm font-semibold text-stone-800">{cert.recipientName}</p>
-            <p className="text-xs text-stone-400">{cert.recipientEmail}</p>
+            <p className="text-sm font-semibold text-white">{cert.recipientName}</p>
+            <p className="text-xs text-zinc-400">{cert.recipientEmail}</p>
           </div>
         </div>
       </td>
 
       {/* Cert ID */}
       <td className="px-4 py-3.5">
-        <code className="text-xs font-mono font-bold text-stone-700 bg-stone-100 px-2 py-1 rounded">
+        <code className="text-xs font-mono font-bold text-white bg-zinc-800 px-2 py-1 rounded">
           {cert.certId}
         </code>
       </td>
@@ -455,8 +463,8 @@ function CertRow({ cert, eventId, onResendClick, resending }) {
       <td className="px-4 py-3.5">
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
           cert.role === "Volunteer"
-            ? "bg-green-100 text-green-700"
-            : "bg-blue-100 text-blue-700"
+            ? "bg-zinc-800 text-white"
+            : "bg-zinc-800/50 text-white"
         }`}>
           {cert.role}
         </span>
@@ -464,15 +472,15 @@ function CertRow({ cert, eventId, onResendClick, resending }) {
 
       {/* Institution */}
       <td className="px-4 py-3.5">
-        <span className="text-xs text-stone-500">{cert.institution || "—"}</span>
+        <span className="text-xs text-zinc-400">{cert.institution || "—"}</span>
       </td>
 
       {/* Issued */}
       <td className="px-4 py-3.5">
-        <p className="text-xs text-stone-600 font-medium">
+        <p className="text-xs text-white font-medium">
           {format(new Date(cert.issuedAt), "dd MMM yyyy")}
         </p>
-        <p className="text-[10px] text-stone-400">
+        <p className="text-[10px] text-zinc-500">
           {formatDistanceToNow(new Date(cert.issuedAt), { addSuffix: true })}
         </p>
       </td>
@@ -481,18 +489,20 @@ function CertRow({ cert, eventId, onResendClick, resending }) {
       <td className="px-4 py-3.5">
         {cert.emailSent ? (
           <div>
-            <span className="inline-flex items-center gap-1 text-xs text-green-600 font-semibold">
-              ✅ Sent
+            <span className="inline-flex items-center gap-1 text-xs text-green-400 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Sent
             </span>
             {cert.emailSentAt && (
-              <p className="text-[10px] text-stone-400 mt-0.5">
+              <p className="text-[10px] text-zinc-500 mt-0.5">
                 {format(new Date(cert.emailSentAt), "dd MMM, h:mm a")}
               </p>
             )}
           </div>
         ) : (
-          <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-semibold">
-            ⏳ Pending
+          <span className="inline-flex items-center gap-1 text-xs text-amber-400 font-semibold">
+            <Clock className="w-3.5 h-3.5" />
+            Pending
           </span>
         )}
       </td>
@@ -503,20 +513,20 @@ function CertRow({ cert, eventId, onResendClick, resending }) {
           {/* Verify */}
           <Link to={`/verify/${cert.certId}`}
             title="Verify certificate"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-stone-400 hover:bg-blue-50 hover:text-blue-600 transition-all text-sm">
-            🔍
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-800 hover:text-white transition-all">
+            <Eye className="w-4 h-4" />
           </Link>
 
           {/* Download PDF */}
           {cert.pdfUrl ? (
             <a href={cert.pdfUrl} target="_blank" rel="noreferrer"
               title="Download PDF"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-stone-400 hover:bg-green-50 hover:text-green-600 transition-all text-sm">
-              ⬇️
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-800 hover:text-white transition-all">
+              <FileDown className="w-4 h-4" />
             </a>
           ) : (
-            <span className="w-8 h-8 flex items-center justify-center text-stone-200 text-sm" title="PDF not available">
-              ⬇️
+            <span className="w-8 h-8 flex items-center justify-center text-zinc-700" title="PDF not available">
+              <FileDown className="w-4 h-4" />
             </span>
           )}
 
@@ -525,8 +535,8 @@ function CertRow({ cert, eventId, onResendClick, resending }) {
             onClick={() => onResendClick(cert)}
             disabled={resending}
             title="Resend certificate email"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-stone-400 hover:bg-amber-50 hover:text-amber-600 transition-all text-sm disabled:opacity-40 disabled:cursor-not-allowed">
-            {resending ? <MiniSpinner/> : "📧"}
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-800 hover:text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+            {resending ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> : <Send className="w-4 h-4" />}
           </button>
         </div>
       </td>
@@ -537,52 +547,33 @@ function CertRow({ cert, eventId, onResendClick, resending }) {
 /* ─── Helpers ─── */
 function Shell({ children }) {
   return (
-    <div className="min-h-screen bg-[#f5f4f0] py-8 px-4" style={{ fontFamily:"'DM Sans',sans-serif" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@700&display=swap');`}</style>
-      <div className="max-w-6xl mx-auto">{children}</div>
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 to-zinc-900 py-8 px-4">
+      <div className="max-w-6xl mx-auto text-white">{children}</div>
     </div>
   );
 }
 
 function StatCard({ icon, label, value, color }) {
   const colors = {
-    green:  "from-green-50  to-green-100/40  border-green-200/70  text-green-700",
-    blue:   "from-blue-50   to-blue-100/40   border-blue-200/70   text-blue-700",
-    amber:  "from-amber-50  to-amber-100/40  border-amber-200/70  text-amber-700",
-    purple: "from-purple-50 to-purple-100/40 border-purple-200/70 text-purple-700",
+    green:  "border-zinc-700 bg-zinc-900/30 text-green-400",
+    blue:   "border-zinc-700 bg-zinc-900/30 text-blue-400",
+    amber:  "border-zinc-700 bg-zinc-900/30 text-amber-400",
+    purple: "border-zinc-700 bg-zinc-900/30 text-purple-400",
   };
   return (
-    <div className={`bg-gradient-to-br ${colors[color]} border rounded-2xl p-4 shadow-sm`}>
-      <div className="text-2xl mb-2">{icon}</div>
-      <p className="text-2xl font-bold" style={{ fontFamily:"Fraunces,serif" }}>{value}</p>
-      <p className="text-xs font-medium opacity-70 mt-0.5">{label}</p>
+    <div className={`border ${colors[color]} bg-linear-to-b from-zinc-950 to-zinc-900 rounded-2xl p-4 shadow-sm`}>
+      <div className="mb-2">{icon}</div>
+      <p className="text-2xl font-bold text-white">{value}</p>
+      <p className="text-xs font-medium text-zinc-400 mt-0.5">{label}</p>
     </div>
   );
 }
 
 function Th({ children }) {
   return (
-    <th className="px-4 py-3 text-left text-xs font-semibold text-stone-400 uppercase tracking-wide whitespace-nowrap">
+    <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase tracking-wide whitespace-nowrap">
       {children}
     </th>
-  );
-}
-
-function Spinner() {
-  return (
-    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-    </svg>
-  );
-}
-
-function MiniSpinner() {
-  return (
-    <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-    </svg>
   );
 }
 
@@ -606,28 +597,28 @@ function SignatureModal({ onConfirm, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+      <div className="border border-zinc-700 rounded-2xl shadow-xl w-full max-w-md p-6 bg-zinc-900">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-bold text-stone-800" style={{ fontFamily:"Fraunces,serif" }}>
+            <h2 className="text-lg font-bold text-white">
               ✍️ Signature
             </h2>
-            <p className="text-xs text-stone-400 mt-0.5">
+            <p className="text-xs text-zinc-400 mt-0.5">
               Paste an image URL to add your signature to the certificate
             </p>
           </div>
           <button onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition-colors">
-            ✕
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* URL Input */}
         <div className="mb-4">
-          <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5 block">
+          <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1.5 block">
             Signature Image URL
           </label>
           <div className="flex gap-2">
@@ -636,38 +627,38 @@ function SignatureModal({ onConfirm, onClose }) {
               value={url}
               onChange={handleChange}
               placeholder="https://example.com/signature.png"
-              className="flex-1 px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100"
+              className="flex-1 px-3 py-2.5 rounded-xl border border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20"
             />
             <button
               onClick={() => checkImage(url)}
               disabled={!url.trim() || checking}
-              className="px-3 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 text-sm font-medium transition-colors disabled:opacity-40">
-              {checking ? <MiniSpinner/> : "Check"}
+              className="px-3 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              {checking ? <Loader2 className="w-4 h-4 animate-spin"/> : "Check"}
             </button>
           </div>
         </div>
 
         {/* Preview */}
         {valid === true && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl">
-            <p className="text-xs text-green-600 font-semibold mb-2">✅ Valid image — preview:</p>
-            <div className="bg-white rounded-lg p-3 flex items-center justify-center border border-green-100 min-h-[80px]">
+          <div className="mb-4 p-3 bg-zinc-800/50 border border-zinc-700 rounded-xl">
+            <p className="text-xs text-green-400 font-semibold mb-2">✅ Valid image — preview:</p>
+            <div className="bg-zinc-800 rounded-lg p-3 flex items-center justify-center border border-zinc-700 min-h-20">
               <img src={url} alt="Signature preview"
-                className="max-h-[70px] max-w-full object-contain"/>
+                className="max-h-17.5 max-w-full object-contain"/>
             </div>
           </div>
         )}
 
         {valid === false && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
-            <p className="text-xs text-red-600 font-semibold">
+          <div className="mb-4 p-3 bg-zinc-800/50 border border-zinc-700 rounded-xl">
+            <p className="text-xs text-red-400 font-semibold">
               ❌ Invalid image URL — signature will be skipped
             </p>
           </div>
         )}
 
         {/* Info note */}
-        <p className="text-xs text-stone-400 mb-5 leading-relaxed">
+        <p className="text-xs text-zinc-500 mb-5 leading-relaxed">
           Leave empty to generate certificates without a signature.
           PNG with transparent background works best.
         </p>
@@ -675,12 +666,12 @@ function SignatureModal({ onConfirm, onClose }) {
         {/* Buttons */}
         <div className="flex gap-2">
           <button onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50 transition-colors">
+            className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-white text-sm font-medium hover:bg-red-500 transition-colors">
             Cancel
           </button>
           <button
             onClick={() => onConfirm(valid === true ? url : "")}
-            className="flex-1 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors shadow-sm">
+            className="flex-1 py-2.5 rounded-xl bg-white text-zinc-900 text-sm font-semibold transition-colors hover:bg-zinc-200 shadow-sm">
             🏅 Generate Certificates
           </button>
         </div>
@@ -693,34 +684,36 @@ function ResendEmailModal({ cert, onConfirm, onClose, sending }) {
   const [email, setEmail] = useState(cert.recipientEmail);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+      <div className="border border-zinc-700 rounded-2xl shadow-xl w-full max-w-sm p-6 bg-zinc-900">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-bold text-stone-800" style={{ fontFamily:"Fraunces,serif" }}>
+          <h2 className="text-base font-bold text-white">
             📧 Resend Certificate
           </h2>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-400">✕</button>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white">
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
-        <p className="text-xs text-stone-400 mb-3">{cert.recipientName} · {cert.certId}</p>
+        <p className="text-xs text-zinc-400 mb-3">{cert.recipientName} · {cert.certId}</p>
 
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100 mb-4"
+          className="w-full px-3 py-2.5 rounded-xl border border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/20 mb-4"
         />
 
         <div className="flex gap-2">
           <button onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50">
+            className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-white text-sm font-medium hover:bg-red-500 transition-colors">
             Cancel
           </button>
           <button
             onClick={() => onConfirm(cert.certId, email)}
             disabled={!email.trim() || sending}
-            className="flex-1 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold disabled:opacity-50 flex items-center justify-center gap-2">
-            {sending ? <><MiniSpinner/> Sending...</> : "Send"}
+            className="flex-1 py-2.5 rounded-xl bg-white text-zinc-900 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:bg-zinc-200 transition-colors">
+            {sending ? <><Loader2 className="w-4 h-4 animate-spin"/> Sending...</> : "Send"}
           </button>
         </div>
       </div>
