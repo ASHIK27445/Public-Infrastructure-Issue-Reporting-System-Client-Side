@@ -198,6 +198,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'admin/waitlist-feed', Component: AdminWaitlistFeed
+            },
+            {
+                path: 'admin/cert/:id', Component: AdminCertificatesPage
             }
 
         ]
@@ -207,9 +210,6 @@ export const router = createBrowserRouter([
     },
     {
         path: '/onlytest', element: <PrivateRouter><MyCertificatesPage/></PrivateRouter>
-    },
-    {
-        path: '/cert/:id', Component: AdminCertificatesPage
     },
     {
         path: '/event/:id/qr/checkin', element: <PrivateRouter><QRCheckinPage /></PrivateRouter>

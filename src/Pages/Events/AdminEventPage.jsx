@@ -9,7 +9,8 @@ import {
   Search, X, ChevronDown, Radio, CheckCircle2,
   XCircle, Clock, Users, Wallet, CalendarDays,
   Leaf, TrendingUp, Ban, Ticket, Brush, TreeDeciduous, Wrench, 
-  Megaphone, GraduationCap, Handshake
+  Megaphone, GraduationCap, Handshake,
+  Medal
 } from "lucide-react";
 import { AuthContext } from "../AuthProvider/AuthContext";
 import './event.css'
@@ -173,6 +174,20 @@ export default function AdminEventsPage() {
       { autoClose: false, closeButton: false, closeOnClick: false }
     );
   };
+
+  const handleCertificatePage = (eventStatus, eventId) =>{
+    if (eventStatus === "upcoming") {
+      toast.warn("Event is not ongoing.")
+      return
+    }
+
+    if (eventStatus === "cancelled") {
+      toast.warn("Event is cancelled.")
+      return
+    }
+
+    navigate(`/dashboard/admin/cert/${eventId}`)
+  }
 
   /* ─────────── RENDER ─────────── */
   return (
@@ -403,6 +418,7 @@ export default function AdminEventsPage() {
                       onDelete={handleDelete}
                       deleting={deleting === event._id}
                       navigate={navigate}
+                      handleCertificatePage={handleCertificatePage}
                     />
                   ))}
                 </tbody>
@@ -441,7 +457,7 @@ export default function AdminEventsPage() {
 /* ═══════════════════════════════════════
    EVENT ROW
 ═══════════════════════════════════════ */
-function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
+function EventRow({ event, onStatusChange, onDelete, deleting, navigate, handleCertificatePage }) {
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const st     = STATUS_STYLE[event.status] || STATUS_STYLE.upcoming;
   const date   = new Date(event.date);
@@ -574,6 +590,8 @@ function EventRow({ event, onStatusChange, onDelete, deleting, navigate }) {
         title="Manage volunteers" icon={Settings2} color="blue"          />
         <ActionBtn onClick={() => navigate(`/dashboard/admin/events/edit/${event._id}`)}   
         title="Edit event"        icon={Pencil}    color="amber"         />
+        <ActionBtn onClick={() => handleCertificatePage(event?.status, event?._id)}   
+        title="Generate Certificate"        icon={Medal}    color="sky"         />
         <ActionBtn onClick={() => onDelete(event._id, event.title)}              
         title="Delete event" icon={deleting ? Loader2 : Trash2} color="red" 
         disabled={deleting} spinning={deleting} />
@@ -612,6 +630,7 @@ function ActionBtn({ onClick, title, icon: Icon, color, disabled, spinning }) {
     blue:  "hover:bg-blue-50  hover:text-blue-600",
     amber: "hover:bg-amber-50 hover:text-amber-600",
     red:   "hover:bg-red-50   hover:text-red-600",
+    sky: "hover:bg-sky-50 hover:text-sky-500"
   };
   return (
     <button onClick={onClick} title={title} disabled={disabled}
