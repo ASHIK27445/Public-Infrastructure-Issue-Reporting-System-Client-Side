@@ -10,10 +10,7 @@ import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import { useParams } from "react-router";
 import { QRCodeCanvas } from "qrcode.react";
 
-/* ═══════════════════════════════════════════
-   WAITLIST MANAGEMENT PANEL
-   Route: /admin/events/:id/manage
-═══════════════════════════════════════════ */
+
 export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
   const { id: eventId } = useParams();
 
@@ -199,7 +196,7 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60">
                   {rows.map((v) => (
-                    <tr key={v._id} className="hover:bg-zinc-800/40 transition-colors">
+                    <tr key={v._id} className="hover:bg-zinc-800/10 transition-colors">
 
                       {/* Position badge (waitlist only) */}
                       {tab === "waitlist" && (

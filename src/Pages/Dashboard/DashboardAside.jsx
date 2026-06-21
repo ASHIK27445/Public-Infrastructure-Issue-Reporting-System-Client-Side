@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
+import { GoOrganization } from 'react-icons/go';
 
 
 const navItems = [
@@ -123,18 +124,17 @@ const navItems = [
       requireSuperStaff: true
     },
     {
-      id: 'notifications',
-      name: 'Notifications',
-      icon: <Bell className="w-5 h-5" />,
-      path: '/notifications',
-      badge: 3,
-      roles: ['admin']
-    },
-    {
       id: 'settings',
       name: 'Settings',
       icon: <Settings className="w-5 h-5" />,
       path: '/settings',
+      roles: ['admin']
+    },
+    {
+      id: 'eventManges',
+      name: 'Events Manage',
+      icon: <GoOrganization className="w-5 h-5" />,
+      path: '/dashboard/admin/events',
       roles: ['admin']
     },
     {
@@ -157,7 +157,15 @@ const navItems = [
       icon: <BadgeDollarSign className='w-5 h-5'/>,
       path: 'payment-history-admin',
       roles: ['admin']
-    }
+    },
+    {
+      id: 'notifications',
+      name: 'Notifications',
+      icon: <Bell className="w-5 h-5" />,
+      path: '/notifications',
+      badge: 3,
+      roles: ['admin']
+    },
 ]
 
 const DashboardAside = () => {
