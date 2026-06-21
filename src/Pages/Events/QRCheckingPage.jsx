@@ -268,7 +268,9 @@ export default function QRCheckinPage() {
   const total = statsData?.stats?.total || 0;
   const pending = statsData?.stats?.pending || 0;
   const percentage = statsData?.stats?.percentage || 0;
-
+  const freeParticipants = statsData?.stats?.freeParticipants || 0;
+  const freeParticipantsPending = statsData?.freeParticipantsPending || [];
+console.log(statsData)
   return (
     <Shell>
       {/* ── Header ── */}
@@ -298,7 +300,7 @@ export default function QRCheckinPage() {
             <p className="text-blue-600 font-bold text-lg leading-none">
               {attended}
               <span className="text-gray-400 text-sm font-normal">
-                /{total}
+                /{total + freeParticipants}
               </span>
             </p>
             <p className="text-gray-500 text-xs">checked in</p>
@@ -314,7 +316,7 @@ export default function QRCheckinPage() {
               {attended} attended
             </span>
             <span>
-              {percentage}% · {pending} remaining
+              {percentage}% · {pending + freeParticipants} remaining
             </span>
           </div>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -326,7 +328,7 @@ export default function QRCheckinPage() {
         </div>
 
         {/* ── Stats ── */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-4 gap-3 mb-6">
           <StatCard
             icon={CheckCircle}
             label="Attended"
@@ -336,7 +338,7 @@ export default function QRCheckinPage() {
           <StatCard
             icon={Clock}
             label="Remaining"
-            value={pending}
+            value={pending + freeParticipants}
             color="amber"
           />
           <StatCard
@@ -345,6 +347,11 @@ export default function QRCheckinPage() {
             value={statsData?.stats?.waitlisted || 0}
             color="gray"
           />
+          <StatCard 
+          icon={UserPlus} 
+          label="Free Participants" 
+          value={freeParticipants} 
+          color="emerald" />
         </div>
 
         {/* ── Tabs ── */}
@@ -362,7 +369,7 @@ export default function QRCheckinPage() {
               id: "pending",
               label: "Pending",
               icon: Clock,
-              count: pending,
+              count: pending + freeParticipants,
             },
           ].map((tab) => (
             <button
@@ -695,35 +702,60 @@ export default function QRCheckinPage() {
             PENDING TAB
         ════════════════════════════════════ */}
         {activeTab === "pending" && (
-          <div className="space-y-3">
+          <div className="space-y-5">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="font-semibold text-white">
-                Not Yet Checked In
-              </h2>
+              <h2 className="font-semibold text-white">Not Yet Checked In</h2>
               <span className="text-xs text-amber-600 font-medium">
-                {pending} remaining
+                {pending + freeParticipants} remaining
               </span>
             </div>
 
-            {!statsData?.pending?.length ? (
+            {pending + freeParticipants === 0 ? (
               <div className="text-center py-12">
                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                <p className="text-sm text-green-600 font-medium">
-                  Everyone has checked in!
-                </p>
+                <p className="text-sm text-green-600 font-medium">Everyone has checked in!</p>
               </div>
             ) : (
-              statsData.pending.map((v, i) => (
-                <CheckinCard
-                  key={v._id || i}
-                  volunteer={v}
-                  type="pending"
-                  onManualCheckin={(email) => {
-                    setManualEmail(email);
-                    setActiveTab("manual");
-                  }}
-                />
-              ))
+              <>
+                {statsData?.pending?.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                      Volunteers · {statsData.pending.length}
+                    </p>
+                    {statsData.pending.map((v, i) => (
+                      <CheckinCard
+                        key={v._id || i}
+                        volunteer={v}
+                        type="pending"
+                        onManualCheckin={(email) => {
+                          setManualEmail(email);
+                          setActiveTab("manual");
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {freeParticipantsPending.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                      Free Participants · {freeParticipantsPending.length}
+                    </p>
+                    {freeParticipantsPending.map((p, i) => (
+                      <CheckinCard
+                        key={p._id || i}
+                        volunteer={p}
+                        type="pending"
+                        isFreeParticipant
+                        onManualCheckin={(email) => {
+                          setManualEmail(email);
+                          setActiveTab("manual");
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
@@ -746,37 +778,43 @@ export default function QRCheckinPage() {
 /* ═══════════════════════════════════════
    CHECK-IN CARD
 ═══════════════════════════════════════ */
-function CheckinCard({ volunteer, type, onUndo, onManualCheckin }) {
+function CheckinCard({ volunteer, type, onUndo, onManualCheckin, isFreeParticipant }) {
   return (
     <div
       className={`rounded-lg border p-4 flex items-center gap-3 transition-all ${
         type === "recent"
-          ? "bg-linear-to-br from-zinc-900 to-zinc-800  border-zinc-700"
-          : "bg-linear-to-br from-zinc-900 to-zinc-800  border-gray-200 hover:border-blue-200"
+          ? "bg-linear-to-br from-zinc-900 to-zinc-800 border-zinc-700"
+          : "bg-linear-to-br from-zinc-900 to-zinc-800 border-gray-200 hover:border-blue-200"
       }`}
     >
       <div
         className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm shrink-0 ${
-          type === "recent"
-            ? "bg-green-100 text-blue-700"
-            : "bg-gray-100 text-gray-600"
+          type === "recent" ? "bg-green-100 text-blue-700" : "bg-gray-100 text-gray-600"
         }`}
       >
         {volunteer.name?.[0]?.toUpperCase() || "?"}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-white text-sm truncate">
-          {volunteer.name}
-        </p>
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-gray-500 capitalize">
-            {volunteer.role}
-          </span>
-          {volunteer.institution && (
-            <span className="text-xs text-gray-400 truncate">
-              · {volunteer.institution}
+        <div className="flex items-center gap-2">
+          <p className="font-medium text-white text-sm truncate">{volunteer.name}</p>
+          {isFreeParticipant && (
+            <span className="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full shrink-0">
+              Participant
             </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          {isFreeParticipant ? (
+            <span className="text-xs text-gray-500">{volunteer.phone || volunteer.email}</span>
+          ) : (
+            <>
+              <span className="text-xs text-gray-500 capitalize">{volunteer.role}</span>
+              {volunteer.institution && (
+                <span className="text-xs text-gray-400 truncate">· {volunteer.institution}</span>
+              )}
+            </>
           )}
           {type === "pending" && volunteer.paymentStatus === "pending" && (
             <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
@@ -784,12 +822,11 @@ function CheckinCard({ volunteer, type, onUndo, onManualCheckin }) {
             </span>
           )}
         </div>
+
         {type === "recent" && volunteer.attendedAt && (
           <p className="text-xs text-blue-600 mt-0.5">
             {format(new Date(volunteer.attendedAt), "h:mm:ss a")} ·{" "}
-            {formatDistanceToNow(new Date(volunteer.attendedAt), {
-              addSuffix: true,
-            })}
+            {formatDistanceToNow(new Date(volunteer.attendedAt), { addSuffix: true })}
           </p>
         )}
       </div>
@@ -806,7 +843,7 @@ function CheckinCard({ volunteer, type, onUndo, onManualCheckin }) {
       {type === "pending" && onManualCheckin && (
         <button
           onClick={() => onManualCheckin(volunteer.email)}
-          className="px-3 py-1.5 rounded-lg bg-linear-to-br from-zinc-900 to-zinc-800  hover:cursor-pointer text-blue-600 text-xs font-medium transition-all"
+          className="px-3 py-1.5 rounded-lg bg-linear-to-br from-zinc-900 to-zinc-800 hover:cursor-pointer text-blue-600 text-xs font-medium transition-all"
         >
           Check In
         </button>
@@ -831,9 +868,10 @@ function Shell({ children }) {
 
 function StatCard({ icon: Icon, label, value, color }) {
   const colors = {
-    blue: "bg-blue-50 border-blue-200 text-blue-700",
-    amber: "bg-amber-50 border-amber-200 text-amber-700",
-    gray: "bg-gray-50 border-gray-200 text-gray-500",
+    blue: "bg-blue-50 border-blue-200 text-white",
+    amber: "bg-amber-50 border-amber-200 text-white",
+    emerald: "bg-emerald-50 border-emerald-200 text-white",
+    gray: "bg-gray-50 border-gray-200 text-white",
   };
 
   return (
