@@ -270,6 +270,8 @@ export default function QRCheckinPage() {
   const percentage = statsData?.stats?.percentage || 0;
   const freeParticipants = statsData?.stats?.freeParticipants || 0;
   const freeParticipantsPending = statsData?.freeParticipantsPending || [];
+  const freeTotal = (statsData?.stats?.freeParticipants || 0) + (statsData?.stats?.freeParticipantsAttended || 0);
+
 console.log(statsData)
   return (
     <Shell>
@@ -300,7 +302,7 @@ console.log(statsData)
             <p className="text-blue-600 font-bold text-lg leading-none">
               {attended}
               <span className="text-gray-400 text-sm font-normal">
-                /{total + freeParticipants}
+                /{total + freeTotal}
               </span>
             </p>
             <p className="text-gray-500 text-xs">checked in</p>
