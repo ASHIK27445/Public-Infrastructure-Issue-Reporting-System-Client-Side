@@ -162,7 +162,7 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     tab === t.id
                       ? "bg-zinc-700 text-white shadow-sm"
-                      : "text-zinc-400 hover:text-zinc-200"
+                      : "text-zinc-400 hover:text-blue-800"
                   }`}
                 >
                   {t.label}
@@ -367,7 +367,12 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
           {/* ── Footer ── */}
           <div className="px-6 py-3 border-t border-zinc-800 flex items-center justify-between">
             <p className="text-xs text-zinc-600">
-              Showing {rows.length} of {tab === "waitlist" ? waitlist.length : volunteers.length} registrations
+              Showing {rows.length} of {
+                tab === "waitlist" ? waitlist.length :
+                tab === "volunteers" ? volunteers.filter(v => !v.isFreeParticipant).length :
+                tab === "free" ? volunteers.filter(v => v.isFreeParticipant).length :
+                volunteers.filter(v => v.attended).length
+              } registrations
             </p>
             <button
               onClick={fetchAll}
