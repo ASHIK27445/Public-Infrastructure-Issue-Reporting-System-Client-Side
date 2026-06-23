@@ -89,7 +89,41 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
 
   /* ── Action handlers (wire to your API) ── */
   const handlePromote   = (reg) => toast.info(`Promote: ${reg.name}`);
-  const handleRemove    = (reg) => toast.warn(`Remove: ${reg.name}`);
+  const handleRemove = (reg) => {
+    toast(
+      ({ closeToast }) => (
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium">
+            Remove <span className="font-bold">{reg.name}</span> from waitlist?
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                closeToast();
+                try {
+                  await axiosSecure.delete(`/events/${eventId}/waitlist/${reg._id}`);
+                  toast.success(`${reg.name} removed from waitlist`);
+                  fetchAll();
+                } catch {
+                  toast.error("Could not remove from waitlist");
+                }
+              }}
+              className="flex-1 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg font-medium"
+            >
+              Yes, Remove
+            </button>
+            <button
+              onClick={closeToast}
+              className="flex-1 py-1.5 bg-zinc-600 hover:bg-zinc-500 text-white text-xs rounded-lg font-medium"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      { autoClose: false, closeOnClick: false, closeButton: false }
+    )
+  }
   const handleCert = async (reg) => {
     try {
       const res = await axiosSecure.get(`/admin/events/${eventId}/certificates`);
