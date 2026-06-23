@@ -52,7 +52,7 @@ export default function MyCertificatesPage() {
     <Shell>
       <div className="flex flex-col items-center justify-center min-h-[55vh]">
         <div className="w-10 h-10 border-[3px] border-emerald-500 border-t-transparent rounded-full animate-spin mb-3"/>
-        <p className="text-gray-400 text-sm">Loading certificates...</p>
+        <p className="text-gray-400 text-base">Loading certificates...</p>
       </div>
     </Shell>
   );
@@ -64,7 +64,7 @@ export default function MyCertificatesPage() {
         <AlertTriangle className="w-14 h-14 text-amber-500 mb-4" />
         <p className="text-gray-400 mb-4">Could not load certificates. Please try again.</p>
         <button onClick={() => window.location.reload()}
-          className="px-5 py-2.5 bg-linear-to-r from-emerald-500 to-teal-500 text-white rounded-xl text-sm font-semibold hover:scale-105 transition-transform">
+          className="px-5 py-2.5 bg-linear-to-r from-emerald-500 to-teal-500 text-white rounded-xl text-base font-semibold hover:scale-105 transition-transform">
           Retry
         </button>
       </div>
@@ -81,16 +81,16 @@ export default function MyCertificatesPage() {
             <Award className="w-10 h-10 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-3">No Certificates Yet</h2>
-          <p className="text-gray-400 text-sm max-w-xs mx-auto mb-7 leading-relaxed">
+          <p className="text-gray-400 text-base max-w-xs mx-auto mb-7 leading-relaxed">
             Join a community event, show up on the day, and your certificate will appear here automatically.
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <Link to="/events"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 text-white rounded-2xl text-sm font-semibold hover:scale-105 transition-transform">
+              className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 text-white rounded-2xl text-base font-semibold hover:scale-105 transition-transform">
               <Sparkles className="w-4 h-4" /> Browse Events
             </Link>
-            <Link to="/verify"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-zinc-700 text-gray-300 rounded-2xl text-sm font-medium hover:border-emerald-500/50 hover:text-emerald-400 transition-colors">
+            <Link to="/ver"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-zinc-700 text-gray-300 rounded-2xl text-base font-medium hover:border-emerald-500/50 hover:text-emerald-400 transition-colors">
               <Search className="w-4 h-4" /> Verify a Certificate
             </Link>
           </div>
@@ -128,7 +128,7 @@ export default function MyCertificatesPage() {
               { id: "guest",     label: `Guest (${certs.filter(c=>c.role==="Guest").length})` },
             ].map((tab) => (
               <button key={tab.id} onClick={() => setFilter(tab.id)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-xl text-base font-medium transition-all ${
                   filter === tab.id
                     ? "bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/20"
                     : "bg-zinc-900 border border-zinc-700 text-gray-400 hover:border-emerald-500/40 hover:text-emerald-400"
@@ -142,7 +142,7 @@ export default function MyCertificatesPage() {
         {/* Certificates grid */}
         {filtered.length === 0 ? (
           <div className="text-center py-16 text-gray-500 bg-zinc-900 rounded-2xl border border-zinc-700">
-            <p className="text-sm">No {filter} certificates found</p>
+            <p className="text-base">No {filter} certificates found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -157,10 +157,10 @@ export default function MyCertificatesPage() {
           <div className="absolute inset-0 bg-linear-to-r from-emerald-500/10 to-teal-500/10" />
           <div className="relative">
             <p className="font-semibold text-white">Earn more certificates</p>
-            <p className="text-gray-400 text-sm mt-0.5">Join upcoming community events in your area</p>
+            <p className="text-gray-400 text-base mt-0.5">Join upcoming community events in your area</p>
           </div>
           <Link to="/events"
-            className="relative px-5 py-2.5 bg-linear-to-r from-emerald-500 to-teal-500 text-white rounded-xl text-sm font-semibold hover:scale-105 transition-transform flex items-center gap-2">
+            className="relative px-5 py-2.5 bg-linear-to-r from-emerald-500 to-teal-500 text-white rounded-xl text-base font-semibold hover:scale-105 transition-transform flex items-center gap-2">
             <Sparkles className="w-4 h-4" /> Browse Events
           </Link>
         </div>
@@ -196,25 +196,25 @@ function CertificateCard({ cert }) {
       <div className="relative p-5">
         {/* Header row */}
         <div className="flex items-center justify-between mb-4">
-          <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-zinc-800 border border-zinc-700 ${color.text}`}>
+          <span className={`inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-full bg-zinc-800 border border-zinc-700 ${color.text}`}>
             {typeLabel}
           </span>
-          <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full text-white bg-linear-to-r ${color.from} ${color.to}`}>
+          <span className={`inline-flex items-center gap-1 text-sm font-bold px-2.5 py-1 rounded-full text-white bg-linear-to-r ${color.from} ${color.to}`}>
             {cert.role}
           </span>
         </div>
 
         {/* Event title */}
-        <h3 className="font-bold text-white text-sm leading-snug mb-2 line-clamp-2 group-hover:text-emerald-400 transition-colors">
+        <h3 className="font-bold text-white text-base leading-snug mb-2 line-clamp-2 group-hover:text-emerald-400 transition-colors">
           {cert.eventTitle}
         </h3>
 
         {/* Meta */}
-        <p className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+        <p className="flex items-center gap-1.5 text-sm text-gray-500 mb-1">
           <Calendar className="w-3.5 h-3.5" /> {format(new Date(cert.eventDate), "dd MMM yyyy")}
         </p>
         {cert.institution && (
-          <p className={`flex items-center gap-1.5 text-xs font-medium mb-3 ${color.text}`}>
+          <p className={`flex items-center gap-1.5 text-sm font-medium mb-3 ${color.text}`}>
             <School className="w-3.5 h-3.5" /> {cert.institution}
           </p>
         )}
@@ -222,7 +222,7 @@ function CertificateCard({ cert }) {
         {/* Cert ID box */}
         <div className="bg-linear-to-br from-zinc-900 to-zinc-800 rounded-xl px-3 py-2.5 mb-3 border border-zinc-700">
           <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Certificate ID</p>
-          <p className="text-xs font-mono font-bold text-gray-200">{cert.certId}</p>
+          <p className="text-sm font-mono font-bold text-gray-200">{cert.certId}</p>
         </div>
 
         {/* Issued time */}
@@ -233,17 +233,17 @@ function CertificateCard({ cert }) {
         {/* Action buttons */}
         <div className="flex gap-2 mb-2">
           <Link to={`/verify/${cert.certId}`}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold border border-zinc-700 text-gray-300 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors">
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold border border-zinc-700 text-gray-300 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors">
             <Search className="w-3.5 h-3.5" /> Verify
           </Link>
           {cert.pdfUrl ? (
             <a href={cert.pdfUrl} target="_blank" rel="noreferrer"
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold text-white bg-linear-to-r ${color.from} ${color.to} hover:scale-105 transition-transform`}>
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold text-white bg-linear-to-r ${color.from} ${color.to} hover:scale-105 transition-transform`}>
               <Download className="w-3.5 h-3.5" /> Download
             </a>
           ) : (
             <button onClick={handleCopy}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold border border-zinc-700 text-gray-300 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors">
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold border border-zinc-700 text-gray-300 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors">
               {copied ? <><Check className="w-3.5 h-3.5" /> Copied!</> : <><Link2 className="w-3.5 h-3.5" /> Copy Link</>}
             </button>
           )}
@@ -253,7 +253,7 @@ function CertificateCard({ cert }) {
         <a
           href={`https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent(cert.eventTitle)}&organizationName=CommunityFix&certId=${cert.certId}&certUrl=${encodeURIComponent(verifyUrl)}`}
           target="_blank" rel="noreferrer"
-          className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-semibold bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 border border-sky-500/20 transition-colors">
+          className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-sm font-semibold bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 border border-sky-500/20 transition-colors">
           <Linkedin className="w-3.5 h-3.5" /> Add to LinkedIn
         </a>
       </div>
@@ -288,22 +288,22 @@ function PageHeader() {
     <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
       <div>
         <div className="inline-block px-4 py-1.5 rounded-full bg-linear-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 mb-3">
-          <span className="text-emerald-400 font-semibold text-xs uppercase tracking-wider">My Achievements</span>
+          <span className="text-emerald-400 font-semibold text-sm uppercase tracking-wider">My Achievements</span>
         </div>
         <h1 className="text-3xl md:text-4xl font-black text-white">
           My <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Certificates</span>
         </h1>
-        <p className="text-gray-400 text-sm mt-2">
+        <p className="text-gray-400 text-base mt-2">
           Certificates earned through civic participation
         </p>
       </div>
       <div className="flex items-center gap-3">
-        <Link to="/verify"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-900 text-gray-300 text-sm font-medium hover:border-emerald-500/50 hover:text-emerald-400 transition-colors">
+        <Link to="/ver"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-900 text-gray-300 text-base font-medium hover:border-emerald-500/50 hover:text-emerald-400 transition-colors">
           <Search className="w-4 h-4" /> Verify a Certificate
         </Link>
         <Link to="/events"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold hover:scale-105 transition-transform">
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 text-white text-base font-semibold hover:scale-105 transition-transform">
           + Earn More
         </Link>
       </div>
@@ -324,10 +324,10 @@ function StatsCard({ icon, label, value, color, small }) {
       <div className={`relative w-10 h-10 bg-linear-to-br ${colors[color]} rounded-xl flex items-center justify-center text-white mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
         {icon}
       </div>
-      <p className={`relative font-bold text-white ${small ? "text-sm" : "text-2xl"} leading-tight`}>
+      <p className={`relative font-bold text-white ${small ? "text-base" : "text-2xl"} leading-tight`}>
         {value}
       </p>
-      <p className="relative text-xs font-medium text-gray-400 mt-0.5">{label}</p>
+      <p className="relative text-sm font-medium text-gray-400 mt-0.5">{label}</p>
     </div>
   );
 }
