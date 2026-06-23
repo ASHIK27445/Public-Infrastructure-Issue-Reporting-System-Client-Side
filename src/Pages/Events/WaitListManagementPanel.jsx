@@ -21,6 +21,7 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
   const [search,     setSearch]     = useState("");
   const [qrModal,    setQrModal]    = useState(null);
   const axiosSecure = useAxiosSecure();
+  const [certModal, setCertModal] = useState(null)
 
   const fetchAll = async () => {
     setLoading(true);
@@ -84,7 +85,21 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
   /* ── Action handlers (wire to your API) ── */
   const handlePromote   = (reg) => toast.info(`Promote: ${reg.name}`);
   const handleRemove    = (reg) => toast.warn(`Remove: ${reg.name}`);
-  const handleCert      = (reg) => toast.success(`Certificate: ${reg.name}`);
+  const handleCert = async (reg) => {
+    try {
+      const res = await axiosSecure.get(`/admin/events/${eventId}/certificates`);
+      const cert = res.data.certificates?.find(
+        (c) => c.registrationId?.toString() === reg._id?.toString()
+      );
+      if (cert) {
+        setCertModal(cert);
+      } else {
+        toast.info("No certificate issued yet.");
+      }
+    } catch {
+      toast.error("Could not fetch certificate.");
+    }
+  };
   const handleQR = (reg) => {
     setQrModal({ name: reg.name, qrToken: reg.qrToken });
   };
@@ -403,8 +418,78 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
           </div>
         </div>
       )}
+
+      {/* Certificate Modal */}
+      {certModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex  justify-center z-50 p-3 md:p-5">
+          <div className="w-[90vw] min-h-screen max-w-7xl bg-zinc-900 border border-zinc-700 rounded-2xl overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-700">
+              <div>
+                <h3 className="text-white text-xl font-semibold">
+                  {certModal.volunteerName}
+                </h3>
+
+                <p className="text-sm text-zinc-500 mt-1">
+                  {certModal.eventTitle}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {certModal.pdfUrl && (
+                  <a
+                    href={certModal.pdfUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-500 text-amber-100 border border-zinc-700 text-xs hover:bg-blue-600 transition">
+                    <Download className="w-4 h-4" />
+                    Download
+                  </a>)}
+
+                  <button
+                    onClick={() => setCertModal(null)}
+                    className="px-3 py-1.5 rounded-lg bg-red-500 text-amber-100 text-xs hover:bg-red-700 transition">
+                    Close
+                  </button>
+              </div>
+            </div>
+
+            {/* PDF Section */}
+            <div className="flex-1 p-5 flex flex-col overflow-hidden">
+              {/* PDF Viewer */}
+              <div className="flex-1 rounded-xl overflow-hidden border border-zinc-700">
+                {certModal.pdfUrl ? (
+                  <iframe
+                    src={certModal.pdfUrl}
+                    title="Certificate Preview"
+                    className="w-full h-full bg-white"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-zinc-800">
+                    <div className="text-center">
+                      <Award className="w-14 h-14 text-violet-400 mx-auto mb-3" />
+                      <p className="text-zinc-500">
+                        No PDF available
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* Footer */}
+            <div className="px-6 py-3 border-t border-zinc-700">
+              <p className="text-[10px] uppercase tracking-wider font-bold text-white">
+                Certificate ID
+              </p>
+              <p className="text-xs font-mono text-white mt-1">
+                {certModal.certId}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
-  );
+  )
 }
 
 /* ── StatCell ── */
