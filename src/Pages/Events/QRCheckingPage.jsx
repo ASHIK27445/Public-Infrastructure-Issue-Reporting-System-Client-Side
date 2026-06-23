@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { Html5Qrcode } from "html5-qrcode";
 import { format, formatDistanceToNow } from "date-fns";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
@@ -224,6 +224,7 @@ export default function QRCheckinPage() {
       const res = await axiosSecure.post(`/events/${id}/checkin/manual`, {
         email: manualEmail.trim(),
       });
+      console.log(res.data)
       setManualResult({ ...res.data, type: "success" });
       setManualEmail("");
       fetchStats();
@@ -243,15 +244,40 @@ export default function QRCheckinPage() {
   };
 
   /* ── Undo check-in ── */
-  const handleUndo = async (regId, name) => {
-    if (!window.confirm(`Undo check-in for ${name}?`)) return;
-    try {
-      await axiosSecure.delete(`/events/${id}/checkin/${regId}`);
-      toast.success(`Check-in undone for ${name}`);
-      fetchStats();
-    } catch {
-      toast.error("Undo failed");
-    }
+  const handleUndo = (regId, name) => {
+    toast(
+      ({ closeToast }) => (
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium">
+            Undo check-in for <span className="font-bold">{name}</span>?
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                closeToast();
+                try {
+                  await axiosSecure.delete(`/events/${id}/checkin/${regId}`);
+                  toast.success(`Check-in undone for ${name}`);
+                  fetchStats();
+                } catch {
+                  toast.error("Undo failed");
+                }
+              }}
+              className="flex-1 py-1.5 bg-red-500 hover:bg-red-600 text-amber-100 text-xs rounded-lg font-medium"
+            >
+              Yes, Undo
+            </button>
+            <button
+              onClick={closeToast}
+              className="flex-1 py-1.5 bg-zinc-600 hover:bg-zinc-500 text-amber-100 text-xs rounded-lg font-medium"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      { autoClose: false, closeOnClick: false, closeButton: false }
+    );
   };
 
   /* ─────────────────── RENDER ─────────────────── */
@@ -272,7 +298,7 @@ export default function QRCheckinPage() {
   const freeParticipantsPending = statsData?.freeParticipantsPending || [];
   const freeTotal = (statsData?.stats?.freeParticipants || 0) + (statsData?.stats?.freeParticipantsAttended || 0);
 
-console.log(statsData)
+// console.log(statsData)
   return (
     <Shell>
       {/* ── Header ── */}
@@ -880,6 +906,8 @@ function Shell({ children }) {
         {`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');`}
       </style>
       {children}
+
+      <ToastContainer />
     </div>
   );
 }
