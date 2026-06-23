@@ -248,9 +248,7 @@ export default function EventDetailPage() {
       {/* ── Back ── */}
       <button onClick={() => navigate("/events")}
         className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-800 mb-6 transition-colors group">
-        <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
+          <ChevronLeft className="w-4 h-4"/>
         Back to Events
       </button>
 
@@ -260,7 +258,7 @@ export default function EventDetailPage() {
         <div className={`space-y-5 ${(event.hasEventLogs && event.eventLogs?.length) || (Array.isArray(event.specialGuests) && event.specialGuests.length > 0) > 0 ? 'lg:col-span-2 lg:order-2 order-1' : 'lg:col-span-2'}`}>
 
           {/* ── Hero card ── */}
-          <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm">
+          <div className="bg-zinc-950 rounded-lg border border-zinc-800 overflow-hidden shadow-sm">
             {event.coverImage ? (
               <div className="relative h-56 md:h-72 overflow-hidden">
                 <img src={event.coverImage} alt={event.title}
@@ -319,7 +317,7 @@ export default function EventDetailPage() {
               </div>
 
               {event.pinnedAnnouncement && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-5 flex gap-3">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-5 flex gap-3">
                   <Pin size={20} className="text-yellow-600 shrink-0" />
                   <div>
                     <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-1">Pinned Announcement</p>
@@ -340,7 +338,7 @@ export default function EventDetailPage() {
           </div>
 
           {/* ── Tabs ── */}
-          <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+          <div className=" rounded-lg border border-zinc-800 overflow-hidden shadow-sm">
             <div className="flex border-b border-stone-100 overflow-x-auto">
               {[
                 { id: "about",      label: "About",     icon: <AlertCircle size={14} /> },
@@ -351,7 +349,7 @@ export default function EventDetailPage() {
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
                     activeTab === tab.id
-                      ? "border-green-500 text-green-600 bg-green-50/50"
+                      ? "border-blue-500 text-blue-600 bg-zinc-800"
                       : "border-transparent text-stone-500 hover:text-stone-700 hover:bg-stone-50"
                   }`}>
                   <span>{tab.icon}</span>
@@ -369,17 +367,16 @@ export default function EventDetailPage() {
               {activeTab === "about" && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3">About This Event</h3>
-                    <p className="text-stone-700 leading-relaxed text-[15px] whitespace-pre-line">{event.description}</p>
+                    <h3 className="text-sm font-semibold text-white uppercase tracking-wide mb-3">About This Event</h3>
+                    <p className="text-white leading-relaxed text-[15px] whitespace-pre-line">{event.description}</p>
                   </div>
 
                   {event.equipmentList?.length > 0 && (
                     <div>
-                      <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3 flex items-center gap-1.5"><Package size={14} /> Bring With You</h3>
+                      <h3 className="text-sm font-semibold text-white uppercase tracking-wide mb-3 flex items-center gap-1.5"><Package size={14} /> Bring With You</h3>
                       <div className="flex flex-wrap gap-2">
                         {event.equipmentList.map((item) => (
-                          <span key={item} className="flex items-center gap-1.5 bg-stone-100 text-stone-700 text-sm px-3 py-1.5 rounded-full">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                          <span key={item} className="flex items-center gap-1.5 bg-zinc-800 text-white text-sm px-3 py-1.5 rounded-full">
                             {item}
                           </span>
                         ))}
@@ -390,7 +387,7 @@ export default function EventDetailPage() {
                   {event.location?.lat && event.location?.lng && (
                     <div>
                       <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wide mb-3 flex items-center gap-1.5"><MapPin size={14} /> Location</h3>
-                      <div className="rounded-2xl overflow-hidden border border-stone-200 h-48">
+                      <div className="rounded-lg overflow-hidden border border-zinc-800 h-48">
                         <iframe
                           title="Event location"
                           src={`https://www.openstreetmap.org/export/embed.html?bbox=${event.location.lng - 0.01},${event.location.lat - 0.01},${parseFloat(event.location.lng) + 0.01},${parseFloat(event.location.lat) + 0.01}&layer=mapnik&marker=${event.location.lat},${event.location.lng}`}
@@ -471,7 +468,7 @@ export default function EventDetailPage() {
 
             {/* Event Timeline */}
             {event.hasEventLogs && event.eventLogs?.length > 0 && (
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+              <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
                 <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
                   Event Timeline
                 </h3>
@@ -506,7 +503,7 @@ export default function EventDetailPage() {
 
             {/* Special Guests */}
             {event.hasSpecialGuests && event.specialGuests?.length > 0 && (
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+              <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
                 <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
                   Special Guests
                 </h3>
@@ -514,7 +511,7 @@ export default function EventDetailPage() {
                   {[...event.specialGuests]
                     .sort((a, b) => (b.isMainGuest ? 1 : 0) - (a.isMainGuest ? 1 : 0))
                     .map((guest, i) => (
-                      <div key={i} className={`flex items-center gap-3 rounded-xl p-3 border ${
+                      <div key={i} className={`flex items-center gap-3 rounded-lg p-3 border ${
                         guest.isMainGuest ? "bg-amber-50 border-amber-200" : "bg-stone-50 border-stone-100"
                       }`}>
                         <div className="w-10 h-10 rounded-full shrink-0 overflow-hidden border-2 border-white shadow-sm bg-stone-200 flex items-center justify-center">
@@ -564,7 +561,7 @@ export default function EventDetailPage() {
             )}
 
             {!userRegistration && !isCancelled && !isCompleted && (
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+              <div className="rounded-lg border border-zinc-800 p-5 shadow-sm">
                 <h3 className="font-bold text-stone-900 mb-1" style={{ fontFamily:"Fraunces,serif" }}>
                   {spotsLeft > 0 ? "Join This Event" : "Join Waitlist"}
                 </h3>
@@ -585,13 +582,13 @@ export default function EventDetailPage() {
                   </div>
                 </div>
                 {event.registrationFee > 0 && (
-                  <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2 mb-4">
+                  <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2 mb-4">
                     <CreditCard size={14} />
                     <span>Registration fee: <strong>৳{event.registrationFee}</strong></span>
                   </div>
                 )}
                 <Link to={`/events/${event._id}/register`}
-                  className={`block w-full text-center py-3 rounded-2xl font-semibold text-sm transition-colors ${
+                  className={`block w-full text-center py-3 rounded-lg font-semibold text-sm transition-colors ${
                     spotsLeft > 0
                       ? "bg-green-500 hover:bg-green-600 text-white"
                       : "bg-amber-500 hover:bg-amber-600 text-white"
@@ -609,7 +606,7 @@ export default function EventDetailPage() {
             )}
 
             {event.fundGoal > 0 && !isCancelled && (
-              <div ref={donateRef} className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+              <div ref={donateRef} className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
                 <div className="flex items-center gap-2 mb-3">
                   <HeartHandshake size={20} className="text-emerald-500" />
                   <h3 className="font-bold text-stone-900 text-sm" style={{ fontFamily:"Fraunces,serif" }}>Support This Event</h3>
@@ -632,7 +629,7 @@ export default function EventDetailPage() {
               </div>
             )}
 
-            <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+            <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
               <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">Event Stats</h3>
               <div className="space-y-3">
                 <StatRow icon={<ThumbsUp size={14} />}      label="Interested" value={event.interestedCount || 0} />
@@ -666,16 +663,16 @@ export default function EventDetailPage() {
               />
             )}
 
-            <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+            <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
               <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Share Event</h3>
               <div className="flex gap-2">
                 <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied!"); }}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition-colors">
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition-colors">
                   <Copy size={13} /> Copy Link
                 </button>
                 <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
                   target="_blank" rel="noreferrer"
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium transition-colors">
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium transition-colors">
                   <Facebook size={13} /> Facebook
                 </a>
               </div>
@@ -737,7 +734,7 @@ function ReactionBar({ eventId, initialReaction, interestedCount, goingCount, cu
           className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-all select-none ${
             reaction === r.type
               ? r.activeClass
-              : "bg-white text-stone-600 border-stone-200 hover:border-stone-300"
+              : "bg-white text-stone-600 border-zinc-800 hover:border-stone-300"
           }`}>
           <span>{r.icon}</span>
           <span>{r.label}</span>
@@ -781,7 +778,7 @@ function VolunteersTab({ confirmedCount, waitlistCount, maxVolunteers, spotsPerc
         </div>
       </div>
 
-      <div className="bg-stone-50 rounded-2xl p-4 text-center text-sm text-stone-500">
+      <div className="bg-stone-50 rounded-lg p-4 text-center text-sm text-stone-500">
         {confirmedCount === 0
           ? "No volunteers yet. Be the first to join!"
           : `${confirmedCount} ${confirmedCount === 1 ? "volunteer has" : "volunteers have"} signed up for this event.`}
@@ -792,7 +789,7 @@ function VolunteersTab({ confirmedCount, waitlistCount, maxVolunteers, spotsPerc
 
       {isAdmin && (
         <Link to={`/admin/events/${eventId}/manage`}
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium transition-colors">
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium transition-colors">
           <Settings size={15} /> Manage Volunteers <ArrowRight size={14} />
         </Link>
       )}
@@ -805,7 +802,7 @@ function GuestSection({ guests }) {
   const visible = showAll ? guests : guests.slice(0, 5);
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+    <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
       <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 flex items-center gap-1.5">
         <UserCheck size={13} /> Guests ({guests.length})
       </h3>
@@ -857,7 +854,7 @@ function VolunteerSection({ volunteers }) {
   const visible = showAll ? volunteers : volunteers.slice(0, 5);
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+    <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
       <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 flex items-center gap-1.5">
         <Users size={13} /> Volunteers ({volunteers.length})
       </h3>
@@ -911,7 +908,7 @@ function FreeParticipantsSection({ participants, eventId, hasFreeParticipate }) 
   const visible = showAll ? participants : participants.slice(0, 8);
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+    <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
       <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 flex items-center gap-1.5">
         <Ticket size={13} /> Free Participants ({participants.length})
       </h3>
@@ -958,7 +955,7 @@ function FreeParticipantsSection({ participants, eventId, hasFreeParticipate }) 
       {hasFreeParticipate && (
         <Link
           to={`/events/${eventId}/free-participate`}
-          className="mt-4 flex items-center justify-center gap-1.5 w-full py-2 rounded-xl
+          className="mt-4 flex items-center justify-center gap-1.5 w-full py-2 rounded-lg
                      bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold transition-colors"
         >
           <Ticket size={13} /> Join as Free Participant <ArrowRight size={12} />
@@ -975,7 +972,7 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
   return (
     <div className="space-y-5">
       {/* Progress */}
-      <div className="bg-linear-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100">
+      <div className="bg-linear-to-br from-emerald-50 to-teal-50 rounded-lg p-5 border border-emerald-100">
         <div className="flex justify-between items-end mb-3">
           <div>
             <p className="text-2xl font-bold text-emerald-700">৳{(fundRaised || 0).toLocaleString()}</p>
@@ -1115,7 +1112,7 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
       {currentUserId ? (
         <form onSubmit={handleSubmit} className="space-y-3">
           {replyTo && (
-            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-xs text-blue-700">
+            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-xs text-blue-700">
               <Reply size={13} /> <span>Replying to <strong>{replyTo.name}</strong></span>
               <button type="button" onClick={() => setReplyTo(null)} className="ml-auto text-blue-400 hover:text-red-500"><XCircle size={13} /></button>
             </div>
@@ -1128,12 +1125,12 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
               <textarea ref={inputRef} value={text} onChange={(e) => setText(e.target.value)}
                 placeholder={replyTo ? `Reply to ${replyTo.name}...` : "Write a comment, ask a question, share thoughts..."}
                 rows={3} maxLength={1000}
-                className="w-full px-4 py-3 rounded-2xl border border-stone-200 text-sm resize-none
+                className="w-full px-4 py-3 rounded-lg border border-zinc-800 text-sm resize-none
                            focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100" />
               <div className="flex items-center justify-between mt-2">
                 <span className="text-xs text-stone-400">{text.length}/1000</span>
                 <button type="submit" disabled={submitting || !text.trim()}
-                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-medium
+                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium
                              transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                   {submitting ? <><Spinner /> Posting...</> : "Post Comment"}
                 </button>
@@ -1142,7 +1139,7 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
           </div>
         </form>
       ) : (
-        <div className="text-center py-4 bg-stone-50 rounded-2xl">
+        <div className="text-center py-4 bg-stone-50 rounded-lg">
           <p className="text-stone-500 text-sm">
             <Link to="/login" className="text-green-600 font-medium hover:underline">Login</Link> to join the discussion
           </p>
@@ -1202,7 +1199,7 @@ function CommentItem({ comment, currentUserId, isAdmin, token, onDelete, onDelet
   const isOwner = comment.userId?._id === currentUserId || comment.userId === currentUserId;
 
   return (
-    <div className={`rounded-2xl p-4 ${comment.pinned ? "bg-yellow-50 border border-yellow-200" : "bg-stone-50"}`}>
+    <div className={`rounded-lg p-4 ${comment.pinned ? "bg-yellow-50 border border-yellow-200" : "bg-stone-50"}`}>
       {comment.pinned && (
         <div className="flex items-center gap-1.5 text-xs font-semibold text-yellow-700 mb-2">
           <Pin size={12} /> Pinned by Admin
@@ -1248,7 +1245,7 @@ function CommentItem({ comment, currentUserId, isAdmin, token, onDelete, onDelet
 
           {/* Replies */}
           {comment.replies?.length > 0 && (
-            <div className="mt-3 space-y-3 pl-3 border-l-2 border-stone-200">
+            <div className="mt-3 space-y-3 pl-3 border-l-2 border-zinc-800">
               {comment.replies.map((reply) => (
                 <div key={reply._id} className="flex gap-2.5">
                   <div className="w-6 h-6 rounded-full bg-stone-200 flex items-center justify-center text-stone-600 font-bold text-[10px] shrink-0">
@@ -1328,7 +1325,7 @@ function DonationForm({ user,  eventId, onDonated }) {
 
   if (!showForm) return (
     <button onClick={() => setShowForm(true)}
-      className="w-full py-2.5 rounded-2xl bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600
+      className="w-full py-2.5 rounded-lg bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600
                  text-white font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-2">
       <HeartHandshake size={16} /> Donate to This Event
     </button>
@@ -1340,10 +1337,10 @@ function DonationForm({ user,  eventId, onDonated }) {
       <div className="grid grid-cols-4 gap-1.5">
         {PRESETS.map((p) => (
           <button key={p} onClick={() => setAmount(String(p))}
-            className={`py-2 rounded-xl text-xs font-semibold border transition-all ${
+            className={`py-2 rounded-lg text-xs font-semibold border transition-all ${
               amount === String(p)
                 ? "bg-emerald-500 text-white border-emerald-500"
-                : "bg-white text-stone-600 border-stone-200 hover:border-emerald-300"
+                : "bg-white text-stone-600 border-zinc-800 hover:border-emerald-300"
             }`}>
             ৳{p}
           </button>
@@ -1352,16 +1349,16 @@ function DonationForm({ user,  eventId, onDonated }) {
 
       <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)}
         placeholder="Custom amount (৳)"
-        className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
+        className="w-full px-3 py-2.5 rounded-lg border border-zinc-800 text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" />
 
       {!user && (
         <>
           <input type="text" value={name} onChange={(e) => setName(e.target.value)}
             placeholder="Your name (optional)"
-            className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+            className="w-full px-3 py-2.5 rounded-lg border border-zinc-800 text-sm focus:outline-none focus:border-emerald-400" />
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
             placeholder="Email for receipt *"
-            className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+            className="w-full px-3 py-2.5 rounded-lg border border-zinc-800 text-sm focus:outline-none focus:border-emerald-400" />
             
         </>
       )}
@@ -1374,16 +1371,16 @@ function DonationForm({ user,  eventId, onDonated }) {
 
       {/* Anonymous: email OR phone required */}
       {anon && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-2">
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
           <p className="text-xs text-amber-700 font-medium flex items-center gap-1">
             <AlertCircle size={13} /> Anonymous donations require at least one contact for verification:
           </p>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
             placeholder="Email (optional)"
-            className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+            className="w-full px-3 py-2 rounded-lg border border-zinc-800 text-sm focus:outline-none focus:border-emerald-400" />
           <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
             placeholder="Phone number (optional)"
-            className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+            className="w-full px-3 py-2 rounded-lg border border-zinc-800 text-sm focus:outline-none focus:border-emerald-400" />
 
             <label className="flex items-center gap-2 text-xs text-stone-500 cursor-pointer select-none">
               <input type="checkbox" checked={wantReceipt} onChange={(e) => setWantReceipt(e.target.checked)}
@@ -1405,22 +1402,22 @@ function DonationForm({ user,  eventId, onDonated }) {
           {wantReceipt && (
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
               placeholder="Email for receipt *"
-              className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+              className="w-full px-3 py-2.5 rounded-lg border border-zinc-800 text-sm focus:outline-none focus:border-emerald-400" />
           )}
 
           <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
             placeholder="Phone number (optional)"
-            className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:border-emerald-400" />
+            className="w-full px-3 py-2.5 rounded-lg border border-zinc-800 text-sm focus:outline-none focus:border-emerald-400" />
         </div>
       )}
 
       <div className="flex gap-2">
         <button onClick={() => setShowForm(false)}
-          className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 text-xs font-medium hover:bg-stone-50 transition-colors">
+          className="flex-1 py-2.5 rounded-lg border border-zinc-800 text-stone-600 text-xs font-medium hover:bg-stone-50 transition-colors">
           Cancel
         </button>
         <button onClick={handleDonate} disabled={loading || !amount}
-          className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold
+          className="flex-1 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold
                      transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5">
           {loading ? <><Spinner /> Processing...</> : `Donate ৳${amount || "—"}`}
         </button>
@@ -1437,7 +1434,7 @@ function UserRegistrationCard({ registration, event, isFree }) {
   const paymentPending = registration.paymentStatus === "pending" && !isFree;
 
   return (
-    <div className={`rounded-2xl border p-5 shadow-sm ${
+    <div className={`rounded-lg border p-5 shadow-sm ${
       isWaitlisted ? "bg-amber-50 border-amber-200" : "bg-green-50 border-green-200"
     }`}>
       <div className="flex items-center gap-2 mb-3">
@@ -1462,7 +1459,7 @@ function UserRegistrationCard({ registration, event, isFree }) {
 
       {/* QR code */}
       {!isWaitlisted && registration.qrToken && !registration.attended && (
-        <div className="bg-white rounded-xl p-3 border border-green-200 text-center">
+        <div className="bg-white rounded-lg p-3 border border-green-200 text-center">
           <p className="text-xs text-stone-500 mb-2">Your QR for check-in</p>
           <div className="inline-block p-2 bg-white rounded-lg">
             <QRCodeCanvas value={registration.qrToken} size={100} level="M" />
@@ -1471,7 +1468,7 @@ function UserRegistrationCard({ registration, event, isFree }) {
       )}
 
       {registration.attended && (
-        <div className="flex items-center gap-2 bg-green-100 rounded-xl px-3 py-2 text-xs text-green-700 font-medium">
+        <div className="flex items-center gap-2 bg-green-100 rounded-lg px-3 py-2 text-xs text-green-700 font-medium">
           <Medal size={14} /> Attendance recorded — certificate coming soon!
         </div>
       )}
@@ -1514,16 +1511,16 @@ function AdminQuickActions({ event, onRefresh, token }) {
   const available = nextStatuses[event.status] || [];
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+    <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
       <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3 flex items-center gap-1.5"><Settings size={13} /> Admin Actions</h3>
       <div className="space-y-2">
         <Link to={`/admin/events/${event._id}/manage`}
-          className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium transition-colors">
+          className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium transition-colors">
           <Users size={15} /> Manage Volunteers
         </Link>
         {available.map((s) => (
           <button key={s} onClick={() => updateStatus(s)} disabled={updating}
-            className={`flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 ${
+            className={`flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
               s === "cancelled" ? "bg-red-50 hover:bg-red-100 text-red-700"
               : s === "completed" ? "bg-blue-50 hover:bg-blue-100 text-blue-700"
               : "bg-green-50 hover:bg-green-100 text-green-700"
@@ -1544,7 +1541,7 @@ function AdminQuickActions({ event, onRefresh, token }) {
 ═══════════════════════════════════════ */
 function Shell({ children }) {
   return (
-    <div className="min-h-screen bg-[#f5f4f0] py-8 px-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="min-h-screen bg-zinc-950 py-8 px-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:wght@600;700;800&display=swap');`}</style>
       <div className="max-w-360 mx-auto">{children}</div>
     </div>
@@ -1588,7 +1585,7 @@ function CountdownPill({ daysLeft, hoursLeft }) {
 function InfoChip({ icon, label, value, sub }) {
   if (!value) return null;
   return (
-    <div className="flex items-start gap-3 bg-stone-50 rounded-2xl p-3.5">
+    <div className="flex items-start gap-3 bg-stone-50 rounded-lg p-3.5">
       <span className="text-lg shrink-0">{icon}</span>
       <div className="min-w-0">
         <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide">{label}</p>
@@ -1613,7 +1610,7 @@ function StatRow({ icon, label, value }) {
 function VolStatBox({ label, value, color }) {
   const colors = { green:"text-green-600 bg-green-50", amber:"text-amber-600 bg-amber-50", blue:"text-blue-600 bg-blue-50", red:"text-red-500 bg-red-50" };
   return (
-    <div className={`rounded-2xl p-3 text-center ${colors[color]}`}>
+    <div className={`rounded-lg p-3 text-center ${colors[color]}`}>
       <p className="text-2xl font-bold">{value}</p>
       <p className="text-xs font-medium opacity-80 mt-0.5">{label}</p>
     </div>
