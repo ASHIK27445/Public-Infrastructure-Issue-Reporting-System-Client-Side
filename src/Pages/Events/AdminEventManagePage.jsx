@@ -30,7 +30,7 @@ const STATUS_NEXT = {
   completed:[], cancelled:[],
 };
 const PAYMENT_BADGE = {
-  "not-required": { bg:"bg-zinc-700", text:"text-white", label:"Free"     },
+  "not-required": { bg:"bg-zinc-900", text:"text-white", label:"Free"     },
   "pending":      { bg:"bg-amber-100", text:"text-amber-700", label:"Pending"  },
   "paid":         { bg:"bg-green-100", text:"text-green-700", label:"Paid"     },
   "refunded":     { bg:"bg-blue-100",  text:"text-blue-700",  label:"Refunded" },
@@ -99,7 +99,7 @@ export default function AdminEventManagePage() {
           </button>
           <button
             onClick={() => toast.dismiss()}
-            className="px-3 py-1 rounded-lg text-sm font-semibold bg-zinc-700 hover:bg-stone-200 text-white transition-colors"
+            className="px-3 py-1 rounded-lg text-sm font-semibold bg-zinc-900 hover:bg-stone-200 text-white transition-colors"
           >
             Dismiss
           </button>
@@ -139,7 +139,7 @@ export default function AdminEventManagePage() {
           </button>
           <button
             onClick={() => toast.dismiss()}
-            className="px-3 py-1 rounded-lg text-sm font-semibold bg-zinc-700 hover:bg-stone-500 text-white transition-colors"
+            className="px-3 py-1 rounded-lg text-sm font-semibold bg-zinc-900 hover:bg-stone-500 text-white transition-colors"
           >
             Cancel
           </button>
@@ -180,15 +180,15 @@ export default function AdminEventManagePage() {
         {/* Stats bar skeleton */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           {Array.from({ length: 7 }).map((_, i) => (
-            <div key={i} className="bg-zinc-700 rounded-2xl p-3 space-y-2">
-              <div className="h-6 bg-zinc-700 rounded-lg w-10 mx-auto" />
-              <div className="h-2.5 bg-zinc-700 rounded-full w-14 mx-auto" />
+            <div key={i} className="bg-zinc-900 rounded-2xl p-3 space-y-2">
+              <div className="h-6 bg-zinc-900 rounded-lg w-10 mx-auto" />
+              <div className="h-2.5 bg-zinc-900 rounded-full w-14 mx-auto" />
             </div>
           ))}
         </div>
 
         {/* Tabs + Table skeleton */}
-        <div className="bg-zinc-700 rounded-2xl border border-zinc-700 overflow-hidden">
+        <div className="bg-zinc-900 rounded-2xl border border-zinc-700 overflow-hidden">
           {/* Tab bar */}
           <div className="flex gap-1 px-4 py-3 border-b border-zinc-700">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -327,13 +327,13 @@ export default function AdminEventManagePage() {
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-5 py-3.5 lg:py-5 text-sm lg:text-base font-medium whitespace-nowrap border-b-2 transition-all ${
               activeTab===tab.id
-                ? "border-emerald-500 text-emerald-600 bg-zinc-700"
+                ? "border-emerald-500 text-emerald-600 bg-zinc-900"
                 : "border-transparent text-white hover:text-white mix hover:bg-zinc-800"
             }`}>
             {tab.icon}
             <span>{tab.label}</span>
             {tab.count > 0 && (
-              <span className={`text-sm font-bold px-1.5 py-0.5 rounded-full ${activeTab===tab.id ? "bg-emerald-100 text-emerald-700" : "bg-zinc-700 text-white"}`}>
+              <span className={`text-sm font-bold px-1.5 py-0.5 rounded-full ${activeTab===tab.id ? "bg-emerald-100 text-emerald-700" : "bg-zinc-900 text-white"}`}>
                 {tab.count}
               </span>
             )}
@@ -464,7 +464,7 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
       <div className="overflow-x-auto rounded-2xl border border-zinc-700">
         <table className="w-full">
           <thead>
-            <tr className="bg-zinc-700 border-b border-zinc-700">
+            <tr className="bg-zinc-900 border-b border-zinc-700">
               {isWaitlist && <Th>#</Th>}
               <Th>Volunteer</Th>
               <Th>Contact</Th>
@@ -556,7 +556,7 @@ function VolunteerTable({ volunteers, eventId, onRemove, showAttended, isWaitlis
 
                 {/* Expanded QR row */}
                 {expanded === v._id && !isWaitlist && (
-                  <tr key={`${v._id}-expanded`} className="bg-zinc-700">
+                  <tr key={`${v._id}-expanded`} className="bg-zinc-900">
                     <td colSpan={99} className="px-6 py-4">
                       <div className="flex items-center gap-6 flex-wrap">
                         <div className="bg-white rounded-2xl p-3 border border-zinc-800 shadow-sm">
@@ -590,15 +590,15 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
   return (
     <div className="space-y-5">
       {/* Summary */}
-      <div className="bg-linear-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100">
+      <div className="bg-zinc-900 rounded-2xl p-5 border border-zinc-800">
         <div className="flex justify-between items-end mb-3">
           <div>
             <p className="text-2xl font-bold text-emerald-700">৳{(totalDonated||0).toLocaleString()}</p>
             <p className="text-sm text-emerald-600">{donations.length} donations · Goal: ৳{fundGoal.toLocaleString()}</p>
           </div>
-          <p className="text-3xl font-bold text-emerald-200">{fundPercent}%</p>
+          <p className="text-3xl font-bold text-white">{fundPercent}%</p>
         </div>
-        <div className="h-3 bg-emerald-100 rounded-full overflow-hidden">
+        <div className="h-3 bg-white rounded-full overflow-hidden">
           <div className="h-full bg-linear-to-r from-emerald-400 to-teal-500 rounded-full" style={{ width:`${fundPercent}%` }} />
         </div>
       </div>
@@ -610,7 +610,7 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
         <div className="overflow-x-auto rounded-2xl border border-zinc-700">
           <table className="w-full">
             <thead>
-              <tr className="bg-stone-50 border-b border-zinc-700">
+              <tr className="bg-zinc-900 border-b border-zinc-700">
                 <Th>Donor</Th>
                 <Th>Email</Th>
                 <Th>Amount</Th>
@@ -618,7 +618,7 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
                 <Th>Date</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-50">
+            <tbody>
               {donations.map((d) => (
                 <tr key={d._id} className="hover:bg-stone-50/50">
                   <Td>
@@ -631,7 +631,7 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
                           : d.donorName?.[0]?.toUpperCase()
                       }
                     </div>
-                      <span className="text-sm font-medium text-stone-800">
+                      <span className="text-sm font-medium text-white">
                         {d.anonymous ? "Anonymous" : d.donorName}
                       </span>
                     </div>
@@ -639,7 +639,7 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
                   <Td><span className="text-sm text-white">{d.anonymous ? "—" : (d.donorEmail || "—")}</span></Td>
                   <Td><span className="font-bold text-emerald-700 text-sm">৳{d.amount.toLocaleString()}</span></Td>
                   <Td>
-                    <span className={`text-sm font-medium px-2 py-1 rounded-full ${d.anonymous ? "bg-zinc-700 text-stone-600" : "bg-green-100 text-green-700"}`}>
+                    <span className={`text-sm font-medium px-2 py-1 rounded-full ${d.anonymous ? "bg-zinc-900 text-white" : "bg-green-100 text-green-700"}`}>
                       {d.anonymous ? "Yes" : "No"}
                     </span>
                   </Td>
@@ -767,7 +767,7 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
               <>
                 <tr key={p._id} className="mix hover:bg-zinc-800 transition-colors">
                   <Td>
-                    <span className="w-6 h-6 rounded-full bg-zinc-700 text-white text-sm font-bold flex items-center justify-center">
+                    <span className="w-6 h-6 rounded-full bg-zinc-900 text-white text-sm font-bold flex items-center justify-center">
                       {i + 1}
                     </span>
                   </Td>
@@ -821,7 +821,7 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
                         </div>
                         <div className="space-y-1">
                           <p className="text-sm font-semibold text-white uppercase tracking-wide">QR Token</p>
-                          <code className="text-sm font-mono bg-zinc-700 px-2 py-1 rounded text-white break-all block max-w-xs">
+                          <code className="text-sm font-mono bg-zinc-900 px-2 py-1 rounded text-white break-all block max-w-xs">
                             {p.qrToken}
                           </code>
                           <p className="text-sm text-stone-400 mt-1">Used for attendance check-in at the event</p>
@@ -1011,7 +1011,7 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
 
         <EditSection icon={Image} title="Cover Preview" subtitle="Banner image">
           {form.coverImage ? (
-            <div className="relative rounded-xl overflow-hidden border border-zinc-700 h-36 bg-zinc-700">
+            <div className="relative rounded-xl overflow-hidden border border-zinc-800 h-36 bg-zinc-900">
               <img src={form.coverImage} alt="Cover"
                 className="w-full h-full object-cover"
                 onError={(e) => { e.target.style.display = "none"; }} />
@@ -1020,7 +1020,7 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
               </span>
             </div>
           ) : (
-            <div className="h-36 rounded-xl border-2 border-dashed border-zinc-700 flex flex-col items-center justify-center gap-2">
+            <div className="h-36 rounded-xl border-2 border-dashed border-zinc-800 flex flex-col items-center justify-center gap-2">
               <EyeOff size={28} />
               <span className="text-sm">No image URL set</span>
             </div>
@@ -1037,7 +1037,7 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
           {form.equipmentList && (
             <div className="flex flex-wrap gap-1.5 mt-2">
               {form.equipmentList.split(",").map(s => s.trim()).filter(Boolean).map((item, i) => (
-                <span key={i} className="text-[10px] bg-zinc-700 text-white px-2 py-0.5 rounded-full font-medium">
+                <span key={i} className="text-[10px] bg-zinc-900 text-white px-2 py-0.5 rounded-full font-medium">
                   {item}
                 </span>
               ))}
@@ -1236,7 +1236,7 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
       </div>
 
       {/* ── Save bar ── */}
-      <div className="flex items-center justify-between py-3 border-t border-zinc-700">
+      <div className="flex items-center justify-between py-3 border-t border-zinc-800">
         <p className="text-sm text-stone-400">
           Last updated: {format(new Date(event.updatedAt || event.createdAt), "dd MMM yyyy, h:mm a")}
         </p>
@@ -1255,10 +1255,10 @@ function EditEventForm({ event, onSaved, axiosSecure }) {
 /* ── Section wrapper ── */
 function EditSection({ icon: Icon, title, subtitle, children }) {
   return (
-    <div className="rounded-2xl border border-zinc-700 overflow-hidden">
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-700 bg-zinc-700">
+    <div className="rounded-2xl border border-zinc-800 overflow-hidden">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800 bg-zinc-950">
         
-        <div className="w-7 h-7 flex items-center justify-center rounded-md bg-zinc-700">
+        <div className="w-7 h-7 flex items-center justify-center rounded-md bg-zinc-950">
           <Icon size={15} className="text-white" />
         </div>
 
@@ -1271,7 +1271,7 @@ function EditSection({ icon: Icon, title, subtitle, children }) {
           )}
         </div>
       </div>
-      <div className="p-4 bg-zinc-700 text-black">{children}</div>
+      <div className="p-4 bg-zinc-950 text-black">{children}</div>
     </div>
   );
 }
@@ -1279,7 +1279,7 @@ function EditSection({ icon: Icon, title, subtitle, children }) {
 /* ── Toggle ── */
 function Toggle({ label, desc, checked, onChange }) {
   return (
-    <label className="flex items-center gap-3 cursor-pointer bg-zinc-700 mix hover:bg-zinc-800 transition-colors px-3 py-2 rounded-xl border border-zinc-700">
+    <label className="flex items-center gap-3 cursor-pointer bg-zinc-900 mix hover:bg-zinc-800 transition-colors px-3 py-2 rounded-xl border border-zinc-700">
       <div className="relative shrink-0 border border-white rounded-full">
         <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="sr-only" />
         <div className={`w-8 h-4 rounded-full transition-colors ${checked ? "bg-green-500" : "bg-stone-300"}`} />
@@ -1397,7 +1397,7 @@ function StatusPill({ status }) {
   const s = {
     upcoming:  { bg:"bg-green-100",  text:"text-green-700"  },
     ongoing:   { bg:"bg-blue-100",   text:"text-blue-700"   },
-    completed: { bg:"bg-zinc-700",  text:"text-stone-600"  },
+    completed: { bg:"bg-zinc-900",  text:"text-stone-600"  },
     cancelled: { bg:"bg-red-100",    text:"text-red-700"    },
     draft:     { bg:"bg-yellow-100", text:"text-yellow-700" },
   };
@@ -1442,7 +1442,7 @@ function Th({ children }) {
   return <th className="px-4 py-2.5 text-left text-sm font-semibold text-white uppercase tracking-wide whitespace-nowrap">{children}</th>;
 }
 function Td({ children }) {
-  return <td className="px-4 py-3 align-top">{children}</td>;
+  return <td className="px-4 py-3 align-top border-b border-zinc-800">{children}</td>;
 }
 function Spinner() {
   return <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>;
