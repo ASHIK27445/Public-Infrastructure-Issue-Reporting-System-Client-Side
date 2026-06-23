@@ -114,7 +114,7 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
             </button>
             <button
               onClick={closeToast}
-              className="flex-1 py-1.5 bg-zinc-600 hover:bg-zinc-500 text-white text-xs rounded-lg font-medium"
+              className="flex-1 py-1.5 bg-zinc-600 hover:bg-zinc-500 text-amber-100 text-xs rounded-lg font-medium"
             >
               Cancel
             </button>

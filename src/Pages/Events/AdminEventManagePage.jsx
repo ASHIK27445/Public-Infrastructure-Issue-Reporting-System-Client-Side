@@ -139,7 +139,7 @@ export default function AdminEventManagePage() {
           </button>
           <button
             onClick={() => toast.dismiss()}
-            className="px-3 py-1 rounded-lg text-sm font-semibold bg-zinc-900 hover:bg-stone-500 text-white transition-colors"
+            className="px-3 py-1 rounded-lg text-sm font-semibold bg-zinc-900 hover:bg-stone-500 text-amber-100 transition-colors"
           >
             Cancel
           </button>
@@ -677,7 +677,7 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
     toast.warn(
       <div className="space-y-2">
         <p className="text-sm font-medium text-stone-800">Remove <span className="font-bold">{name}</span>?</p>
-        <p className="text-sm text-white">This free participant will be permanently removed.</p>
+        <p className="text-sm text-black">This free participant will be permanently removed.</p>
         <div className="flex gap-2">
           <button
             onClick={async () => {
@@ -698,7 +698,7 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
           </button>
           <button
             onClick={() => toast.dismiss()}
-            className="px-3 py-1 rounded-lg text-sm font-semibold bg-gray-700 text-white hover:bg-gray-800 transition-colors"
+            className="px-3 py-1 rounded-lg text-sm font-semibold bg-gray-700 text-amber-100 hover:bg-gray-800 transition-colors"
           >
             Cancel
           </button>
