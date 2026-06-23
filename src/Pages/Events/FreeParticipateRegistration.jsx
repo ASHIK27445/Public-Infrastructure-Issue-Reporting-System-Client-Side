@@ -1,633 +1,341 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { format } from "date-fns";
-import { QRCodeCanvas } from "qrcode.react";
-import { BookCheck, Calendar, ChevronLeft, Mail, MapPinned, Medal, Ticket,   
-  Trash2, Trees,  Wrench, Megaphone, GraduationCap, Handshake,  Ban, XCircle,
-  CheckCircle,
-  Loader2,
-  AlertCircle} from "lucide-react";
+'use client';
 
-/* ─── Constants ─── */
+import { motion, AnimatePresence } from 'motion/react';
+import { useState } from 'react';
+import {
+  MapPin, CheckCircle, Clock, ChevronLeft, ChevronRight,
+  Trash2, Trees, Wrench, Megaphone, GraduationCap, Handshake,
+  Calendar, Ticket, BookCheck, AlertCircle
+} from 'lucide-react';
+import { Link } from 'react-router';
+
 const TYPE_ICON = {
-  cleanup: Trash2,
+  cleanup:    Trash2,
   plantation: Trees,
-  repair: Wrench,
-  awareness: Megaphone,
-  student: GraduationCap,
-  meetup: Handshake,
+  repair:     Wrench,
+  awareness:  Megaphone,
+  student:    GraduationCap,
+  meetup:     Handshake,
 };
 
-/* ═══════════════════════════════════════════
-   MAIN COMPONENT
-═══════════════════════════════════════════ */
-export default function FreeParticipateRegistration() {
-  const { id }      = useParams();
-  const navigate    = useNavigate();
-  const qrRef       = useRef(null);
-
-  const [event, setEvent]         = useState(null);
-  const [eventLoading, setEventLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted]   = useState(false);
-  const [result, setResult]         = useState(null);
-  const [errors, setErrors]         = useState({});
-  
-
-  const [form, setForm] = useState({
-    name:  "",
-    email: "",
-    phone: "",
-  });
-
-  /* ── Fetch event ── */
-  useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_API_MANUAL}/events/${id}`)
-      .then((r) => setEvent(r.data?.event))
-      .catch(() => toast.error("Could not load event details"))
-      .finally(() => setEventLoading(false));
-  }, [id]);
-
-  /* helpers */
-  const setF = (k, v) => {
-    setForm((p) => ({ ...p, [k]: v }));
-    setErrors((p) => ({ ...p, [k]: "" }));
-  };
-
-  /* ── Validation ── */
-  const validate = () => {
-    const e = {};
-    if (!form.name.trim())  e.name  = "Name is required";
-    if (!form.email.trim()) e.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      e.email = "Enter a valid email";
-    if (!form.phone.trim()) e.phone = "Phone is required";
-    else if (!/^01[3-9]\d{8}$/.test(form.phone.replace(/\s/g, "")))
-      e.phone = "Enter a valid BD number (01XXXXXXXXX)";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
-  /* ── Submit ── */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setSubmitting(true);
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_MANUAL}/events/${id}/free-participate`,
-        form,
-      );
-      setResult(res.data.participant);
-      setSubmitted(true);
-      toast.success(res.data.message || "Registered successfully!");
-    } catch (err) {
-      const msg = err.response?.data?.message || "Registration failed. Please try again.";
-      toast.error(msg);
-      if (msg.toLowerCase().includes("already registered") || msg.toLowerCase().includes("phone number is already"))
-        setErrors({ phone: "This phone number is already registered for this event" });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  /* ── Download QR as image ── */
-  const handleDownloadQR = () => {
-    const canvas = qrRef.current?.querySelector("canvas");
-    if (!canvas) return;
-
-    const padding    = 24;
-    const qrSize     = canvas.width;
-    const totalW     = qrSize + padding * 2;
-    const labelH     = 52;
-    const totalH     = qrSize + padding * 2 + labelH;
-
-    const offscreen  = document.createElement("canvas");
-    offscreen.width  = totalW;
-    offscreen.height = totalH;
-    const ctx        = offscreen.getContext("2d");
-
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, totalW, totalH);
-
-    ctx.drawImage(canvas, padding, padding);
-
-    ctx.fillStyle = "#111827";
-    ctx.font      = "bold 13px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(event?.title || "Event QR", totalW / 2, qrSize + padding * 2 + 16);
-
-    ctx.fillStyle = "#6b7280";
-    ctx.font      = "11px sans-serif";
-    ctx.fillText("Show at entry for check-in", totalW / 2, qrSize + padding * 2 + 34);
-
-    const link    = document.createElement("a");
-    link.download = `qr-${id}.png`;
-    link.href     = offscreen.toDataURL("image/png");
-    link.click();
-  };
-
-  /* ── Derived ── */
-  const spotsLeft = event
-    ? event.maxFreeParticipate > 0
-      ? Math.max(0, event.maxFreeParticipate - (event.freeParticipateCount || 0))
-      : null
-    : null;
-  const isFull    = spotsLeft !== null && spotsLeft <= 0;
-  const isPastDate = event ? new Date(event.date) < new Date() : false;
-  const EventIcon = TYPE_ICON[event?.eventType] || Handshake;
-
-  /* ════════════════════════════════════════
-     LOADING
-  ════════════════════════════════════════ */
-  if (eventLoading)
-    return (
-      <PageShell>
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-
-          {/* LOADING SPINNER */}
-          <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
-
-          <p className="text-gray-400 text-base">Loading event...</p>
-        </div>
-      </PageShell>
-    );
-
-  /* ════════════════════════════════════════
-    NOT FOUND
-  ════════════════════════════════════════ */
-
-  if (!event)
-    return (
-      <PageShell>
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-
-          {/* ICON */}
-          <AlertCircle className="w-14 h-14 text-yellow-500 mb-4" />
-
-          {/* TITLE */}
-          <h2
-            className="text-xl font-semibold text-white mb-2"
-            style={{ fontFamily: "Fraunces, serif" }}
-          >
-            Event not found
-          </h2>
-
-          {/* LINK */}
-          <Link
-            to="/events"
-            className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-base mt-2"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Back to events
-          </Link>
-
-        </div>
-      </PageShell>
-    );
-
-  /* ════════════════════════════════════════
-     FREE PARTICIPATE NOT ENABLED / CLOSED
-  ════════════════════════════════════════ */
-  if (
-    !event.isFreeParticipate ||
-    isPastDate ||
-    ["cancelled", "completed"].includes(event.status)
-  )
-    return (
-      <PageShell>
-        <div className="max-w-md mx-auto text-center py-20">
-
-          {/* ICON */}
-          <div className="flex justify-center mb-4">
-            {!event.isFreeParticipate ? (
-              <Ban className="w-14 h-14 text-red-500" />
-            ) : event.status === "cancelled" ? (
-              <XCircle className="w-14 h-14 text-red-500" />
-            ) : (
-              <CheckCircle className="w-14 h-14 text-green-500" />
-            )}
-          </div>
-
-          {/* TITLE */}
-          <h2
-            className="text-xl font-semibold text-white mb-2"
-            style={{ fontFamily: "Fraunces, serif" }}
-          >
-            {!event.isFreeParticipate
-              ? "Free Participation Not Available"
-              : event.status === "cancelled"
-              ? "Event Cancelled"
-              : "Event Completed"}
-          </h2>
-
-          {/* DESCRIPTION */}
-          <p className="text-white text-base mb-6">
-            {!event.isFreeParticipate
-              ? "This event does not offer free participation."
-              : "This event is no longer accepting registrations."}
-          </p>
-
-          {/* BACK BUTTON */}
-          <Link
-            to={`/events/${id}`}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-500 text-white rounded-lg text-base font-semibold hover:bg-blue-600 transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Back to Event
-          </Link>
-
-        </div>
-      </PageShell>
-    );
-
-  /* ════════════════════════════════════════
-     SUCCESS STATE
-  ════════════════════════════════════════ */
-  if (submitted && result) return (
-    <PageShell>
-      <div className="max-w-5xl mx-auto w-full">
-
-        {/* Back */}
-        <Link
-          to={`/events/${id}`}
-          className="flex items-center gap-1.5 text-base text-white hover:text-gray-400 mb-6 transition-colors"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Back to Event
-        </Link>
-
-        {/* MAIN CARD */}
-        <div className="rounded-3xl border border-zinc-800 overflow-hidden flex flex-col items-center md:flex-row">
-
-          {/* LEFT SIDE (QR) */}
-          <div className="w-full md:w-105 border-b md:border-b-0 md:border-r border-zinc-800">
-
-            {/* Banner */}
-            <div className="py-10 px-8 text-center">
-              <div className="text-6xl mb-3 animate-bounce flex justify-center">
-                <Ticket className="w-8 h-8" />
-              </div>
-
-              <h2
-                className="text-2xl font-bold text-white mb-2"
-                style={{ fontFamily: "Fraunces, serif" }}
-              >
-                You're In!
-              </h2>
-
-              <p className="text-white text-base max-w-sm mx-auto">
-                Free participation confirmed. Show QR at entrance.
-              </p>
-            </div>
-
-            {/* QR SECTION */}
-            <div className="p-7 space-y-5">
-
-              {result.qrToken && (
-                <div className="rounded-2xl p-5 border border-zinc-800 text-center">
-
-                  <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">
-                    Your QR Code
-                  </p>
-
-                  <div
-                    ref={qrRef}
-                    className="inline-block p-3 bg-white rounded-2xl"
-                  >
-                    <QRCodeCanvas
-                      value={result.qrToken}
-                      size={160}
-                      bgColor="#ffffff"
-                      fgColor="#111827"
-                    />
-                  </div>
-
-                  <code className="block text-[11px] font-mono text-white break-all mt-4">
-                    {result.qrToken}
-                  </code>
-
-                  <button
-                    onClick={handleDownloadQR}
-                    className="mt-4 w-full px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-semibold transition"
-                  >
-                    Download QR
-                  </button>
-                </div>
-              )}
-
-              {/* STATUS */}
-              <div className="border border-zinc-800 rounded-2xl p-4 flex items-center gap-3">
-                <BookCheck className="text-white" />
-                <div>
-                  <p className="text-white font-medium">
-                    Free Participation Confirmed
-                  </p>
-                  <p className="text-sm text-white">
-                    No payment required
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT SIDE (DETAILS) */}
-          <div className="flex-1 p-6 space-y-8">
-
-            {/* Event Details */}
-            <div className="rounded-2xl p-4 border border-zinc-800 space-y-3">
-              <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                Event Details
-              </p>
-
-              <DetailRow
-                icon={TYPE_ICON[event.eventType] || Handshake}
-                text={event.title}
-                bold
-              />
-
-              <DetailRow
-                icon={Calendar}
-                text={format(new Date(event.date), "EEEE, dd MMM yyyy • h:mm a")}
-              />
-
-              <DetailRow
-                icon={MapPinned}
-                text={event.location?.address}
-              />
-            </div>
-
-            {/* What's Next */}
-            <div>
-              <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                What's Next
-              </p>
-
-              <div className="space-y-3">
-                {[
-                  "Check email for QR code.",
-                  "Save/download before event.",
-                  "Show QR at entrance.",
-                  "Get certificate after attendance.",
-                ].map((text, i) => (
-                  <div key={i} className="flex gap-3 text-base text-white">
-                    <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 text-sm flex items-center justify-center shrink-0 font-semibold mt-0.5">
-                      {i + 1}
-                    </span>
-                    {text}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ACTIONS */}
-            <div className="flex gap-3 pt-2">
-              <Link
-                to={`/events/${event._id}`}
-                className="flex-1 text-center py-2.5 rounded-xl border border-zinc-800 text-white  transition"
-              >
-                View Event
-              </Link>
-
-              <Link
-                to="/events"
-                className="flex-1 text-center py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold"
-              >
-                Browse Events
-              </Link>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </PageShell>
-  );
-
-  /* ════════════════════════════════════════
-     REGISTRATION FORM
-  ════════════════════════════════════════ */
-  return (
-    <PageShell>
-      <div className="max-w-xl mx-auto">
-
-        {/* Back */}
-        <button
-          onClick={() => navigate(`/events/${id}`)}
-          className="flex items-center gap-1.5 text-base text-white hover:cursor-pointer mb-6 transition-colors">
-          <ChevronLeft className="w-4 h-4"/>
-          Back to Event
-        </button>
-
-        {/* Event summary */}
-        <div className="bg-zinc-950 rounded-2xl border border-zinc-800 p-5 mb-5 flex items-start gap-4">
-          <div className="shrink-0">
-            <EventIcon className="w-10 h-10 text-blue-500" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2
-              className="font-semibold text-white text-base leading-snug mb-1"
-              style={{ fontFamily: "Fraunces,serif" }}
-            >
-              {event.title}
-            </h2>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-base text-white mb-2.5">
-              <span className="flex items-center gap-2"><Calendar /> {format(new Date(event.date), "dd MMM yyyy, h:mm a")}</span>
-              <span className="flex items-center gap-2"><MapPinned /> {event.location?.address}</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="flex items-center gap-1 text-sm bg-blue-50 text-blue-700 ring-1 ring-red-200 px-2.5 py-1 rounded-full font-bold">
-                <Ticket fill="white" color="blue"/> Free Entry
-              </span>
-              {spotsLeft !== null && (
-                <span className="text-sm bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
-                  <BookCheck fill="green" color="black"/> {spotsLeft} spots left
-                </span>
-              )}
-              {spotsLeft === null && (
-                <span className="text-sm bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
-                  <BookCheck fill="green" color="black"/> Open entry
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Form card */}
-        <div className="bg-zinc-950 rounded-3xl border border-zinc-800 shadow-sm overflow-hidden">
-
-          {/* Header */}
-          <div className="px-7 pt-7 pb-5 border-b border-zinc-700">
-            <h1 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: "Fraunces,serif" }}>
-              Free Participation
-            </h1>
-            <p className="text-white text-base">
-              No fee, no account needed — just fill in your details and you're in.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="p-7 space-y-5">
-
-            {/* Name */}
-            <Field label="Full Name" required error={errors.name}>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => setF("name", e.target.value)}
-                placeholder="Your full name"
-                className={`${inp(errors.name)} placeholder:text-zinc-500`}
-              />
-            </Field>
-
-            {/* Email */}
-            <Field label="Email Address" required error={errors.email}>
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) => setF("email", e.target.value)}
-                placeholder="you@example.com"
-                className={`${inp(errors.email)} placeholder:text-zinc-500`}
-              />
-              <p className="text-sm text-gray-400 mt-1">QR code will be sent to this email</p>
-            </Field>
-
-            {/* Phone */}
-            <Field label="Phone Number" required error={errors.phone}>
-              <div className="flex">
-                <span className="inline-flex items-center px-3.5 py-2.5 border border-r-0 border-zinc-800
-                                 bg-gray-50 rounded-l-xl text-base text-black select-none whitespace-nowrap">
-                  🇧🇩 +880
-                </span>
-                <input
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => setF("phone", e.target.value)}
-                  placeholder="01XXXXXXXXX"
-                  className={`${inp(errors.phone)} rounded-l-none border-l-0 placeholder:text-zinc-500`}
-                />
-              </div>
-            </Field>
-
-            {/* Info notices */}
-            <div className="space-y-3">
-              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-base text-blue-800 flex gap-3">
-                <span className="text-xl shrink-0"><Ticket color="blue" fill="white" /></span>
-                <div>
-                  <p className="font-semibold mb-0.5">No Login Required</p>
-                  <p className="text-sm text-blue-700 leading-relaxed">
-                    Free participation is open to everyone — no account needed.
-                    A QR code will be emailed to you for check-in on the day.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4 text-base text-purple-800 flex gap-3">
-                <span className="text-xl shrink-0"><Medal /></span>
-                <div>
-                  <p className="font-medium mb-0.5">Digital Certificate after attendance</p>
-                  <p className="text-sm text-purple-700 leading-relaxed">
-                    Attendees get a verifiable digital certificate sent to their email after the event.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full py-3.5 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-semibold
-                         text-base transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed
-                         flex items-center justify-center gap-2.5 mt-2"
-            >
-              {submitting ? (
-                <><Loader2 className="w-4 h-4" /> Submitting...</>
-              ) : (
-                <><Ticket /> Register for Free</>
-              )}
-            </button>
-
-            <p className="text-sm text-center text-gray-400">
-              By registering, you agree to follow event guidelines and code of conduct.
-            </p>
-          </form>
-        </div>
-
-        {/* Already a volunteer? */}
-        <p className="text-center text-base text-gray-400 mt-5">
-          Want to actively help?{" "}
-          <Link to={`/events/${id}/register`} className="text-emerald-600 hover:underline font-medium">
-            Register as Volunteer 
-          </Link>
-        </p>
-      </div>
-    </PageShell>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   SMALL HELPERS
-═══════════════════════════════════════════ */
-function PageShell({ children }) {
-  return (
-    <div className="min-h-screen bg-zinc-950 py-10 px-4" style={{ fontFamily: "'DM Sans',sans-serif" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@600;700&display=swap');`}</style>
-      <div className="max-full mx-auto">{children}</div>
-    </div>
-  );
-}
-
-function Field({ label, required, error, children }) {
-  return (
-    <div>
-      <label className="block text-base font-medium text-white mb-1.5">
-        {label}{required && <span className="text-red-400 ml-1">*</span>}
-      </label>
-      {children}
-      {error && (
-        <p className="text-red-500 text-sm mt-1.5 flex items-center gap-1">
-          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-              clipRule="evenodd" />
-          </svg>
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
+const priorityConfig = {
+  Critical: { badge: 'bg-red-500/15 text-red-400 border-red-500/25' },
+  High:     { badge: 'bg-orange-500/15 text-orange-400 border-orange-500/25' },
+  Medium:   { badge: 'bg-blue-500/15 text-blue-400 border-blue-500/25' },
+};
+
+const resolvedIssues = [
+  {
+    id: 1,
+    caseId: 'CF-2024-0891',
+    title: "Broken Streetlight on Park Avenue",
+    description: "Multiple streetlights not working causing safety concerns in residential area.",
+    location: "Park Avenue, Block A",
+    reportedBy: "John Doe",
+    resolvedDate: "Dec 18, 2024",
+    resolutionTime: "14 hrs",
+    priority: "High",
+    category: "repair",
+    image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&h=400&fit=crop"
+  },
+  {
+    id: 2,
+    caseId: 'CF-2024-0887',
+    title: "Large Pothole on Main Street",
+    description: "Deep pothole causing vehicle damage and creating traffic hazards.",
+    location: "Main Street, Junction 5",
+    reportedBy: "Emily Chen",
+    resolvedDate: "Dec 17, 2024",
+    resolutionTime: "9 hrs",
+    priority: "Critical",
+    category: "repair",
+    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop"
+  },
+  {
+    id: 3,
+    caseId: 'CF-2024-0874',
+    title: "Water Leakage in Residential Area",
+    description: "Continuous water leakage from underground pipe affecting multiple homes.",
+    location: "Green Valley, Sector 12",
+    reportedBy: "Michael Brown",
+    resolvedDate: "Dec 16, 2024",
+    resolutionTime: "22 hrs",
+    priority: "High",
+    category: "cleanup",
+    image: "https://images.unsplash.com/photo-1584467541268-b040f83be3fd?w=600&h=400&fit=crop"
+  },
+  {
+    id: 4,
+    caseId: 'CF-2024-0861',
+    title: "Garbage Overflow Near Market",
+    description: "Overflowing bins causing health and sanitation issues in commercial area.",
+    location: "Central Market, Zone 3",
+    reportedBy: "Lisa Anderson",
+    resolvedDate: "Dec 15, 2024",
+    resolutionTime: "6 hrs",
+    priority: "Medium",
+    category: "cleanup",
+    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&h=400&fit=crop"
+  },
+  {
+    id: 5,
+    caseId: 'CF-2024-0849',
+    title: "Damaged Footpath Construction",
+    description: "Broken concrete tiles making footpath unusable for pedestrians.",
+    location: "Oak Street, Block C",
+    reportedBy: "David Wilson",
+    resolvedDate: "Dec 14, 2024",
+    resolutionTime: "31 hrs",
+    priority: "Medium",
+    category: "repair",
+    image: "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=600&h=400&fit=crop"
+  },
+  {
+    id: 6,
+    caseId: 'CF-2024-0832',
+    title: "Non-functional Traffic Signal",
+    description: "Traffic light malfunction at major intersection causing safety concerns.",
+    location: "Highway Junction, Exit 7",
+    reportedBy: "Anna Martinez",
+    resolvedDate: "Dec 13, 2024",
+    resolutionTime: "4 hrs",
+    priority: "Critical",
+    category: "repair",
+    image: "https://images.unsplash.com/photo-1502977249166-824b3a8a4d6d?w=600&h=400&fit=crop"
+  },
+];
 
 function DetailRow({ icon: Icon, text, bold }) {
   return (
-    <div className="flex items-start gap-2.5 text-base text-white">
-      <span className="shrink-0 flex items-center">
-        <Icon className="w-5 h-5" />
-      </span>
-
-      <span className={bold ? "font-semibold" : ""}>
-        {text}
-      </span>
+    <div className="flex items-start gap-2.5 text-sm text-zinc-300">
+      <Icon className="w-4 h-4 shrink-0 mt-0.5 text-zinc-500" />
+      <span className={bold ? 'font-semibold text-white' : ''}>{text}</span>
     </div>
-  )
-}
-
-function Spinner() {
-  return (
-    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-    </svg>
   );
 }
 
-function inp(error) {
-  return [
-    "w-full px-4 py-2.5 rounded-xl border text-base text-black transition-all outline-none",
-    error
-      ? "border-red-300 bg-red-50 focus:border-red-400 focus:ring-2 focus:ring-red-100"
-      : "border-zinc-800 bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-100",
-  ].join(" ");
+const SLIDE_VARIANTS = {
+  enter: (dir) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit:  (dir) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
+};
+
+export default function ResolvedIssues() {
+  const [[current, dir], setPage] = useState([0, 0]);
+
+  const paginate = (newDir) => {
+    setPage(([prev]) => {
+      const next = (prev + newDir + resolvedIssues.length) % resolvedIssues.length;
+      return [next, newDir];
+    });
+  };
+
+  const issue = resolvedIssues[current];
+  const pc    = priorityConfig[issue.priority] ?? priorityConfig.Medium;
+  const EventIcon = TYPE_ICON[issue.category] ?? Handshake;
+
+  return (
+    <section className="py-28 px-6">
+      <div className="max-w-7xl mx-auto">
+
+        {/* ── header ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+          className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14"
+        >
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="h-px w-6 bg-emerald-500/60" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-emerald-500">
+                Success Stories
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-3 max-w-lg">
+              Recently{' '}
+              <span className="bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                resolved
+              </span>{' '}
+              issues
+            </h2>
+            <p className="text-base text-zinc-400 leading-relaxed max-w-md">
+              Real problems fixed by real people. Every case closed means a safer, better community.
+            </p>
+          </div>
+
+          {/* live pill */}
+          <div className="shrink-0 flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900/60 self-start md:self-auto">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            <span className="text-xs text-zinc-400 font-medium">
+              <span className="text-white font-semibold">24,891</span> issues resolved
+            </span>
+          </div>
+        </motion.div>
+
+        {/* ── carousel card — mirrors FreeParticipate success UI ── */}
+        <div className="relative">
+          <AnimatePresence mode="wait" custom={dir}>
+            <motion.div
+              key={current}
+              custom={dir}
+              variants={SLIDE_VARIANTS}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.32, ease: 'easeInOut' }}
+              className="rounded-3xl border border-zinc-800 overflow-hidden flex flex-col md:flex-row bg-zinc-900/60"
+            >
+              {/* ── LEFT — image + stamp (mirrors QR side) ── */}
+              <div className="w-full md:w-[380px] shrink-0 border-b md:border-b-0 md:border-r border-zinc-800 flex flex-col">
+
+                {/* image */}
+                <div className="relative h-56 md:h-64 overflow-hidden">
+                  <img
+                    src={issue.image}
+                    alt={issue.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-zinc-900/20 to-transparent" />
+
+                  {/* priority badge top-left */}
+                  <span className={`absolute top-4 left-4 text-[11px] font-semibold px-2.5 py-1 rounded-lg border ${pc.badge}`}>
+                    {issue.priority}
+                  </span>
+
+                  {/* resolved stamp top-right */}
+                  <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[11px] font-semibold">
+                    <CheckCircle size={11} strokeWidth={2} />
+                    Resolved
+                  </span>
+                </div>
+
+                {/* banner — mirrors "You're In!" */}
+                <div className="py-6 px-7 text-center border-b border-zinc-800">
+                  <div className="flex justify-center mb-2">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                      <EventIcon className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <h2 className="text-xl font-bold text-white mb-1" style={{ fontFamily: 'Fraunces, serif' }}>
+                    Case Closed
+                  </h2>
+                  <p className="text-sm text-zinc-400">
+                    Issue verified and resolved by field staff.
+                  </p>
+                </div>
+
+                {/* resolution stats — mirrors QR status box */}
+                <div className="p-6 space-y-3">
+                  <div className="border border-zinc-800 rounded-2xl p-4 flex items-center gap-3">
+                    <BookCheck className="text-emerald-400 w-5 h-5 shrink-0" />
+                    <div>
+                      <p className="text-white text-sm font-medium">Resolved in {issue.resolutionTime}</p>
+                      <p className="text-xs text-zinc-500">{issue.resolvedDate}</p>
+                    </div>
+                  </div>
+
+                  <div className="border border-zinc-800 rounded-2xl p-4 flex items-center gap-3">
+                    <AlertCircle className="text-zinc-500 w-5 h-5 shrink-0" />
+                    <div>
+                      <p className="text-white text-sm font-medium">Reported by</p>
+                      <p className="text-xs text-zinc-500">{issue.reportedBy}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── RIGHT — details (mirrors event details side) ── */}
+              <div className="flex-1 p-6 md:p-8 flex flex-col gap-7">
+
+                {/* case id */}
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-zinc-600">{issue.caseId}</span>
+                  <span className="text-[11px] text-zinc-600">
+                    {current + 1} / {resolvedIssues.length}
+                  </span>
+                </div>
+
+                {/* title + desc */}
+                <div>
+                  <h3 className="text-2xl font-bold text-white leading-snug mb-3" style={{ fontFamily: 'Fraunces, serif' }}>
+                    {issue.title}
+                  </h3>
+                  <p className="text-sm text-zinc-400 leading-relaxed">
+                    {issue.description}
+                  </p>
+                </div>
+
+                {/* details block — mirrors EventDetails */}
+                <div className="rounded-2xl p-5 border border-zinc-800 space-y-3">
+                  <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-3">
+                    Issue Details
+                  </p>
+                  <DetailRow icon={MapPin}   text={issue.location} />
+                  <DetailRow icon={Clock}    text={`Resolved in ${issue.resolutionTime}`} />
+                  <DetailRow icon={Calendar} text={issue.resolvedDate} />
+                </div>
+
+                {/* what happened — mirrors What's Next */}
+                <div>
+                  <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-3">
+                    How It Was Resolved
+                  </p>
+                  <div className="space-y-2.5">
+                    {[
+                      "Citizen submitted report with photo evidence.",
+                      "Admin verified and escalated to field team.",
+                      "Staff inspected site and began repairs.",
+                      "Issue confirmed resolved and case closed.",
+                    ].map((text, i) => (
+                      <div key={i} className="flex gap-3 text-sm text-zinc-300">
+                        <span className="w-5 h-5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs flex items-center justify-center shrink-0 font-semibold mt-0.5">
+                          {i + 1}
+                        </span>
+                        {text}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* dot indicators */}
+                <div className="flex items-center gap-1.5 mt-auto pt-4">
+                  {resolvedIssues.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setPage(([prev]) => [i, i > prev ? 1 : -1])}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        i === current
+                          ? 'w-6 bg-emerald-500'
+                          : 'w-1.5 bg-zinc-700 hover:bg-zinc-500'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* ── nav arrows ── */}
+          <button
+            onClick={() => paginate(-1)}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 w-10 h-10 rounded-full border border-zinc-700 bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-500 transition-all duration-200 z-10"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            onClick={() => paginate(1)}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 w-10 h-10 rounded-full border border-zinc-700 bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-500 transition-all duration-200 z-10"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+
+      </div>
+    </section>
+  );
 }
