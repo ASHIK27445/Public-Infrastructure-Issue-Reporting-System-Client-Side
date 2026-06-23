@@ -307,7 +307,7 @@ export default function QRCheckinPage() {
           <button
             onClick={() => {
               stopScanner();
-              navigate(`/dashboard/admin/events/${id}/manage`);
+              navigate(`/dashboard/admin/events/edit/${id}`);
             }}
             className="flex items-center gap-2 text-sm text-white hover:cursor-pointer transition-colors">
             <ArrowLeft className="w-4 h-4" />

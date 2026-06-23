@@ -56,7 +56,6 @@ import AdminEventManagePage from "../Pages/Events/AdminEventManagePAge"
 import CertificateVerifyPage from "../Pages/Events/CertificateVerifyPage"
 import MyCertificatesPage from "../Pages/Events/MyCertificatePage"
 import AdminCertificatesPage from "../Pages/Events/AdminCertificatePage"
-import QRCheckinPageDemo from "../Pages/Events/QRCheckingPageDemo"
 
 export const router = createBrowserRouter([
     {

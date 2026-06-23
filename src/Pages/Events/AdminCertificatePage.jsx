@@ -190,7 +190,7 @@ export default function AdminCertificatesPage() {
     <Shell>
       {/* ── Back button ── */}
       <button onClick={() => navigate(`/dashboard/admin/events`)}
-        className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white mb-6 transition-colors group">
+        className="flex items-center gap-1.5 text-sm text-white hover:cursor-pointer mb-6 transition-colors group">
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
         Back to Event Management
       </button>
