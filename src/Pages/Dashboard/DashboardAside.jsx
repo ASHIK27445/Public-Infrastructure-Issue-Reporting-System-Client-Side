@@ -23,7 +23,8 @@ import {
   NotepadText,
   BadgePoundSterling,
   BadgeDollarSign,
-  InspectIcon
+  InspectIcon,
+  Trophy
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../AuthProvider/AuthContext';
@@ -102,6 +103,13 @@ const navItems = [
       roles: ['admin']
     },
     {
+      id: 'myCertficate',
+      name: 'My Certificate',
+      icon: <Trophy className='w-5 h-5'></Trophy>,
+      path: 'my-certificates',
+      roles: ['citizen', 'staff', 'admin']
+    },
+    {
       id: 'staffPerformanceInsights',
       name: 'Staff Performance',
       icon: <InspectIcon className='w-5 h-5'></InspectIcon>,
@@ -124,13 +132,6 @@ const navItems = [
       requireSuperStaff: true
     },
     {
-      id: 'settings',
-      name: 'Settings',
-      icon: <Settings className="w-5 h-5" />,
-      path: '/settings',
-      roles: ['admin']
-    },
-    {
       id: 'eventManges',
       name: 'Events Manage',
       icon: <GoOrganization className="w-5 h-5" />,
@@ -143,6 +144,13 @@ const navItems = [
       icon: <BadgePoundSterling className='w-5 h-5'/>,
       path: 'payment-history',
       roles: ['citizen']
+    },
+    {
+      id: 'settings',
+      name: 'Settings',
+      icon: <Settings className="w-5 h-5" />,
+      path: '/settings',
+      roles: ['admin']
     },
     {
       id: 'help',
