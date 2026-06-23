@@ -17,7 +17,7 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
   const [volunteers, setVolunteers] = useState([]);
   const [waitlist,   setWaitlist]   = useState([]);
   const [loading,    setLoading]    = useState(true);
-  const [tab,        setTab]        = useState("confirmed");
+  const [tab, setTab] = useState("volunteers");
   const [search,     setSearch]     = useState("");
   const [qrModal,    setQrModal]    = useState(null);
   const axiosSecure = useAxiosSecure();
@@ -49,8 +49,13 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
   const pendingCount  = volunteers.filter((v) => v.paymentStatus === "pending").length;
 
   /* ── Filtered rows ── */
-  const rows = (tab === "waitlist" ? waitlist : volunteers).filter((v) => {
-    if (tab === "attended" && !v.attended) return false;
+  const rows = (() => {
+    if (tab === "waitlist") return waitlist;
+    if (tab === "volunteers") return volunteers.filter(v => !v.isFreeParticipant);
+    if (tab === "free") return volunteers.filter(v => v.isFreeParticipant);
+    if (tab === "attended") return volunteers.filter(v => v.attended);
+    return volunteers;
+  })().filter((v) => {
     const q = search.toLowerCase();
     return (
       v.name?.toLowerCase().includes(q) ||
@@ -106,9 +111,10 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
 
   /* ── Tabs config ── */
   const TABS = [
-    { id: "confirmed", label: "Confirmed", count: volunteers.length },
-    { id: "waitlist",  label: "Waitlist",  count: waitlist.length   },
-    { id: "attended",  label: "Attended",  count: attendedCount     },
+    { id: "volunteers",       label: "Volunteers",       count: volunteers.filter(v => !v.isFreeParticipant).length },
+    { id: "free",             label: "Free Participants", count: volunteers.filter(v => v.isFreeParticipant).length },
+    { id: "waitlist",         label: "Waitlist",          count: waitlist.length },
+    { id: "attended",         label: "Attended",          count: attendedCount },
   ];
 
   return (
@@ -200,11 +206,11 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
                     {tab === "waitlist" && <Th>#</Th>}
                     <Th>Name</Th>
                     <Th>Contact</Th>
-                    <Th>Institution</Th>
-                    <Th>Skills</Th>
-                    {tab !== "waitlist" && <Th>Payment</Th>}
-                    {tab === "attended"  && <Th>Check-in</Th>}
-                    {tab === "confirmed" && <Th>Attended</Th>}
+                    {tab !== "free" && <Th>Institution</Th>}
+                    {tab !== "free" && <Th>Skills</Th>}
+                    {tab !== "waitlist" && tab !== "free" && <Th>Payment</Th>}
+                    {tab === "attended" && <Th>Check-in</Th>}
+                    {(tab === "volunteers" || tab === "free") && <Th>Attended</Th>}
                     <Th>Registered</Th>
                     <Th>Actions</Th>
                   </tr>
@@ -234,34 +240,37 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
                         <p className="text-xs text-white">{v.email}</p>
                         <p className="text-xs text-zinc-500 mt-0.5">{v.phone}</p>
                       </Td>
+                      {/* Institution and Free Participant haven't it*/}
+                      {tab !== "free" && (
+                        <Td>
+                          <p className="text-xs text-zinc-300">{v.institution || "—"}</p>
+                          <p className="text-xs text-zinc-500 mt-0.5">{v.ageGroup}</p>
+                        </Td>
+                      )}
 
-                      {/* Institution */}
-                      <Td>
-                        <p className="text-xs text-zinc-300">{v.institution || "—"}</p>
-                        <p className="text-xs text-zinc-500 mt-0.5">{v.ageGroup}</p>
-                      </Td>
+                      {/* Skills and Free Participant haven't it*/}
+                      {tab !== "free" && (
+                        <Td>
+                          <div className="flex flex-wrap gap-1">
+                            {v.skills?.length > 0
+                              ? v.skills.slice(0, 3).map((s) => (
+                                <span key={s} className="text-[10px] bg-emerald-500/10 text-emerald-400
+                                                          border border-emerald-500/20 px-1.5 py-0.5 rounded-full">
+                                  {s}
+                                </span>
+                              ))
+                              : <span className="text-xs text-zinc-600">—</span>
+                            }
+                          </div>
+                        </Td>
+                      )}
 
-                      {/* Skills */}
-                      <Td>
-                        <div className="flex flex-wrap gap-1">
-                          {v.skills?.length > 0
-                            ? v.skills.slice(0, 3).map((s) => (
-                              <span key={s} className="text-[10px] bg-emerald-500/10 text-emerald-400
-                                                        border border-emerald-500/20 px-1.5 py-0.5 rounded-full">
-                                {s}
-                              </span>
-                            ))
-                            : <span className="text-xs text-zinc-600">—</span>
-                          }
-                        </div>
-                      </Td>
-
-                      {/* Payment (confirmed + attended) */}
-                      {tab !== "waitlist" && (
+                      {/* Payment — and Waitlist haven't it */}
+                      {tab !== "waitlist" && tab !== "free" && (
                         <Td><PaymentBadge status={v.paymentStatus} /></Td>
                       )}
 
-                      {/* Check-in time (attended tab) */}
+                      {/* Check-in time — attended tab */}
                       {tab === "attended" && (
                         <Td>
                           <span className="inline-flex items-center gap-1 text-xs bg-emerald-500/10
@@ -272,8 +281,8 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
                         </Td>
                       )}
 
-                      {/* Attended flag (confirmed tab) */}
-                      {tab === "confirmed" && (
+                      {/* Attended flag — volunteers + free tab */}
+                      {(tab === "volunteers" || tab === "free") && (
                         <Td>
                           {v.attended ? (
                             <div>
@@ -325,26 +334,17 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
                               />
                             </>
                           )}
-                          {tab === "confirmed" && (
+                          {tab === "volunteers" && (
                             <>
-                              <ActionBtn
-                                icon={<QrCode className="w-3.5 h-3.5" />}
-                                label="QR"
-                                color="sky"
-                                onClick={() => handleQR(v)}
-                              />
-                              <ActionBtn
-                                icon={<Award className="w-3.5 h-3.5" />}
-                                label="Certificate"
-                                color="violet"
-                                onClick={() => handleCert(v)}
-                              />
-                              <ActionBtn
-                                icon={<UserMinus className="w-3.5 h-3.5" />}
-                                label="Remove"
-                                color="red"
-                                onClick={() => handleRemove(v)}
-                              />
+                              <ActionBtn icon={<QrCode className="w-3.5 h-3.5" />} label="QR" color="sky" onClick={() => handleQR(v)} />
+                              <ActionBtn icon={<Award className="w-3.5 h-3.5" />} label="Certificate" color="violet" onClick={() => handleCert(v)} />
+                              <ActionBtn icon={<UserMinus className="w-3.5 h-3.5" />} label="Remove" color="red" onClick={() => handleRemove(v)} />
+                            </>
+                          )}
+                          {tab === "free" && (
+                            <>
+                              <ActionBtn icon={<Award className="w-3.5 h-3.5" />} label="Certificate" color="violet" onClick={() => handleCert(v)} />
+                              <ActionBtn icon={<UserMinus className="w-3.5 h-3.5" />} label="Remove" color="red" onClick={() => handleRemove(v)} />
                             </>
                           )}
                           {tab === "attended" && (
