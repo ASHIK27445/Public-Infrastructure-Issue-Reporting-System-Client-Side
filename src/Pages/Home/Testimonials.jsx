@@ -1,76 +1,169 @@
 import React from 'react';
-import { Star } from 'lucide-react';
+import { Star, Quote, Users, CheckCircle, TrendingUp } from 'lucide-react';
+import './testimonials.css';
 
-const Testimonials = () => {
-  const testimonials = [
-    {
-      name: "Robert Thompson",
-      role: "Local Resident",
-      text: "This platform has completely transformed how we interact with city services. I reported a dangerous pothole on my street and it was fixed within 48 hours. The transparency and tracking features are game-changers!",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Robert",
-      rating: 5
-    },
-    {
-      name: "Maria Garcia",
-      role: "Community Leader",
-      text: "Finally, a transparent system where we can actually see our tax dollars at work. The premium support is absolutely worth it for urgent community issues. Highly recommended for every citizen!",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
-      rating: 5
-    },
-    {
-      name: "James Wilson",
-      role: "Business Owner",
-      text: "As a business owner, seeing infrastructure issues resolved quickly benefits everyone in the area. This system is exactly what modern cities need. Professional, efficient, and incredibly user-friendly.",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=James",
-      rating: 5
-    }
-  ];
+const allTestimonials = [
+  {
+    name: "Robert Thompson",
+    role: "Local Resident",
+    text: "Reported a dangerous pothole and it was fixed within 48 hours. The transparency and real-time tracking are absolute game-changers!",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Robert",
+    rating: 5,
+  },
+  {
+    name: "Maria Garcia",
+    role: "Community Leader",
+    text: "Finally a system where we can see our tax dollars at work. Premium support is worth every penny for urgent community issues.",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
+    rating: 5,
+  },
+  {
+    name: "James Wilson",
+    role: "Business Owner",
+    text: "Infrastructure resolved quickly benefits everyone. This is exactly what modern cities need — professional, efficient, user-friendly.",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=James",
+    rating: 5,
+  },
+  {
+    name: "Priya Patel",
+    role: "School Teacher",
+    text: "The broken streetlights near our school were reported and fixed in days. Kids are safe now. This platform genuinely works.",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Priya",
+    rating: 5,
+  },
+  {
+    name: "David Kim",
+    role: "Urban Planner",
+    text: "From a professional standpoint, the issue categorisation and resolution workflow is impressively well-thought-out.",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
+    rating: 5,
+  },
+  {
+    name: "Aisha Rahman",
+    role: "Volunteer Coordinator",
+    text: "Organising community clean-ups has never been this easy. The event management tools are intuitive and powerful.",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aisha",
+    rating: 5,
+  },
+  {
+    name: "Carlos Mendez",
+    role: "Retired Engineer",
+    text: "I've seen many civic apps come and go. This one actually listens and acts. Rare combination of simplicity and depth.",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos",
+    rating: 5,
+  },
+  {
+    name: "Emily Chen",
+    role: "Neighbourhood Watch",
+    text: "Illegal dumping in our park was documented, assigned, and cleared in under a week. Remarkable coordination.",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emily",
+    rating: 5,
+  },
+];
+
+// Split into two rows
+const row1 = allTestimonials.slice(0, 4);
+const row2 = allTestimonials.slice(4, 8);
+
+const stats = [
+  { value: '12,400+', label: 'Issues Resolved', icon: CheckCircle },
+  { value: '98%',     label: 'Satisfaction Rate', icon: TrendingUp },
+  { value: '3,200+',  label: 'Active Volunteers', icon: Users },
+];
+
+/* ---- Single card ---- */
+const TestimonialCard = ({ testimonial }) => (
+  <div className="testimonial-card">
+    {/* Stars */}
+    <div className="testimonial-stars">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star
+          key={i}
+          className={`w-4 h-4 ${
+            i < testimonial.rating
+              ? 'fill-emerald-500 text-emerald-500'
+              : 'text-zinc-700'
+          }`}
+        />
+      ))}
+    </div>
+
+    {/* Quote body */}
+    <p className="testimonial-body">"{testimonial.text}"</p>
+
+    {/* Footer */}
+    <div className="testimonial-footer">
+      <div className="testimonial-avatar-ring">
+        <img src={testimonial.avatar} alt={testimonial.name} />
+      </div>
+      <div>
+        <div className="testimonial-name">{testimonial.name}</div>
+        <div className="testimonial-role">{testimonial.role}</div>
+      </div>
+    </div>
+  </div>
+);
+
+/* ---- Marquee row ---- */
+const MarqueeRow = ({ items, reverse = false }) => {
+  // Duplicate for seamless loop
+  const doubled = [...items, ...items];
 
   return (
-    <section className="py-32 px-6 bg-zinc-900">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20">
-          <div className="inline-block px-6 py-2 rounded-full bg-linear-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 mb-6">
-            <span className="text-emerald-400 font-semibold text-sm uppercase tracking-wider">Testimonials</span>
-          </div>
-          <h2 className="text-5xl md:text-7xl font-black text-white mb-6">
-            What Citizens <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Say</span>
-          </h2>
-          <p className="text-xl text-gray-400">Real feedback from real people making real change</p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="group relative bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500 hover:scale-105">
-              <div className="absolute -top-5 left-8 w-16 h-16 bg-linear-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center shadow-xl">
-                <img 
-                  src={testimonial.avatar} 
-                  alt={testimonial.name}
-                  className="w-14 h-14 rounded-full"
-                />
-              </div>
-              
-              <div className="flex mb-4 mt-6">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`w-5 h-5 ${i < testimonial.rating ? 'fill-emerald-500 text-emerald-500' : 'text-gray-700'}`} 
-                  />
-                ))}
-              </div>
-              
-              <p className="text-gray-300 mb-8 leading-relaxed italic">"{testimonial.text}"</p>
-              
-              <div className="border-t border-zinc-700 pt-6">
-                <div className="text-white font-bold text-lg">{testimonial.name}</div>
-                <div className="text-emerald-400 text-sm font-medium">{testimonial.role}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="testimonials-marquee-outer mb-6">
+      <div
+        className={`testimonials-marquee-track ${
+          reverse ? 'testimonials-marquee-track--reverse' : ''
+        }`}
+      >
+        {doubled.map((t, i) => (
+          <TestimonialCard key={i} testimonial={t} />
+        ))}
       </div>
-    </section>
+    </div>
   );
 };
+
+/* ---- Main section ---- */
+const Testimonials = () => (
+  <section className="py-28 bg-zinc-900 overflow-hidden">
+    {/* Header */}
+    <div className="max-w-7xl mx-auto px-6 mb-16 text-center">
+      <div className="testimonials-badge">
+        <Quote className="w-3.5 h-3.5 text-emerald-400" />
+        <span>Testimonials</span>
+      </div>
+
+      <h2 className="text-5xl md:text-6xl font-black text-white leading-tight mb-4">
+        Trusted by{' '}
+        <span className="bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+          Real Citizens
+        </span>
+      </h2>
+      <p className="text-lg text-zinc-400 max-w-xl mx-auto">
+        Thousands of communities are already using CommunityFix to make change happen.
+      </p>
+    </div>
+
+    {/* Marquee rows */}
+    <MarqueeRow items={row1} />
+    <MarqueeRow items={row2} reverse />
+
+    {/* Stats strip */}
+    <div className="max-w-7xl mx-auto px-6">
+      <div className="testimonials-stats">
+        {stats.map(({ value, label, icon: Icon }) => (
+          <div key={label} className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Icon className="w-4 h-4 text-emerald-500" />
+              <div className="testimonials-stat-value">{value}</div>
+            </div>
+            <div className="testimonials-stat-label">{label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
 
 export default Testimonials;
