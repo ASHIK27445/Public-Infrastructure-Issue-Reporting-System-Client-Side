@@ -32,7 +32,7 @@ const Contact = () => {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-linear-to-b from-zinc-900 via-[#141414] to-zinc-950 py-24 md:py-32 px-6">
+    <section className="relative overflow-hidden bg-linear-to-b from-zinc-900 via-[#141414] to-zinc-950 pt-15 pb-18 md:pt-32 md:pb-32 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Hero */}
         <div className="relative h-100 md:h-125 lg:h-150 overflow-hidden rounded-2xl">
