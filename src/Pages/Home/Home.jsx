@@ -9,6 +9,7 @@ import CTASection from "./CTASection";
 import Testimonials from "./Testimonials";
 import Contact from "./Contact";
 import Footer from "./Footer";
+import ResolvedIssuesold from './ResolvedIssuesold';
 
 const Home = () => {
   return (
@@ -16,7 +17,8 @@ const Home = () => {
       <title>CommunityFix - Home</title>
       <HeroBanner />
       <StatusBar />
-      <ResolvedIssue />
+      {/* <ResolvedIssue /> */}
+      <ResolvedIssuesold />
       <Features />
       <HowItWorks />
       <CTASection />

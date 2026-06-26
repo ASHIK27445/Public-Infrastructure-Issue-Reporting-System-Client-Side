@@ -193,7 +193,7 @@ const DashboardAside = () => {
   return (
     <>
       {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      <div className="lg:hidden fixed top-4 left-4 z-999">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 bg-zinc-800 border border-zinc-700 rounded-xl text-white"
@@ -205,7 +205,7 @@ const DashboardAside = () => {
       {/* Sidebar for Desktop and Mobile */}
       <aside className={`
         fixed top-0 left-0 h-[133vh] bg-linear-to-b from-zinc-900 to-zinc-950 border-r border-zinc-800
-        w-64 z-40 transform transition-transform duration-300 ease-in-out
+        w-64 z-900 transform transition-transform duration-300 ease-in-out
         lg:translate-x-0 lg:relative lg:h-auto
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
 

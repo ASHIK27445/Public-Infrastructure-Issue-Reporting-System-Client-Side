@@ -1,26 +1,57 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import LiquidChrome from "./LiquidChrome";
 
 const Contact = () => {
+  const [showLiquid, setShowLiquid] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+
+    const handleChange = (e) => {
+      setShowLiquid(e.matches);
+    };
+
+    // Initial check
+    setShowLiquid(mediaQuery.matches);
+
+    // Listen for screen size changes
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", handleChange);
+    } else {
+      mediaQuery.addListener(handleChange);
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener("change", handleChange);
+      } else {
+        mediaQuery.removeListener(handleChange);
+      }
+    };
+  }, []);
+
   return (
     <section className="relative overflow-hidden bg-linear-to-b from-zinc-900 via-[#141414] to-zinc-950 py-24 md:py-32 px-6">
-      {/* Same container width as ResolvedIssues */}
       <div className="max-w-7xl mx-auto">
         {/* Hero */}
-        <div className="relative h-150 overflow-hidden rounded-2xl">
+        <div className="relative h-100 md:h-125 lg:h-150 overflow-hidden rounded-2xl">
           {/* Background */}
           <div className="absolute inset-0 z-0">
-            <LiquidChrome
-              baseColor={[0.08, 0.08, 0.08]}
-              speed={0.9}
-              amplitude={0.45}
-              interactive={true}
-            />
+            {showLiquid ? (
+              <LiquidChrome
+                baseColor={[0.08, 0.08, 0.08]}
+                speed={0.9}
+                amplitude={0.45}
+                interactive={true}
+              />
+            ) : (
+              <div className="h-full w-full bg-zinc-950" />
+            )}
           </div>
 
           {/* Overlay */}
-          <div className="absolute inset-0 bg-black/45 z-1" />
+          <div className="absolute inset-0 z-1 bg-black/45" />
 
           {/* Glass Card */}
           <div className="absolute left-5 top-5 sm:left-10 sm:top-10 md:left-16 md:top-16 lg:left-20 lg:top-20 z-10 w-[calc(100%-40px)] sm:w-95 md:w-107.5 lg:w-125 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-2xl p-6 md:p-8 lg:p-10">
