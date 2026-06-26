@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { format, formatDistanceToNow } from "date-fns";
 import { QRCodeCanvas } from "qrcode.react";
@@ -49,8 +48,6 @@ export default function AdminEventManagePage() {
   const [statusUpdating, setStatusUpdating] = useState(false);
   const axiosSecure = useAxiosSecure()
 
-  const token   = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
 
   const fetchData = async () => {
     setLoading(true);
@@ -112,7 +109,8 @@ export default function AdminEventManagePage() {
       }
     );
   };
-
+ 
+  //implement this later
   const handleRemoveVolunteer = async (regId, name) => {
     toast.warn(
       <div className="space-y-2">
@@ -123,9 +121,8 @@ export default function AdminEventManagePage() {
             onClick={async () => {
               toast.dismiss();
               try {
-                await axios.patch(
-                  `${import.meta.env.VITE_API_URL}/admin/events/${id}/volunteer/${regId}/remove`,
-                  {}, { headers }
+                await axiosSecure.patch(
+                  `/admin/events/${id}/volunteer/${regId}/remove`,{}
                 );
                 toast.success(`${name} removed. Waitlist updated.`);
                 fetchData();
@@ -392,7 +389,7 @@ export default function AdminEventManagePage() {
               fundRaised={event.fundRaised}
               spendingBreakdown={event.spendingBreakdown}
               onSaved={fetchData}
-              token={token}
+              axiosSecure={axiosSecure}
             />
           )}
         </div>
@@ -660,9 +657,6 @@ function DonationsTab({ donations, totalDonated, fundGoal }) {
 function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) {
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState(null);
-
-  const token   = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
 
   const filtered = participants.filter((p) => {
     const q = search.toLowerCase();
@@ -1296,7 +1290,7 @@ function Toggle({ label, desc, checked, onChange }) {
 /* ═══════════════════════════════════════
    SPENDING TAB (after event completed)
 ═══════════════════════════════════════ */
-function SpendingTab({ eventId, fundRaised, spendingBreakdown, onSaved, token }) {
+function SpendingTab({ eventId, fundRaised, spendingBreakdown, onSaved }) {
   const [items,  setItems]  = useState(spendingBreakdown || []);
   const [saving, setSaving] = useState(false);
 
@@ -1312,11 +1306,9 @@ function SpendingTab({ eventId, fundRaised, spendingBreakdown, onSaved, token })
     if (valid.length !== items.length) { toast.error("All items need a label and amount"); return; }
     setSaving(true);
     try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/admin/events/${eventId}/spending`,
-        { spendingBreakdown: valid.map((i) => ({ label: i.label, amount: Number(i.amount) })) },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axiosSecure.patch(
+        `/admin/events/${eventId}/spending`,
+        { spendingBreakdown: valid.map((i) => ({ label: i.label, amount: Number(i.amount) })) });
       toast.success("Spending breakdown saved!");
       onSaved();
     } catch (err) { toast.error(err.response?.data?.message || "Save failed"); }

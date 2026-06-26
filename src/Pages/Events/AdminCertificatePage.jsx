@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { format, formatDistanceToNow } from "date-fns";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";

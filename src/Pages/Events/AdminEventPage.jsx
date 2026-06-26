@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, use } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { format, formatDistanceToNow } from "date-fns";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
@@ -59,9 +58,6 @@ export default function AdminEventsPage() {
   const [searchInput, setSearchInput] = useState(search);
   const axiosSecure = useAxiosSecure()
   const {user} = use(AuthContext)
-
-  const token   = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
 
   /* ── Fetch stats ── */
   useEffect(() => {
@@ -145,6 +141,7 @@ export default function AdminEventsPage() {
     );
   };
 
+  //implement this later
   const handleDelete = async (eventId, title) => {
     toast.warn(
       <div className="space-y-2">
@@ -156,7 +153,7 @@ export default function AdminEventsPage() {
               toast.dismiss();
               setDeleting(eventId);
               try {
-                await axios.delete(`${import.meta.env.VITE_API_URL}/admin/events/${eventId}`, { headers });
+                await axiosSecure.delete(`/admin/events/${eventId}`);
                 toast.success("Event deleted");
                 fetchEvents();
               } catch (err) { toast.error(err.response?.data?.message || "Delete failed"); }

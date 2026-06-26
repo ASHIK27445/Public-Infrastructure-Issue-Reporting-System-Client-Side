@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { BookCheck, Brush, Cog, FileText, GraduationCap, HandCoins, Handshake, MapPin, Ribbon, Settings2, TreeDeciduous } from "lucide-react";

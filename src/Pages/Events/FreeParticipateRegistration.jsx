@@ -191,7 +191,7 @@ export default function ResolvedIssues() {
               className="rounded-3xl border border-zinc-800 overflow-hidden flex flex-col md:flex-row bg-zinc-900/60"
             >
               {/* ── LEFT — image + stamp (mirrors QR side) ── */}
-              <div className="w-full md:w-[380px] shrink-0 border-b md:border-b-0 md:border-r border-zinc-800 flex flex-col">
+              <div className="w-full md:w-95 shrink-0 border-b md:border-b-0 md:border-r border-zinc-800 flex flex-col">
 
                 {/* image */}
                 <div className="relative h-56 md:h-64 overflow-hidden">

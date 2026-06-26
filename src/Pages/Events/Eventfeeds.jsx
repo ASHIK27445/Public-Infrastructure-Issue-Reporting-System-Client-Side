@@ -18,6 +18,7 @@ import {
   TriangleAlert,
   RefreshCw,
 } from "lucide-react";
+import useAxios from "../../Hooks/useAxios";
 
 /* ─── Constants ─── */
 const STATUS_TABS = [
@@ -56,12 +57,9 @@ export default function EventsFeed() {
   const page   = Number(searchParams.get("page") || 1);
   const sort   = searchParams.get("sort")   || "date_asc";
   const search = searchParams.get("search") || "";
+  const axiosInstance = useAxios()
 
   const [searchInput, setSearchInput] = useState(search);
-
-  // Current user
-  const currentUserId = localStorage.getItem("userId") || null;
-  const isAdmin = localStorage.getItem("role") === "admin";
 
   /* ─── Fetch events ─── */
   const fetchEvents = useCallback(async () => {
@@ -72,8 +70,8 @@ export default function EventsFeed() {
       if (type)   params.set("type", type);
       if (search) params.set("search", search);
 
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_MANUAL}/events?${params}`
+      const res = await axiosInstance.get(
+        `/events?${params}`
       );
       let fetched = res.data?.events || [];
 
@@ -142,16 +140,6 @@ export default function EventsFeed() {
                 Every hand counts — show up, make a difference.
               </p>
             </div>
-            {isAdmin && (
-              <Link
-                to="/admin/events/create"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-500
-                           text-white font-semibold rounded-xl transition-colors text-sm"
-              >
-                <Plus className="w-4 h-4" />
-                Create Event
-              </Link>
-            )}
           </div>
 
           {/* ── Search bar ── */}
@@ -317,7 +305,7 @@ export default function EventsFeed() {
         {!loading && !error && events.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {events.map((event) => (
-              <EventCard key={event._id} event={event} currentUserId={currentUserId} />
+              <EventCard key={event._id} event={event} />
             ))}
           </div>
         )}
@@ -344,16 +332,7 @@ export default function EventsFeed() {
               >
                 Clear filters
               </button>
-            ) : isAdmin ? (
-              <Link
-                to="/admin/events/create"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600
-                           hover:bg-emerald-500 text-white rounded-xl text-sm font-medium transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Create First Event
-              </Link>
-            ) : null}
+            ) :  null}
           </div>
         )}
 

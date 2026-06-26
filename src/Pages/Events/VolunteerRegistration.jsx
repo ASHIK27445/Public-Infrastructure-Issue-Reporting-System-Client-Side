@@ -12,6 +12,7 @@ import {
   Loader2, AlertCircle, XCircle, CheckCircle, CreditCard, Clock,
   UserCheck, Users, UserPlus, Ban, ArrowRight, Mail,
 } from "lucide-react";
+import useAxios from "../../Hooks/useAxios";
 
 /* ─── Constants ─── */
 const AGE_GROUPS = [
@@ -57,6 +58,7 @@ export default function VolunteerRegistration() {
   const [errors, setErrors]             = useState({});
   const axiosSecure = useAxiosSecure();
   const { user } = use(AuthContext);
+  const axiosInstance = useAxios()
 
   const stripeSuccess   = searchParams.get("session_id");
   const stripeCancelled = searchParams.get("cancelled");
@@ -77,7 +79,7 @@ export default function VolunteerRegistration() {
 
   /* ── Fetch event ── */
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_MANUAL}/events/${id}`)
+    axiosInstance.get(`/events/${id}`)
       .then((r) => setEvent(r.data?.event))
       .catch(() => toast.error("Could not load event details"))
       .finally(() => setEventLoading(false));
@@ -88,8 +90,8 @@ export default function VolunteerRegistration() {
     if (stripeSuccess) {
       const verify = async () => {
         try {
-          const res = await axios.get(
-            `${import.meta.env.VITE_API_URL}/events/${id}/verify-payment/${stripeSuccess}`
+          const res = await axiosInstance.get(
+            `/events/${id}/verify-payment/${stripeSuccess}`
           );
           if (res.data.paid) {
             setResult({
@@ -165,16 +167,14 @@ export default function VolunteerRegistration() {
     }
   };
 
+  //implement later
   /* ── Cancel registration ── */
   const handleCancel = async () => {
     if (!window.confirm("Cancel your registration? If you paid, you'll be refunded.")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/${id}/cancel-registration`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axiosSecure.post(
+        `/events/${id}/cancel-registration`,{});
       toast.success("Registration cancelled. Refund (if any) processed in 5–7 days.");
       navigate(`/events/${id}`);
     } catch (err) {

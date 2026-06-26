@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, use } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { format, formatDistanceToNow, isPast, differenceInDays, differenceInHours } from "date-fns";
 import { QRCodeCanvas } from "qrcode.react";
@@ -14,6 +13,7 @@ import {
 } from "lucide-react";
 import { AuthContext } from "../AuthProvider/AuthContext";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import useAxios from "../../Hooks/useAxios";
 
 /* ─── Constants ─── */
 const TYPE_META = {
@@ -39,7 +39,7 @@ const COLOR_MAP = {
 export default function EventDetailPage() {
   const { id }           = useParams();
   const navigate         = useNavigate();
-  const [searchParams]   = useSearchParams();
+  const [searchParams, setSearchParams]   = useSearchParams();
   const commentInputRef  = useRef(null);
   const donateRef        = useRef(null);
 
@@ -48,21 +48,26 @@ export default function EventDetailPage() {
   const [activeTab, setActiveTab] = useState("about"); // about | volunteers | donors | comments
   const {user, role} = use(AuthContext)
   const axiosSecure = useAxiosSecure()
+  const axiosInstance = useAxios()
 
   // user info from localStorage
   const currentUserId = localStorage.getItem("userId");
   const isAdmin       = user && role === 'admin'
-  const token         = localStorage.getItem("token");
 
-  // scroll to donate section if ?donate=true
+  //donation verification
+  const donationVerifiedRef = useRef(false);
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
     const donated   = searchParams.get("donated");
     const donate    = searchParams.get("donate");
 
     if (donated === "true" && sessionId) {
-      axios.get(`${import.meta.env.VITE_API_MANUAL}/verify-donation/${sessionId}`)
+      if (donationVerifiedRef.current) return; // ← already running, skip
+      donationVerifiedRef.current = true;      // ← mark as started
+
+      axiosInstance.get(`/verify-donation/${sessionId}`)
         .then((res) => {
+          setSearchParams({});
           if (res.data.success && res.data.paid) {
             toast.success("Thank you for your donation!");
             fetchDetail();
@@ -70,7 +75,10 @@ export default function EventDetailPage() {
             toast.error("Donation verification failed.");
           }
         })
-        .catch(() => toast.error("Donation verification failed."));
+        .catch(() => {
+          setSearchParams({});
+          toast.error("Donation verification failed.");
+        });
     }
 
     if (donate === "true") {
@@ -78,12 +86,13 @@ export default function EventDetailPage() {
     }
   }, [searchParams]);
 
+
   /* ── fetch ── */
   const fetchDetail = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_MANUAL}/events/${id}`,
+      const res = await axiosInstance.get(
+        `/events/${id}`,
       );
       setData(res.data);
     } catch (err) {
@@ -334,6 +343,7 @@ export default function EventDetailPage() {
                 goingCount={event.goingCount}
                 currentUserId={currentUserId}
                 onRefresh={fetchDetail}
+                axiosSecure={axiosSecure}
               />
             </div>
           </div>
@@ -451,7 +461,6 @@ export default function EventDetailPage() {
                   comments={comments}
                   currentUserId={currentUserId}
                   isAdmin={isAdmin}
-                  token={token}
                   inputRef={commentInputRef}
                   onCommentAdded={fetchDetail}
                   user={user}
@@ -552,7 +561,7 @@ export default function EventDetailPage() {
 
             {isAdmin && (
               <AdminQuickActions event={event} onRefresh={fetchDetail} 
-              token={token} axiosSecure={axiosSecure} />
+              axiosSecure={axiosSecure} />
             )}
           </div>)}
 
@@ -633,7 +642,8 @@ export default function EventDetailPage() {
                   </div>
                   <p className="text-xs text-white mt-1.5">Goal: ৳{event.fundGoal.toLocaleString()}</p>
                 </div>
-                <DonationForm user={user} eventId={event._id} onDonated={fetchDetail} />
+                <DonationForm user={user} eventId={event._id} 
+                axiosSecure={axiosSecure} onDonated={fetchDetail} />
               </div>
             )}
 
@@ -690,14 +700,16 @@ export default function EventDetailPage() {
   );
 }
 
+//implement later
 /* ═══════════════════════════════════════
    REACTION BAR
 ═══════════════════════════════════════ */
-function ReactionBar({ eventId, initialReaction, interestedCount, goingCount, currentUserId, onRefresh }) {
+function ReactionBar({ eventId, initialReaction, interestedCount, goingCount, currentUserId, onRefresh, axiosSecure }) {
   const [reaction, setReaction] = useState(initialReaction);
   const [counts,   setCounts]   = useState({ interested: interestedCount || 0, going: goingCount || 0 });
   const [loading,  setLoading]  = useState(false);
 
+  //implement later
   const handleReact = async (type) => {
     if (!currentUserId) { toast.info("Please login to react"); return; }
     if (loading) return;
@@ -715,11 +727,8 @@ function ReactionBar({ eventId, initialReaction, interestedCount, goingCount, cu
     setReaction(isSame ? null : type);
     setCounts(nc);
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${import.meta.env.VITE_API_URL}/events/${eventId}/react`,
-        { reaction: isSame ? "not-going" : type },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axiosSecure.post(`/events/${eventId}/react`,
+        { reaction: isSame ? "not-going" : type })
     } catch {
       setReaction(prev);
       setCounts(prevCounts);
@@ -994,32 +1003,34 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
       </div>
 
       {/* Donor list */}
-      {donations.map((d, i) => (
-        <div key={i} className="flex items-center justify-between py-2.5 border-b border-zinc-800 last:border-0">
-          <div className="flex items-center gap-3">
-            {d.userPhoto && !d.anonymous ? (
-              <img
-                src={d.userPhoto}
-                alt={d.donorName}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-xs font-bold">
-                {d.anonymous ? "?" : d.donorName?.[0]?.toUpperCase() || "?"}
+      {[...donations]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .map((d, i) => (
+          <div key={i} className="flex items-center justify-between py-2.5 border-b border-zinc-800 last:border-0">
+            <div className="flex items-center gap-3">
+              {d.userPhoto && !d.anonymous ? (
+                <img
+                  src={d.userPhoto}
+                  alt={d.donorName}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-xs font-bold">
+                  {d.anonymous ? "?" : d.donorName?.[0]?.toUpperCase() || "?"}
+                </div>
+              )}
+              <div>
+                <p className="text-sm font-medium text-white">
+                  {d.anonymous ? "Anonymous" : d.donorName}
+                </p>
+                <p className="text-xs text-stone-400">
+                  {formatDistanceToNow(new Date(d.createdAt), { addSuffix: true })}
+                </p>
               </div>
-            )}
-            <div>
-              <p className="text-sm font-medium text-white">
-                {d.anonymous ? "Anonymous" : d.donorName}
-              </p>
-              <p className="text-xs text-stone-400">
-                {formatDistanceToNow(new Date(d.createdAt), { addSuffix: true })}
-              </p>
             </div>
+            <span className="text-sm font-bold text-emerald-600">৳{d.amount.toLocaleString()}</span>
           </div>
-          <span className="text-sm font-bold text-emerald-600">৳{d.amount.toLocaleString()}</span>
-        </div>
-      ))}
+        ))}
 
       {/* Spending breakdown */}
       {spendingBreakdown?.length > 0 && (
@@ -1042,7 +1053,7 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
 /* ═══════════════════════════════════════
    COMMENTS TAB
 ═══════════════════════════════════════ */
-function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRef, onCommentAdded, user, axiosSecure }) {
+function CommentsTab({ eventId, comments, currentUserId, isAdmin, inputRef, onCommentAdded, user, axiosSecure }) {
   const [text,        setText]        = useState("");
   const [replyTo,     setReplyTo]     = useState(null); // { id, name }
   const [submitting,  setSubmitting]  = useState(false);
@@ -1274,7 +1285,7 @@ function CommentItem({ comment, user, isAdmin, onDelete, onDeleteReply, onPin, o
 /* ═══════════════════════════════════════
    DONATION FORM (in sidebar)
 ═══════════════════════════════════════ */
-function DonationForm({ user,  eventId, onDonated }) {
+function DonationForm({ user,  eventId, onDonated, axiosSecure }) {
   const [amount,    setAmount]    = useState("");
   const [name,      setName]      = useState(user?.displayName || "");
   const [email,     setEmail]     = useState(user?.email || "");
@@ -1287,7 +1298,7 @@ function DonationForm({ user,  eventId, onDonated }) {
   const PRESETS = [100, 500, 1000, 2000];
 
   const handleDonate = async () => {
-    if (!amount || Number(amount) < 10) { toast.error("Minimum donation is ৳10"); return; }
+    if (!amount || Number(amount) < 65) { toast.error("Minimum donation is ৳65"); return; }
     if (anon && !email.trim() && !phone.trim()) {
       toast.error("Anonymous donation requires at least an email or phone number");
       return;
@@ -1300,12 +1311,10 @@ function DonationForm({ user,  eventId, onDonated }) {
     }
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_MANUAL}/events/${eventId}/donate`,
+      const res = await axiosSecure.post(
+        `/events/${eventId}/donate`,
         { amount: Number(amount), donorName: name || "Supporter", donorEmail: email,
-          donorPhone: phone || null, anonymous: anon, wantReceipt: !anon && wantReceipt },
-        { headers: user?.accessToken ? { Authorization: `Bearer ${user?.accessToken}` } : {} }
+          donorPhone: phone || null, anonymous: anon, wantReceipt: !anon && wantReceipt }
       );
       if (res.data.paymentUrl) {
         toast.info("Redirecting to payment...");
@@ -1366,7 +1375,7 @@ function DonationForm({ user,  eventId, onDonated }) {
 
       {/* Anonymous: email OR phone required */}
       {anon && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+        <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-3 space-y-2">
           <p className="text-xs text-amber-700 font-medium flex items-center gap-1">
             <AlertCircle size={13} /> Anonymous donations require at least one contact for verification:
           </p>
@@ -1474,7 +1483,7 @@ function UserRegistrationCard({ registration, event, isFree }) {
 /* ═══════════════════════════════════════
    ADMIN QUICK ACTIONS
 ═══════════════════════════════════════ */
-function AdminQuickActions({ event, onRefresh, token, axiosSecure }) {
+function AdminQuickActions({ event, onRefresh, axiosSecure }) {
   const [updating, setUpdating] = useState(false);
 
   const updateStatus = async (status) => {

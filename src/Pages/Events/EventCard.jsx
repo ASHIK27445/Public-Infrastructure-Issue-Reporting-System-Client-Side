@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { format, formatDistanceToNow, isPast } from "date-fns";
 import {
@@ -22,6 +21,7 @@ import {
   Brush,
   HandCoins,
 } from "lucide-react";
+import useAxios from "../../Hooks/useAxios";
 
 /* ─── Constants ─── */
 const TYPE_CONFIG = {
@@ -46,13 +46,14 @@ const STATUS_STYLE = {
 };
 
 /* ─── EventCard ─── */
-export default function EventCard({ event, currentUserId }) {
+export default function EventCard({ event }) {
   const [userReaction, setUserReaction] = useState(event.userReaction || null);
   const [counts, setCounts] = useState({
     interested: event.interestedCount || 0,
     going: event.goingCount || 0,
   });
   const [reacting, setReacting] = useState(false);
+  const axiosInstance = useAxios()
 
   const typeConfig  = TYPE_CONFIG[event.eventType] || TYPE_CONFIG.meetup;
   const TypeIcon    = typeConfig.Icon;
@@ -68,7 +69,7 @@ export default function EventCard({ event, currentUserId }) {
 
   /* ── React handler ── */
   const handleReact = async (type) => {
-    if (!currentUserId) { toast.info("Please login to react"); return; }
+    // if (!currentUserId) { toast.info("Please login to react"); return; }
     if (reacting) return;
     setReacting(true);
 
@@ -88,12 +89,11 @@ export default function EventCard({ event, currentUserId }) {
     setUserReaction(newReaction);
     setCounts(newCounts);
 
+    //implement later
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/${event._id}/react`,
+      await axiosInstance.post(
+        `/events/${event._id}/react`,
         { reaction: isSame ? "not-going" : type },
-        { headers: { Authorization: `Bearer ${token}` } }
       );
     } catch {
       setUserReaction(prevReaction);
