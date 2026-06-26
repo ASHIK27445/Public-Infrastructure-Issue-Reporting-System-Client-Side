@@ -1,304 +1,155 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { AuthContext } from '../AuthProvider/AuthContext';
-import { use, useState } from "react";
+import { use, useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import { 
-  Menu, 
-  X, 
-  Home, 
-  AlertTriangle, 
-  MapPin, 
-  User, 
-  LogOut, 
+import {
+  Menu,
+  X,
+  Home,
+  AlertTriangle,
+  MapPin,
+  User,
+  LogOut,
   LayoutDashboard,
   ChevronDown,
-  Zap, Moon, Sun
+  Zap,
+  Moon,
+  Sun,
+  CalendarDays,
 } from "lucide-react";
 import { useTheme } from "../Theme/ThemeContext";
 
 const Navbar = () => {
-  const {user, mUser, logoutUser, role} = use(AuthContext);
+  const { user, mUser, logoutUser, role } = use(AuthContext);
   const { theme, toggleTheme } = useTheme();
-  const [isOpen, setIsOpen] = useState(false)
-  const [logoutLoading, setLogoutLoading] = useState(false)
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const location = useLocation()
-  const navigate = useNavigate()
+  const [isOpen, setIsOpen] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const profileRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setIsProfileOpen(false);
+      }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(e.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+    setIsProfileOpen(false);
+  }, [location.pathname]);
+
   const handleLogout = () => {
-    setLogoutLoading(true)
+    setLogoutLoading(true);
     logoutUser()
       .then(() => {
-        setLogoutLoading(false)
-        toast.success("Logout Successful!")
+        setLogoutLoading(false);
+        toast.success("Logout Successful!");
       })
-      .catch((error) => toast.error(error.message));
+      .catch((error) => {
+        setLogoutLoading(false);
+        toast.error(error.message);
+      });
   };
 
   const navLinks = [
     { path: "/", label: "Home", icon: <Home className="w-4 h-4" /> },
-    { path: "/allissues", label: "All Issues", icon: <AlertTriangle className="w-4 h-4" /> },
-    { path: "/map-view", label: "Map View", icon: <MapPin className="w-4 h-4" /> },
+    { path: "/allissues", label: "Issues", icon: <AlertTriangle className="w-4 h-4" /> },
+    { path: "/map-view", label: "Map", icon: <MapPin className="w-4 h-4" /> },
+    { path: "/events", label: "Events", icon: <CalendarDays className="w-4 h-4" /> },
     { path: "/premium", label: "Premium", icon: <Zap className="w-4 h-4" /> },
   ];
 
   const userMenuItems = [
     { label: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
-    { label: "Profile", path: "dashboard/dashboard/myProfile", icon: <User className="w-4 h-4" /> },
+    { label: "Profile", path: "/dashboard/dashboard/myProfile", icon: <User className="w-4 h-4" /> },
     { type: "divider" },
-    { 
-      label: "Logout", 
-      action: handleLogout, 
+    {
+      label: "Logout",
+      action: handleLogout,
       icon: <LogOut className="w-4 h-4" />,
-      className: "text-red-400 hover:text-red-300"
+      className: "text-red-400 hover:text-red-300 hover:bg-red-500/10",
     },
-  ]
+  ];
+
+  const handleStaffReportIssue = () => {
+    if (role === "staff") {
+      toast.error("Staff can't report issues.");
+      return;
+    }
+    navigate("dashboard/dashboard/addissues");
+  };
 
   if (logoutLoading) {
-  return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-      <div className="text-center space-y-4">
-        {/* Power button animation */}
-        <div className="relative w-16 h-16 mx-auto">
-          {/* Outer circle */}
-          <div className="absolute inset-0 border-2 border-red-500/30 rounded-full" />
-          
-          {/* Inner circle fading */}
-          <div className="absolute inset-4 bg-red-500/20 rounded-full animate-pulse" />
-          
-          {/* Power symbol */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="w-0.5 h-6 bg-red-500" />
-            <div className="w-4 h-4 border-2 border-red-500 rounded-full -top-5 -translate-x-1/2 left-1/2 absolute" />
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="relative w-16 h-16 mx-auto">
+            <div className="absolute inset-0 border-2 border-red-500/30 rounded-full" />
+            <div className="absolute inset-4 bg-red-500/20 rounded-full animate-pulse" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <div className="w-0.5 h-6 bg-red-500" />
+              <div className="w-4 h-4 border-2 border-red-500 rounded-full -top-5 -translate-x-1/2 left-1/2 absolute" />
+            </div>
           </div>
+          <p className="text-gray-400 text-sm">Closing session</p>
         </div>
-        
-        <p className="text-gray-400 text-sm">Closing session</p>
       </div>
-    </div>
-  );
+    );
   }
 
-  const handleStaffReportIsse = () => {
-      if(role === 'staff'){
-        toast.error("staff can't report.")
-        return;
-      }else{
-        navigate('dashboard/dashboard/addissues')
-      }
-  }
   return (
     <nav className="sticky top-0 z-50 w-full bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-20">
-          
-          {/* Logo Section - Fixed width */}
-          <div className="shrink-0 min-w-50">
-            <NavLink 
-              to="/" 
-              className="flex items-center space-x-3 group">
-              <div className="w-12 h-12 bg-linear-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
-                <MapPin className="w-7 h-7 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-black text-white">
-                  Community<span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Fix</span>
-                </span>
-                <span className="text-xs text-gray-400 hidden sm:block">Building Better Communities</span>
-              </div>
-            </NavLink>
-          </div>
+      <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-6">
+        <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20">
 
-          {/* Desktop Navigation Links - Centered */}
-          <div className="hidden md:flex items-center space-x-1 flex-1 justify-center mx-4">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                className={({ isActive }) => 
-                  `group flex items-center space-x-2 px-4 py-2 rounded-2xl font-medium transition-all duration-300 ${
-                    isActive 
-                      ? 'bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/30' 
-                      : 'text-gray-300 hover:text-white hover:bg-zinc-800'
-                  }`
-                }
-              >
-                {link.icon}
-                <span className="whitespace-nowrap">{link.label}</span>
-              </NavLink>
-            ))}
-          </div>
-
-          {/* Right Section - User Menu */}
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <button 
-              onClick={toggleTheme}
-              className="p-2 sm:p-3 rounded-2xl hover:bg-zinc-800 transition-colors"
-              aria-label="Toggle theme">
-              {theme === 'light' ? (
-                <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-              ) : (
-                <Sun className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300" />
-              )}
-            </button>
-            
-            {/* Report Button */}
-            <Link
-              onClick={handleStaffReportIsse}
-              className="hidden md:flex items-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300"
-            >
-              <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="whitespace-nowrap">Report Issue</span>
-            </Link>
-
-            {/* User Menu */}
-            {user ? (
-              <div className="relative group">
-                <button 
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setIsProfileOpen(prev => !prev)}
-                }
-                className="flex items-center space-x-2 sm:space-x-3 p-1 sm:p-2 rounded-2xl hover:bg-zinc-800 transition-all duration-300">
-                  <div className="relative">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-emerald-500/50">
-                      <img
-                        src={user?.photoURL || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + user?.displayName}
-                        alt={user?.displayName}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-emerald-500 rounded-full border-2 border-zinc-900" />
-                  </div>
-                  
-                  <div className="hidden lg:flex flex-col items-start">
-                    <span className="text-white font-bold text-sm">
-                      {user?.displayName?.split(' ')[0] || 'User'}
-                    </span>
-                    <span className="text-emerald-400 text-xs font-medium">{role}</span>
-                  </div>
-                  
-                  <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-emerald-400 transition-colors" />
-                </button>
-
-                {/* Dropdown Menu */}
-                <div className={`absolute right-0 top-full mt-2 w-64 opacity-0 invisible md:group-hover:opacity-100 md:group-hover:visible transition-all duration-300 z-50
-                ${isProfileOpen ? 'opacity-100 visible' : ''}
-                `}>
-
-                  <div className="bg-zinc-800/95 backdrop-blur-xl rounded-2xl border border-zinc-700 shadow-2xl p-4 mt-4">
-                    
-                    {/* User Info */}
-                    <div className="flex items-center space-x-3 p-3 rounded-xl bg-linear-to-r from-emerald-500/10 to-teal-500/10 mb-4">
-                      <div className="shrink-0 w-12 h-12 rounded-full overflow-hidden">
-                        <img
-                          src={user?.photoURL || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + (user?.displayName || "default")}
-                          alt={user?.displayName || "User Avatar"}
-                          className="w-12 h-12 object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-white font-bold truncate">{user?.displayName || "Unknown User"}</div>
-                        <div className="text-emerald-400 text-sm truncate">{user?.email || "No Email"}</div>
-                      </div>
-                    </div>
-
-
-                    {/* Menu Items */}
-                    <div className="space-y-1">
-                      {userMenuItems.map((item, index) => (
-                        item.type === "divider" ? (
-                          <div key={index} className="h-px bg-zinc-700 my-2" />
-                        ) : (
-                          <NavLink
-                            key={item.label}
-                            to={item.path || "#"}
-                            onClick={item.action}
-                            className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-zinc-700/50 transition-all duration-300 ${
-                              item.className || ''
-                            }`}
-                          >
-                            <div className="text-emerald-400">{item.icon}</div>
-                            <span className="font-medium">{item.label}</span>
-                          </NavLink>
-                        )
-                      ))}
-                    </div>
-
-                    {/* Stats */}
-                    { (role === 'staff' || role === 'citizen') &&
-                    <div className="mt-4 pt-4 border-t border-zinc-700">
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="text-center p-2 rounded-xl bg-zinc-900/50">
-                          <div className="text-emerald-400 font-bold">
-                            {mUser?.role === 'staff' ? mUser?.assignIssued || 0 : 
-                            mUser?.role === 'citizen' ? mUser?.issueCount || 0 : 0 }</div>
-                          <div className="text-xs text-gray-400">
-                            {mUser?.role === 'staff' ? 'Assign' : 'Report'}
-                          </div>
-                        </div>
-                        <div className="text-center p-2 rounded-xl bg-zinc-900/50">
-                          <div className="text-emerald-400 font-bold">
-                            {mUser?.role === 'staff' ? mUser?.resolvedIssued || 0 : 
-                            mUser?.role === 'citizen' ? mUser?.solvedIssue || 0 : 0 }
-                          </div>
-                          <div className="text-xs text-gray-400">Resolved</div>
-                        </div>
-                      </div>
-                    </div>
-                    }
-                  </div>
-                </div>
-              </div>
-            ) : (
-              // Login Button for non-authenticated users
-              <div className="flex items-center space-x-2 sm:space-x-4">
-                <NavLink
-                  to="/login"
-                  state={{from: location.pathname}}
-                  className="px-4 py-2 sm:px-6 sm:py-3 border-2 border-emerald-500/50 rounded-2xl font-bold text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500 transition-all duration-300 whitespace-nowrap"
-                >
-                  Login
-                </NavLink>
-                <NavLink
-                  to="/register"
-                  className="px-4 py-2 sm:px-6 sm:py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300 whitespace-nowrap"
-                >
-                  Register
-                </NavLink>
-              </div>
-            )}
-
-            {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-2xl hover:bg-zinc-800 transition-colors"
+          {/* ── Logo ── */}
+          <NavLink
+            to="/"
+            className="flex items-center gap-2.5 shrink-0 group"
           >
-            {isOpen ? (
-              <X className="w-6 h-6 text-gray-300" />
-            ) : (
-              <Menu className="w-6 h-6 text-gray-300" />
-            )}
-          </button>
+            <div className="w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 bg-linear-to-br from-emerald-500 to-teal-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
+              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-[1.15rem] sm:text-xl lg:text-2xl font-black text-white tracking-tight">
+                Community
+                <span className="bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                  Fix
+                </span>
+              </span>
+              <span className="text-[10px] sm:text-xs text-gray-400 hidden sm:block mt-0.5">
+                Building Better Communities
+              </span>
+            </div>
+          </NavLink>
 
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isOpen &&  
-        <div className="md:hidden bg-zinc-800/95 backdrop-blur-xl border-t border-zinc-700">
-          <div className="px-6 py-4 space-y-2">
+          {/* ── Desktop Nav Links ── */}
+          <div className="hidden lg:flex items-center gap-0.5 flex-1 justify-center mx-6">
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
+                end={link.path === "/"}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 px-4 py-3 rounded-2xl font-medium transition-all duration-300 ${
+                  `flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-medium text-sm transition-all duration-200 ${
                     isActive
-                      ? 'bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400'
-                      : 'text-gray-300 hover:text-white hover:bg-zinc-700/50'
+                      ? "bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/30"
+                      : "text-gray-300 hover:text-white hover:bg-zinc-800"
                   }`
                 }
               >
@@ -306,28 +157,289 @@ const Navbar = () => {
                 <span>{link.label}</span>
               </NavLink>
             ))}
-            
-            <NavLink
-            to= '/dashboard'
-            className={({ isActive }) =>
-                  `flex items-center space-x-3 px-4 py-3 rounded-2xl font-medium transition-all duration-300 ${
-                    isActive
-                      ? 'bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400'
-                      : 'text-gray-300 hover:text-white hover:bg-zinc-700/50'
-                  }`
-                }>
-                <LayoutDashboard className="w-4 h-4" />
-                <span>Dashboard</span>  
-            </NavLink>
-
-            <NavLink
-              onClick={handleStaffReportIsse}
-              className="flex items-center justify-center space-x-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-white shadow-lg mt-4">
-              <AlertTriangle className="w-5 h-5" />
-              <span>Report Issue</span>
-            </NavLink>
           </div>
-        </div>}
+
+          {/* ── Right Controls ── */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-xl hover:bg-zinc-800 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? (
+                <Moon className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-gray-600" />
+              ) : (
+                <Sun className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-gray-300" />
+              )}
+            </button>
+
+            {/* Report Issue — desktop */}
+            <button
+              onClick={handleStaffReportIssue}
+              className="hidden lg:flex items-center gap-2 px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl font-bold text-sm text-white shadow-lg hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-300"
+            >
+              <AlertTriangle className="w-4 h-4" />
+              <span>Report Issue</span>
+            </button>
+
+            {/* ── User menu / Login buttons ── */}
+            {user ? (
+              <div className="relative" ref={profileRef}>
+                <button
+                  onClick={() => setIsProfileOpen((prev) => !prev)}
+                  className="flex items-center gap-1.5 sm:gap-2 p-1 sm:p-1.5 rounded-xl hover:bg-zinc-800 transition-all duration-200"
+                >
+                  {/* Avatar */}
+                  <div className="relative">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full overflow-hidden border-2 border-emerald-500/50">
+                      <img
+                        src={
+                          user?.photoURL ||
+                          `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName}`
+                        }
+                        alt={user?.displayName}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-500 rounded-full border-2 border-zinc-900" />
+                  </div>
+
+                  {/* Name + role — large screens only */}
+                  <div className="hidden xl:flex flex-col items-start">
+                    <span className="text-white font-bold text-sm leading-tight">
+                      {user?.displayName?.split(" ")[0] || "User"}
+                    </span>
+                    <span className="text-emerald-400 text-xs font-medium capitalize">
+                      {role}
+                    </span>
+                  </div>
+
+                  <ChevronDown
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                      isProfileOpen ? "rotate-180 text-emerald-400" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Dropdown */}
+                {isProfileOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-64 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="bg-zinc-800/98 backdrop-blur-xl rounded-2xl border border-zinc-700 shadow-2xl p-4">
+
+                      {/* User info card */}
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-linear-to-r from-emerald-500/10 to-teal-500/10 mb-3">
+                        <div className="shrink-0 w-11 h-11 rounded-full overflow-hidden border border-emerald-500/30">
+                          <img
+                            src={
+                              user?.photoURL ||
+                              `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName || "default"}`
+                            }
+                            alt={user?.displayName || "Avatar"}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-white font-bold text-sm truncate">
+                            {user?.displayName || "Unknown User"}
+                          </div>
+                          <div className="text-emerald-400 text-xs truncate">
+                            {user?.email || "No Email"}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Menu items */}
+                      <div className="space-y-0.5">
+                        {userMenuItems.map((item, index) =>
+                          item.type === "divider" ? (
+                            <div key={index} className="h-px bg-zinc-700 my-2" />
+                          ) : (
+                            <NavLink
+                              key={item.label}
+                              to={item.path || "#"}
+                              onClick={() => {
+                                setIsProfileOpen(false);
+                                if (item.action) item.action();
+                              }}
+                              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-zinc-700/50 transition-all duration-200 text-sm font-medium ${
+                                item.className || ""
+                              }`}
+                            >
+                              <span className="text-emerald-400 shrink-0">
+                                {item.icon}
+                              </span>
+                              {item.label}
+                            </NavLink>
+                          )
+                        )}
+                      </div>
+
+                      {/* Stats */}
+                      {(role === "staff" || role === "citizen") && (
+                        <div className="mt-3 pt-3 border-t border-zinc-700">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="text-center p-2 rounded-xl bg-zinc-900/60">
+                              <div className="text-emerald-400 font-bold text-base">
+                                {mUser?.role === "staff"
+                                  ? mUser?.assignIssued || 0
+                                  : mUser?.role === "citizen"
+                                  ? mUser?.issueCount || 0
+                                  : 0}
+                              </div>
+                              <div className="text-xs text-gray-400">
+                                {mUser?.role === "staff" ? "Assigned" : "Reported"}
+                              </div>
+                            </div>
+                            <div className="text-center p-2 rounded-xl bg-zinc-900/60">
+                              <div className="text-emerald-400 font-bold text-base">
+                                {mUser?.role === "staff"
+                                  ? mUser?.resolvedIssued || 0
+                                  : mUser?.role === "citizen"
+                                  ? mUser?.solvedIssue || 0
+                                  : 0}
+                              </div>
+                              <div className="text-xs text-gray-400">Resolved</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Not logged in */
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <NavLink
+                  to="/login"
+                  state={{ from: location.pathname }}
+                  className="px-3 py-1.5 sm:px-4 sm:py-2 border border-emerald-500/50 rounded-xl font-bold text-xs sm:text-sm text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500 transition-all duration-200"
+                >
+                  Login
+                </NavLink>
+                <NavLink
+                  to="/register"
+                  className="px-3 py-1.5 sm:px-4 sm:py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl font-bold text-xs sm:text-sm text-white shadow-lg hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-300"
+                >
+                  Register
+                </NavLink>
+              </div>
+            )}
+
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setIsOpen((prev) => !prev)}
+              className="lg:hidden p-2 rounded-xl hover:bg-zinc-800 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isOpen ? (
+                <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300" />
+              ) : (
+                <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Mobile / Tablet Drawer ── */}
+      {isOpen && (
+        <div
+          ref={mobileMenuRef}
+          className="lg:hidden bg-zinc-800/98 backdrop-blur-xl border-t border-zinc-700"
+        >
+          <div className="max-w-7xl mx-auto px-3 sm:px-5 py-3 space-y-1">
+
+            {/* Nav links */}
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                end={link.path === "/"}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                    isActive
+                      ? "bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/20"
+                      : "text-gray-300 hover:text-white hover:bg-zinc-700/50"
+                  }`
+                }
+              >
+                {link.icon}
+                <span>{link.label}</span>
+              </NavLink>
+            ))}
+
+            {/* Dashboard shortcut (only when logged in) */}
+            {user && (
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                    isActive
+                      ? "bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/20"
+                      : "text-gray-300 hover:text-white hover:bg-zinc-700/50"
+                  }`
+                }
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Dashboard</span>
+              </NavLink>
+            )}
+
+            {/* Divider */}
+            <div className="h-px bg-zinc-700 my-1" />
+
+            {/* Report Issue CTA */}
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                handleStaffReportIssue();
+              }}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl font-bold text-sm text-white shadow-lg"
+            >
+              <AlertTriangle className="w-4 h-4" />
+              <span>Report Issue</span>
+            </button>
+
+            {/* Mobile user info strip (when logged in) */}
+            {user && (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-900/50 mt-1">
+                <div className="w-9 h-9 rounded-full overflow-hidden border border-emerald-500/40 shrink-0">
+                  <img
+                    src={
+                      user?.photoURL ||
+                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName}`
+                    }
+                    alt={user?.displayName}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-white font-semibold text-sm truncate">
+                    {user?.displayName || "User"}
+                  </div>
+                  <div className="text-emerald-400 text-xs capitalize">{role}</div>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    handleLogout();
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:bg-red-500/10 text-xs font-semibold transition-colors"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
