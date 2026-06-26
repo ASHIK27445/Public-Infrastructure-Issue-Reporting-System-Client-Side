@@ -13,6 +13,7 @@ import {
   UserCheck, Banknote, Share2, ArrowRight, Package, Map,
 } from "lucide-react";
 import { AuthContext } from "../AuthProvider/AuthContext";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 /* ─── Constants ─── */
 const TYPE_META = {
@@ -45,11 +46,12 @@ export default function EventDetailPage() {
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("about"); // about | volunteers | donors | comments
-  const {user} = use(AuthContext)
+  const {user, role} = use(AuthContext)
+  const axiosSecure = useAxiosSecure()
 
   // user info from localStorage
   const currentUserId = localStorage.getItem("userId");
-  const isAdmin       = localStorage.getItem("role") === "admin";
+  const isAdmin       = user && role === 'admin'
   const token         = localStorage.getItem("token");
 
   // scroll to donate section if ?donate=true
@@ -84,8 +86,9 @@ export default function EventDetailPage() {
         `${import.meta.env.VITE_API_MANUAL}/events/${id}`,
       );
       setData(res.data);
+      console.log(res.data)
     } catch (err) {
-      console.warn("API failed, using demo data:", err.message);
+      // console.warn("API failed, using demo data:", err.message);
       
       // // Default/Demo data structure
       // const demoData = {
@@ -198,7 +201,7 @@ export default function EventDetailPage() {
       // }
 
       // setData(demoData);
-      toast.info("Showing demo data (API unavailable)");
+      // toast.info("Showing demo data (API unavailable)");
     } finally {
       setLoading(false);
     }
@@ -297,12 +300,12 @@ export default function EventDetailPage() {
                 )}
               </div>
 
-              <h1 className="text-2xl md:text-3xl font-bold text-stone-900 leading-tight mb-4"
+              <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight mb-4"
                 style={{ fontFamily: "Fraunces, serif" }}>
                 {event.title}
               </h1>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+              <div className="bg-zinc-950 grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
                 <InfoChip icon={<Calendar size={18} />} label="Date & Time"
                   value={format(eventDate, "EEEE, dd MMM yyyy")}
                   sub={format(eventDate, "h:mm a") + (event.endDate ? ` – ${format(new Date(event.endDate),"h:mm a")}` : "")} />
@@ -317,7 +320,7 @@ export default function EventDetailPage() {
               </div>
 
               {event.pinnedAnnouncement && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-5 flex gap-3">
+                <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 mb-5 flex gap-3">
                   <Pin size={20} className="text-yellow-600 shrink-0" />
                   <div>
                     <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-1">Pinned Announcement</p>
@@ -339,7 +342,7 @@ export default function EventDetailPage() {
 
           {/* ── Tabs ── */}
           <div className=" rounded-lg border border-zinc-800 overflow-hidden shadow-sm">
-            <div className="flex border-b border-stone-100 overflow-x-auto">
+            <div className="flex border-b border-zinc-700 overflow-x-auto">
               {[
                 { id: "about",      label: "About",     icon: <AlertCircle size={14} /> },
                 { id: "volunteers", label: "Volunteers", icon: <Users size={14} />, count: volunteerCount },
@@ -350,7 +353,7 @@ export default function EventDetailPage() {
                   className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
                     activeTab === tab.id
                       ? "border-blue-500 text-blue-600 bg-zinc-800"
-                      : "border-transparent text-stone-500 hover:text-stone-700 hover:bg-stone-50"
+                      : "border-transparent text-white hover:text-stone-700 hover:bg-stone-50"
                   }`}>
                   <span>{tab.icon}</span>
                   <span>{tab.label}</span>
@@ -443,7 +446,7 @@ export default function EventDetailPage() {
                   spendingBreakdown={event.spendingBreakdown}
                 />
               )}
-
+              {/*not implement yet*/}
               {activeTab === "comments" && (
                 <CommentsTab
                   eventId={event._id}
@@ -453,6 +456,8 @@ export default function EventDetailPage() {
                   token={token}
                   inputRef={commentInputRef}
                   onCommentAdded={fetchDetail}
+                  user={user}
+                  axiosSecure={axiosSecure}
                 />
               )}
             </div>
@@ -468,7 +473,7 @@ export default function EventDetailPage() {
 
             {/* Event Timeline */}
             {event.hasEventLogs && event.eventLogs?.length > 0 && (
-              <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
+              <div className="bg-zinc-950 rounded-lg border border-zinc-800 p-5 shadow-sm">
                 <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
                   Event Timeline
                 </h3>
@@ -484,11 +489,11 @@ export default function EventDetailPage() {
                           <div>
                             <div className="flex items-center gap-2 flex-wrap mb-0.5">
                               {log.time && (
-                                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full font-mono">
+                                <span className="text-[10px] font-bold text-black bg-green-50 px-1.5 py-0.5 rounded-full font-mono">
                                   {log.time}
                                 </span>
                               )}
-                              <p className="text-xs font-semibold text-stone-800">{log.title}</p>
+                              <p className="text-xs font-semibold text-white">{log.title}</p>
                             </div>
                             {log.description && (
                               <p className="text-[10px] text-stone-400 leading-relaxed">{log.description}</p>
@@ -503,7 +508,7 @@ export default function EventDetailPage() {
 
             {/* Special Guests */}
             {event.hasSpecialGuests && event.specialGuests?.length > 0 && (
-              <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
+              <div className="bg-zinc-950 rounded-lg border border-zinc-800 p-5 shadow-sm">
                 <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">
                   Special Guests
                 </h3>
@@ -546,12 +551,17 @@ export default function EventDetailPage() {
                 </div>
               </div>
             )}
+
+            {isAdmin && (
+              <AdminQuickActions event={event} onRefresh={fetchDetail} 
+              token={token} axiosSecure={axiosSecure} />
+            )}
           </div>)}
 
           {/* ════ RIGHT SIDEBAR ════ */}
           
           <div className="space-y-4 lg:order-3">
-
+            {/*not implement yet*/}
             {userRegistration && (
               <UserRegistrationCard
                 registration={userRegistration}
@@ -562,16 +572,16 @@ export default function EventDetailPage() {
 
             {!userRegistration && !isCancelled && !isCompleted && (
               <div className="rounded-lg border border-zinc-800 p-5 shadow-sm">
-                <h3 className="font-bold text-stone-900 mb-1" style={{ fontFamily:"Fraunces,serif" }}>
+                <h3 className="font-bold text-white mb-1" style={{ fontFamily:"Fraunces,serif" }}>
                   {spotsLeft > 0 ? "Join This Event" : "Join Waitlist"}
                 </h3>
-                <p className="text-xs text-stone-400 mb-4">
+                <p className="text-xs text-stone-500 mb-4">
                   {spotsLeft > 0
                     ? `${spotsLeft} spots remaining out of ${event.maxVolunteers}`
                     : `All ${event.maxVolunteers} spots filled. ${waitlistCount || 0} on waitlist.`}
                 </p>
                 <div className="mb-4">
-                  <div className="flex justify-between text-xs text-stone-400 mb-1.5">
+                  <div className="flex justify-between text-xs text-stone-500 mb-1.5">
                     <span>{volunteerCount || 0} joined</span>
                     <span>{event.maxVolunteers} max</span>
                   </div>
@@ -598,7 +608,7 @@ export default function EventDetailPage() {
                   </span>
                 </Link>
                 {!currentUserId && (
-                  <p className="text-xs text-center text-stone-400 mt-2">
+                  <p className="text-xs text-center text-stone-500 mt-2">
                     <Link to="/login" className="text-green-600 hover:underline">Login</Link> to register faster
                   </p>
                 )}
@@ -606,16 +616,16 @@ export default function EventDetailPage() {
             )}
 
             {event.fundGoal > 0 && !isCancelled && (
-              <div ref={donateRef} className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
+              <div ref={donateRef} className="bg-zinc-950 rounded-lg border border-zinc-800 p-5 shadow-sm">
                 <div className="flex items-center gap-2 mb-3">
                   <HeartHandshake size={20} className="text-emerald-500" />
-                  <h3 className="font-bold text-stone-900 text-sm" style={{ fontFamily:"Fraunces,serif" }}>Support This Event</h3>
+                  <h3 className="font-bold text-white text-sm" style={{ fontFamily:"Fraunces,serif" }}>Support This Event</h3>
                 </div>
-                <p className="text-xs text-stone-500 mb-4 leading-relaxed">
+                <p className="text-xs text-white mb-4 leading-relaxed">
                   Can't make it? Donate to help fund equipment and supplies.
                 </p>
                 <div className="mb-4">
-                  <div className="flex justify-between text-xs text-stone-500 mb-1.5">
+                  <div className="flex justify-between text-xs text-white mb-1.5">
                     <span className="font-semibold text-stone-700">৳{(event.fundRaised || 0).toLocaleString()} raised</span>
                     <span>{fundPercent}%</span>
                   </div>
@@ -623,14 +633,14 @@ export default function EventDetailPage() {
                     <div className="h-full bg-linear-to-r from-emerald-400 to-teal-500 rounded-full transition-all"
                       style={{ width: `${fundPercent}%` }} />
                   </div>
-                  <p className="text-xs text-stone-400 mt-1.5">Goal: ৳{event.fundGoal.toLocaleString()}</p>
+                  <p className="text-xs text-white mt-1.5">Goal: ৳{event.fundGoal.toLocaleString()}</p>
                 </div>
                 <DonationForm user={user} eventId={event._id} onDonated={fetchDetail} />
               </div>
             )}
 
-            <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
-              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">Event Stats</h3>
+            <div className="bg-zinc-950 rounded-lg border border-zinc-800 p-5 shadow-sm">
+              <h3 className="text-xs font-semibold text-white uppercase tracking-wide mb-4">Event Stats</h3>
               <div className="space-y-3">
                 <StatRow icon={<ThumbsUp size={14} />}      label="Interested" value={event.interestedCount || 0} />
                 <StatRow icon={<CheckCircle size={14} />}   label="Going"      value={event.goingCount      || 0} />
@@ -642,10 +652,6 @@ export default function EventDetailPage() {
                 <StatRow icon={<MessageCircle size={14} />} label="Comments"  value={comments?.length || 0} />
               </div>
             </div>
-
-            {isAdmin && (
-              <AdminQuickActions event={event} onRefresh={fetchDetail} token={token} />
-            )}
 
             {data?.registrationInfo?.filter(r => r.role === "guest").length > 0 && (
               <GuestSection guests={data.registrationInfo.filter(r => r.role === "guest")} />
@@ -663,7 +669,7 @@ export default function EventDetailPage() {
               />
             )}
 
-            <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
+            <div className="bg-zinc-950 rounded-lg border border-zinc-800 p-5 shadow-sm">
               <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Share Event</h3>
               <div className="flex gap-2">
                 <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied!"); }}
@@ -672,8 +678,8 @@ export default function EventDetailPage() {
                 </button>
                 <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
                   target="_blank" rel="noreferrer"
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium transition-colors">
-                  <Facebook size={13} /> Facebook
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-amber-100 text-xs font-medium transition-colors">
+                  <Facebook size={13} fill="white" color="white" /> Facebook
                 </a>
               </div>
             </div>
@@ -734,7 +740,7 @@ function ReactionBar({ eventId, initialReaction, interestedCount, goingCount, cu
           className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-all select-none ${
             reaction === r.type
               ? r.activeClass
-              : "bg-white text-stone-600 border-zinc-800 hover:border-stone-300"
+              : "bg-zinc-950 text-white border-zinc-800 hover:cursor-pointer"
           }`}>
           <span>{r.icon}</span>
           <span>{r.label}</span>
@@ -746,7 +752,7 @@ function ReactionBar({ eventId, initialReaction, interestedCount, goingCount, cu
         </button>
       ))}
       <span className="text-xs text-stone-400 ml-auto">
-        {(counts.interested + counts.going)} people interested
+        {(counts.interested)} people interested & {counts.going} people is going
       </span>
     </div>
   );
@@ -778,7 +784,7 @@ function VolunteersTab({ confirmedCount, waitlistCount, maxVolunteers, spotsPerc
         </div>
       </div>
 
-      <div className="bg-stone-50 rounded-lg p-4 text-center text-sm text-stone-500">
+      <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-center text-sm text-white">
         {confirmedCount === 0
           ? "No volunteers yet. Be the first to join!"
           : `${confirmedCount} ${confirmedCount === 1 ? "volunteer has" : "volunteers have"} signed up for this event.`}
@@ -788,8 +794,8 @@ function VolunteersTab({ confirmedCount, waitlistCount, maxVolunteers, spotsPerc
       </div>
 
       {isAdmin && (
-        <Link to={`/admin/events/${eventId}/manage`}
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium transition-colors">
+        <Link to={`/dashboard/admin/events/${eventId}/manage`}
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-zinc-950 border border-zinc-800  text-white text-sm font-medium transition-colors">
           <Settings size={15} /> Manage Volunteers <ArrowRight size={14} />
         </Link>
       )}
@@ -802,8 +808,8 @@ function GuestSection({ guests }) {
   const visible = showAll ? guests : guests.slice(0, 5);
 
   return (
-    <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
-      <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 flex items-center gap-1.5">
+    <div className="bg-zinc-950 rounded-lg border border-zinc-800 p-5 shadow-sm">
+      <h3 className="text-xs font-semibold text-white uppercase tracking-wide mb-4 flex items-center gap-1.5">
         <UserCheck size={13} /> Guests ({guests.length})
       </h3>
 
@@ -815,7 +821,7 @@ function GuestSection({ guests }) {
               <img
                 src={guest.userPhoto}
                 alt={guest.name}
-                className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm cursor-pointer"
+                className="w-10 h-10 rounded-full object-cover border-2 border-zinc-800 shadow-sm cursor-pointer"
               />
             ) : (
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm border-2 border-white shadow-sm cursor-pointer">
@@ -854,8 +860,8 @@ function VolunteerSection({ volunteers }) {
   const visible = showAll ? volunteers : volunteers.slice(0, 5);
 
   return (
-    <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
-      <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 flex items-center gap-1.5">
+    <div className="bg-zinc-950 rounded-lg border border-zinc-800 p-5 shadow-sm">
+      <h3 className="text-xs font-semibold text-white uppercase tracking-wide mb-4 flex items-center gap-1.5">
         <Users size={13} /> Volunteers ({volunteers.length})
       </h3>
 
@@ -866,7 +872,7 @@ function VolunteerSection({ volunteers }) {
               <img
                 src={vol.userPhoto}
                 alt={vol.name}
-                className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm cursor-pointer"
+                className="w-10 h-10 rounded-full object-cover border-2 border-zinc-800 shadow-sm cursor-pointer"
               />
             ) : (
               <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-sm border-2 border-white shadow-sm cursor-pointer">
@@ -908,8 +914,8 @@ function FreeParticipantsSection({ participants, eventId, hasFreeParticipate }) 
   const visible = showAll ? participants : participants.slice(0, 8);
 
   return (
-    <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
-      <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 flex items-center gap-1.5">
+    <div className="bg-zinc-950 rounded-lg border border-zinc-800 p-5 shadow-sm">
+      <h3 className="text-xs font-semibold text-white uppercase tracking-wide mb-4 flex items-center gap-1.5">
         <Ticket size={13} /> Free Participants ({participants.length})
       </h3>
 
@@ -919,9 +925,9 @@ function FreeParticipantsSection({ participants, eventId, hasFreeParticipate }) 
             
             {/* Avatar */}
             <div
-              className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center
-                         text-blue-700 font-bold text-[10px] border-2 border-white shadow-sm
-                         hover:bg-blue-200 transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center
+                         text-white font-bold text-[10px] border-2 border-zinc-800 shadow-sm
+                         hover:bg-blue-500 transition-colors cursor-pointer"
             >
               {p.name?.[0]?.toUpperCase()}
             </div>
@@ -946,7 +952,7 @@ function FreeParticipantsSection({ participants, eventId, hasFreeParticipate }) 
       {participants.length > 8 && (
         <button
           onClick={() => setShowAll(!showAll)}
-          className="mt-3 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors flex items-center gap-1"
+          className="mt-3 text-xs text-blue-400 hover:text-blue-500 font-medium transition-colors flex items-center gap-1"
         >
           {showAll ? <><ChevronUp size={12} /> Show less</> : <><ChevronDown size={12} /> See more ({participants.length - 8} more)</>}
         </button>
@@ -956,7 +962,7 @@ function FreeParticipantsSection({ participants, eventId, hasFreeParticipate }) 
         <Link
           to={`/events/${eventId}/free-participate`}
           className="mt-4 flex items-center justify-center gap-1.5 w-full py-2 rounded-lg
-                     bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold transition-colors"
+                     bg-blue-400 hover:bg-blue-500 text-white text-xs font-semibold transition-colors"
         >
           <Ticket size={13} /> Join as Free Participant <ArrowRight size={12} />
         </Link>
@@ -972,7 +978,7 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
   return (
     <div className="space-y-5">
       {/* Progress */}
-      <div className="bg-linear-to-br from-emerald-50 to-teal-50 rounded-lg p-5 border border-emerald-100">
+      <div className="bg-zinc-950 rounded-lg p-5 border border-zinc-800">
         <div className="flex justify-between items-end mb-3">
           <div>
             <p className="text-2xl font-bold text-emerald-700">৳{(fundRaised || 0).toLocaleString()}</p>
@@ -991,9 +997,8 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
 
       {/* Donor list */}
       {donations.map((d, i) => (
-        <div key={i} className="flex items-center justify-between py-2.5 border-b border-stone-50 last:border-0">
+        <div key={i} className="flex items-center justify-between py-2.5 border-b border-zinc-800 last:border-0">
           <div className="flex items-center gap-3">
-            {/* ✅ userPhoto আছে এবং anonymous না হলে photo দেখাবে */}
             {d.userPhoto && !d.anonymous ? (
               <img
                 src={d.userPhoto}
@@ -1006,7 +1011,7 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
               </div>
             )}
             <div>
-              <p className="text-sm font-medium text-stone-800">
+              <p className="text-sm font-medium text-white">
                 {d.anonymous ? "Anonymous" : d.donorName}
               </p>
               <p className="text-xs text-stone-400">
@@ -1021,12 +1026,12 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
       {/* Spending breakdown */}
       {spendingBreakdown?.length > 0 && (
         <div>
-          <h4 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3 flex items-center gap-1.5"><Banknote size={13} /> Spending Breakdown</h4>
+          <h4 className="text-xs font-semibold text-white uppercase tracking-wide mb-3 flex items-center gap-1.5"><Banknote size={13} /> Spending Breakdown</h4>
           <div className="space-y-2">
             {spendingBreakdown.map((item, i) => (
               <div key={i} className="flex justify-between text-sm">
                 <span className="text-stone-600">{item.label}</span>
-                <span className="font-semibold text-stone-800">৳{item.amount.toLocaleString()}</span>
+                <span className="font-semibold text-white">৳{item.amount.toLocaleString()}</span>
               </div>
             ))}
           </div>
@@ -1039,7 +1044,7 @@ function DonorsTab({ donations, fundRaised, fundGoal, fundPercent, spendingBreak
 /* ═══════════════════════════════════════
    COMMENTS TAB
 ═══════════════════════════════════════ */
-function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRef, onCommentAdded }) {
+function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRef, onCommentAdded, user, axiosSecure }) {
   const [text,        setText]        = useState("");
   const [replyTo,     setReplyTo]     = useState(null); // { id, name }
   const [submitting,  setSubmitting]  = useState(false);
@@ -1050,14 +1055,12 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!text.trim()) return;
-    if (!currentUserId) { toast.info("Please login to comment"); return; }
+    if (!user) { toast.info("Please login to comment"); return; }
     setSubmitting(true);
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/${eventId}/comments`,
-        { text: text.trim(), parentId: replyTo?.id || null },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axiosSecure.post(
+        `/events/${eventId}/comments`,
+        { text: text.trim(), parentId: replyTo?.id || null });
       const newComment = res.data.comment;
       if (replyTo) {
         setLocalComments((prev) =>
@@ -1078,10 +1081,8 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
   const handleDelete = async (commentId, parentId) => {
     if (!window.confirm("Delete this comment?")) return;
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_API_URL}/events/comments/${commentId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axiosSecure.delete(
+        `/events/comments/${commentId}`)
       if (parentId) {
         setLocalComments((prev) => prev.map((c) =>
           c._id === parentId ? { ...c, replies: c.replies.filter((r) => r._id !== commentId) } : c
@@ -1095,11 +1096,9 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
 
   const handlePin = async (commentId) => {
     try {
-      const res = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/events/comments/${commentId}/pin`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axiosSecure.patch(
+        `/events/comments/${commentId}/pin`,
+        {},)
       setLocalComments((prev) => prev.map((c) =>
         c._id === commentId ? { ...c, pinned: res.data.pinned } : c
       ));
@@ -1109,10 +1108,10 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
   return (
     <div className="space-y-5">
       {/* Comment input */}
-      {currentUserId ? (
+      {user ? (
         <form onSubmit={handleSubmit} className="space-y-3">
           {replyTo && (
-            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-xs text-blue-700">
+            <div className="flex items-center gap-2 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-blue-700">
               <Reply size={13} /> <span>Replying to <strong>{replyTo.name}</strong></span>
               <button type="button" onClick={() => setReplyTo(null)} className="ml-auto text-blue-400 hover:text-red-500"><XCircle size={13} /></button>
             </div>
@@ -1139,8 +1138,8 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
           </div>
         </form>
       ) : (
-        <div className="text-center py-4 bg-stone-50 rounded-lg">
-          <p className="text-stone-500 text-sm">
+        <div className="text-center py-4 bg-zinc-950 border border-zinc-800 runded-lg">
+          <p className="text-white text-sm">
             <Link to="/login" className="text-green-600 font-medium hover:underline">Login</Link> to join the discussion
           </p>
         </div>
@@ -1148,7 +1147,7 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
 
       {/* Comments list */}
       {localComments.length === 0 ? (
-        <div className="text-center py-10 text-stone-400 text-sm">
+        <div className="text-center py-10 text-white text-sm">
           <div className="flex justify-center mb-2"><MessageCircle size={40} className="text-stone-300" /></div>
           No comments yet. Start the conversation!
         </div>
@@ -1158,9 +1157,8 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
             <CommentItem
               key={comment._id}
               comment={comment}
-              currentUserId={currentUserId}
+              user={user}
               isAdmin={isAdmin}
-              token={token}
               onDelete={(cId) => handleDelete(cId, null)}
               onDeleteReply={(rId) => handleDelete(rId, comment._id)}
               onPin={() => handlePin(comment._id)}
@@ -1168,6 +1166,7 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
                 setReplyTo({ id, name });
                 inputRef?.current?.focus();
               }}
+              axiosSecure={axiosSecure}
             />
           ))}
         </div>
@@ -1179,24 +1178,22 @@ function CommentsTab({ eventId, comments, currentUserId, isAdmin, token, inputRe
 /* ═══════════════════════════════════════
    COMMENT ITEM
 ═══════════════════════════════════════ */
-function CommentItem({ comment, currentUserId, isAdmin, token, onDelete, onDeleteReply, onPin, onReply }) {
+function CommentItem({ comment, user, isAdmin, onDelete, onDeleteReply, onPin, onReply, axiosSecure }) {
   const [likeCount, setLikeCount] = useState(comment.likes?.length || 0);
   const [liked,     setLiked]     = useState(comment.likes?.map(String).includes(currentUserId));
 
   const handleLike = async () => {
-    if (!currentUserId) { toast.info("Login to like"); return; }
+    if (!user) { toast.info("Login to like"); return; }
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/events/comments/${comment._id}/like`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axiosSecure.post(
+        `/events/comments/${comment._id}/like`,
+        {},)
       setLiked(res.data.liked);
       setLikeCount(res.data.likeCount);
     } catch { /* silent */ }
   };
 
-  const isOwner = comment.userId?._id === currentUserId || comment.userId === currentUserId;
+  const isOwner = comment.userId?._id === user || comment.userId === user;
 
   return (
     <div className={`rounded-lg p-4 ${comment.pinned ? "bg-yellow-50 border border-yellow-200" : "bg-stone-50"}`}>
@@ -1479,25 +1476,55 @@ function UserRegistrationCard({ registration, event, isFree }) {
 /* ═══════════════════════════════════════
    ADMIN QUICK ACTIONS
 ═══════════════════════════════════════ */
-function AdminQuickActions({ event, onRefresh, token }) {
+function AdminQuickActions({ event, onRefresh, token, axiosSecure }) {
   const [updating, setUpdating] = useState(false);
 
   const updateStatus = async (status) => {
-    if (!window.confirm(`Change status to "${status}"?`)) return;
-    setUpdating(true);
-    try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/events/${event._id}/status`,
-        { status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success(`Status updated to ${status}`);
-      onRefresh();
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Update failed");
-    } finally {
-      setUpdating(false);
-    }
+    const toastId = toast(
+      ({ closeToast }) => (
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium text-zinc-800">
+            Change status to <span className="font-bold capitalize">"{status}"</span>?
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                closeToast();
+                setUpdating(true);
+                try {
+                  await axiosSecure.patch(
+                    `/admin/events/${event._id}/status`,
+                    { status }
+                  );
+                  toast.success(`Status updated to ${status}`);
+                  onRefresh();
+                } catch (err) {
+                  toast.error(err.response?.data?.message || "Update failed");
+                } finally {
+                  setUpdating(false);
+                }
+              }}
+              className="flex-1 px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors"
+            >
+              Confirm
+            </button>
+            <button
+              onClick={closeToast}
+              className="flex-1 px-3 py-1.5 rounded-md bg-zinc-200 hover:bg-zinc-300 text-zinc-700 text-xs font-semibold transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        closeButton: false,
+        position: "top-center",
+      }
+    );
   };
 
   const nextStatuses = {
@@ -1511,19 +1538,19 @@ function AdminQuickActions({ event, onRefresh, token }) {
   const available = nextStatuses[event.status] || [];
 
   return (
-    <div className="bg-white rounded-lg border border-zinc-800 p-5 shadow-sm">
+    <div className="bg-zinc-950 rounded-lg border border-zinc-800 p-5 shadow-sm">
       <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3 flex items-center gap-1.5"><Settings size={13} /> Admin Actions</h3>
       <div className="space-y-2">
-        <Link to={`/admin/events/${event._id}/manage`}
-          className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium transition-colors">
+        <Link to={`/dashboard/admin/events/${event._id}/manage`}
+          className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg bg-zinc-950 hover:cursor-pointer border border-zinc-800 hover:bg-stone-200 text-stone-700 text-sm font-medium transition-colors">
           <Users size={15} /> Manage Volunteers
         </Link>
         {available.map((s) => (
           <button key={s} onClick={() => updateStatus(s)} disabled={updating}
-            className={`flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
-              s === "cancelled" ? "bg-red-50 hover:bg-red-100 text-red-700"
-              : s === "completed" ? "bg-blue-50 hover:bg-blue-100 text-blue-700"
-              : "bg-green-50 hover:bg-green-100 text-green-700"
+            className={`flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm font-medium border border-zinc-800 transition-colors disabled:opacity-50 hover:cursor-pointer ${
+              s === "cancelled" ? "bg-zinc-950 hover:bg-red-100 text-red-700"
+              : s === "completed" ? "bg-zinc-950 hover:bg-blue-100 text-blue-700"
+              : "bg-zinc-950 hover:bg-emerald-100 text-emerald-700"
             }`}>
             {s === "ongoing"    ? <><CircleDot size={15} className="text-red-500" /> Mark as Ongoing</>
            : s === "completed"  ? <><CheckCircle size={15} /> Mark as Completed</>
@@ -1585,12 +1612,12 @@ function CountdownPill({ daysLeft, hoursLeft }) {
 function InfoChip({ icon, label, value, sub }) {
   if (!value) return null;
   return (
-    <div className="flex items-start gap-3 bg-stone-50 rounded-lg p-3.5">
+    <div className="flex items-start gap-3 bg-zinc-950 border border-zinc-800 rounded-lg p-3.5">
       <span className="text-lg shrink-0">{icon}</span>
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide">{label}</p>
-        <p className="text-sm font-medium text-stone-800 leading-snug">{value}</p>
-        {sub && <p className="text-xs text-stone-400 mt-0.5">{sub}</p>}
+        <p className="text-[10px] font-semibold text-white uppercase tracking-wide">{label}</p>
+        <p className="text-sm font-medium text-white leading-snug">{value}</p>
+        {sub && <p className="text-xs text-white-400 mt-0.5">{sub}</p>}
       </div>
     </div>
   );
@@ -1599,18 +1626,18 @@ function InfoChip({ icon, label, value, sub }) {
 function StatRow({ icon, label, value }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="flex items-center gap-2 text-sm text-stone-500">
+      <span className="flex items-center gap-2 text-sm text-white">
         <span>{icon}</span>{label}
       </span>
-      <span className="text-sm font-bold text-stone-800">{value}</span>
+      <span className="text-sm font-bold text-white">{value}</span>
     </div>
   );
 }
 
 function VolStatBox({ label, value, color }) {
-  const colors = { green:"text-green-600 bg-green-50", amber:"text-amber-600 bg-amber-50", blue:"text-blue-600 bg-blue-50", red:"text-red-500 bg-red-50" };
+  const colors = { green:"text-green-600", amber:"text-amber-600", blue:"text-blue-600", red:"text-red-500" };
   return (
-    <div className={`rounded-lg p-3 text-center ${colors[color]}`}>
+    <div className={`rounded-lg p-3 text-center bg-zinc-950 border border-zinc-800 ${colors[color]}`}>
       <p className="text-2xl font-bold">{value}</p>
       <p className="text-xs font-medium opacity-80 mt-0.5">{label}</p>
     </div>
