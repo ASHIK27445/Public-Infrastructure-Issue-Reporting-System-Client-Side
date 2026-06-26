@@ -227,7 +227,7 @@ const Navbar = () => {
                 {/* Dropdown */}
                 {isProfileOpen && (
                   <div className="absolute right-0 top-full mt-2 w-64 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                    <div className="bg-zinc-800/98 backdrop-blur-xl rounded-2xl border border-zinc-700 shadow-2xl p-4">
+                    <div className="bg-zinc-900 backdrop-blur-xl rounded-2xl border border-zinc-800 shadow-2xl p-4">
 
                       {/* User info card */}
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-linear-to-r from-emerald-500/10 to-teal-500/10 mb-3">
@@ -282,7 +282,7 @@ const Navbar = () => {
                       {(role === "staff" || role === "citizen") && (
                         <div className="mt-3 pt-3 border-t border-zinc-700">
                           <div className="grid grid-cols-2 gap-2">
-                            <div className="text-center p-2 rounded-xl bg-zinc-900/60">
+                            <div className="text-center p-2 rounded-xl bg-zinc-800 border border-zinc-800">
                               <div className="text-emerald-400 font-bold text-base">
                                 {mUser?.role === "staff"
                                   ? mUser?.assignIssued || 0
@@ -294,7 +294,7 @@ const Navbar = () => {
                                 {mUser?.role === "staff" ? "Assigned" : "Reported"}
                               </div>
                             </div>
-                            <div className="text-center p-2 rounded-xl bg-zinc-900/60">
+                            <div className="text-center p-2 rounded-xl bg-zinc-800 border border-zinc-800">
                               <div className="text-emerald-400 font-bold text-base">
                                 {mUser?.role === "staff"
                                   ? mUser?.resolvedIssued || 0
@@ -348,93 +348,109 @@ const Navbar = () => {
 
       {/* ── Mobile / Tablet Drawer ── */}
       {isOpen && (
-        <div
-          ref={mobileMenuRef}
-          className="lg:hidden bg-zinc-800/98 backdrop-blur-xl border-t border-zinc-700"
-        >
-          <div className="max-w-7xl mx-auto px-3 sm:px-5 py-3 space-y-1">
+      <div
+        ref={mobileMenuRef}
+        className="
+          lg:hidden
+          fixed
+          top-16
+          right-0
+          w-1/2
+          h-[calc(100vh-4rem)]
+          bg-zinc-900
+          border-l border-zinc-700
+          shadow-2xl
+          z-50
+        "
+      >
+          <div className="h-full flex flex-col px-4 py-4">
 
-            {/* Nav links */}
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                end={link.path === "/"}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
-                    isActive
-                      ? "bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/20"
-                      : "text-gray-300 hover:text-white hover:bg-zinc-700/50"
-                  }`
-                }
-              >
-                {link.icon}
-                <span>{link.label}</span>
-              </NavLink>
-            ))}
+            {/* Top Menu */}
+            <div className="space-y-2">
 
-            {/* Dashboard shortcut (only when logged in) */}
-            {user && (
-              <NavLink
-                to="/dashboard"
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
-                    isActive
-                      ? "bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/20"
-                      : "text-gray-300 hover:text-white hover:bg-zinc-700/50"
-                  }`
-                }
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                <span>Dashboard</span>
-              </NavLink>
-            )}
-
-            {/* Divider */}
-            <div className="h-px bg-zinc-700 my-1" />
-
-            {/* Report Issue CTA */}
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                handleStaffReportIssue();
-              }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl font-bold text-sm text-white shadow-lg"
-            >
-              <AlertTriangle className="w-4 h-4" />
-              <span>Report Issue</span>
-            </button>
-
-            {/* Mobile user info strip (when logged in) */}
-            {user && (
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-900/50 mt-1">
-                <div className="w-9 h-9 rounded-full overflow-hidden border border-emerald-500/40 shrink-0">
-                  <img
-                    src={
-                      user?.photoURL ||
-                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName}`
-                    }
-                    alt={user?.displayName}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-white font-semibold text-sm truncate">
-                    {user?.displayName || "User"}
-                  </div>
-                  <div className="text-emerald-400 text-xs capitalize">{role}</div>
-                </div>
-                <button
-                  onClick={() => {
-                    setIsOpen(false);
-                    handleLogout();
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:bg-red-500/10 text-xs font-semibold transition-colors"
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  end={link.path === "/"}
+                  className={({ isActive }) =>
+                    `flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                      isActive
+                        ? "bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/20"
+                        : "text-gray-300 hover:text-white hover:bg-zinc-800"
+                    }`
+                  }
                 >
-                  <LogOut className="w-3.5 h-3.5" />
-                  Logout
-                </button>
+                  {link.icon}
+                  <span>{link.label}</span>
+                </NavLink>
+              ))}
+
+              {user && (
+                <NavLink
+                  to="/dashboard"
+                  className={({ isActive }) =>
+                    `flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                      isActive
+                        ? "bg-linear-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/20"
+                        : "text-gray-300 hover:text-white hover:bg-zinc-800"
+                    }`
+                  }
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Dashboard</span>
+                </NavLink>
+              )}
+
+              <div className="h-px bg-zinc-700 my-2" />
+
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  handleStaffReportIssue();
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl font-bold text-sm text-white"
+              >
+                <AlertTriangle className="w-4 h-4" />
+                <span>Report Issue</span>
+              </button>
+            </div>
+
+            {/* Bottom User Section */}
+            {user && (
+              <div className="mt-auto border-t border-zinc-700 pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full overflow-hidden border border-emerald-500/40 shrink-0">
+                    <img
+                      src={
+                        user?.photoURL ||
+                        `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.displayName}`
+                      }
+                      alt={user?.displayName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white font-semibold text-sm truncate">
+                      {user?.displayName || "User"}
+                    </div>
+                    <div className="text-emerald-400 text-xs capitalize">
+                      {role}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      handleLogout();
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 text-sm font-semibold transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </div>
               </div>
             )}
           </div>
