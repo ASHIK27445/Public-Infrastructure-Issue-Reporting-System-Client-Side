@@ -232,7 +232,7 @@ function CertificateCard({ cert }) {
 
         {/* Action buttons */}
         <div className="flex gap-2 mb-2">
-          <Link to={`/verify/${cert.certId}`}
+          <Link to={`/ver/${cert.certId}`}
             className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold border border-zinc-700 text-gray-300 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors">
             <Search className="w-3.5 h-3.5" /> Verify
           </Link>

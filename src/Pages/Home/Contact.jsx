@@ -1,122 +1,101 @@
-import React from 'react';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import React from "react";
+import { ArrowRight } from "lucide-react";
+import LiquidChrome from "./LiquidChrome";
 
 const Contact = () => {
   return (
-    <section className="py-32 px-6 bg-linear-to-b from-zinc-900 to-zinc-950">
-      <title>CommunityFix - Contact</title>
+    <section className="relative overflow-hidden bg-linear-to-b from-zinc-900 via-[#141414] to-zinc-950 py-24 md:py-32 px-6">
+      {/* Same container width as ResolvedIssues */}
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20">
-          <div className="inline-block px-6 py-2 rounded-full bg-linear-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 mb-6">
-            <span className="text-emerald-400 font-semibold text-sm uppercase tracking-wider">Contact</span>
+        {/* Hero */}
+        <div className="relative h-150 overflow-hidden rounded-2xl">
+          {/* Background */}
+          <div className="absolute inset-0 z-0">
+            <LiquidChrome
+              baseColor={[0.08, 0.08, 0.08]}
+              speed={0.9}
+              amplitude={0.45}
+              interactive={true}
+            />
           </div>
-          <h2 className="text-5xl md:text-7xl font-black text-white mb-6">
-            Get In <span className="bg-linear-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">Touch</span>
-          </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Have questions or need support? Our team is here to help you make a difference in your community.
-          </p>
+
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/45 z-1" />
+
+          {/* Glass Card */}
+          <div className="absolute left-5 top-5 sm:left-10 sm:top-10 md:left-16 md:top-16 lg:left-20 lg:top-20 z-10 w-[calc(100%-40px)] sm:w-95 md:w-107.5 lg:w-125 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-2xl p-6 md:p-8 lg:p-10">
+            <h2 className="text-amber-100 text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+              Building Better
+              <br />
+              Communities Together.
+            </h2>
+
+            <p className="mt-5 text-sm md:text-base leading-7 text-white/75">
+              CommunityFix empowers citizens to report local issues,
+              participate in community events, and collaborate with local
+              authorities to build cleaner, safer, and smarter neighborhoods.
+            </p>
+
+            <a
+              href="/allissues"
+              className="mt-8 inline-flex items-center gap-2 border-b border-amber-100 pb-1 text-sm md:text-base font-semibold text-amber-100 transition hover:border-white hover:opacity-90"
+            >
+              Explore Community
+              <ArrowRight size={16} strokeWidth={2.4} />
+            </a>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          <div className="space-y-8">
-            <div className="group bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500">
-              <div className="flex items-start space-x-4">
-                <div className="w-16 h-16 bg-linear-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-500">
-                  <Phone className="w-8 h-8" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Call Us</h3>
-                  <p className="text-gray-400 mb-2">Available 24/7 for emergency issues</p>
-                  <a href="tel:+18001234567" className="text-emerald-400 text-xl font-bold hover:text-emerald-300 transition-colors">
-                    +1 (800) 123-4567
-                  </a>
-                </div>
-              </div>
-            </div>
+        {/* Footer */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 border-t border-zinc-800 py-10">
+          {/* Column 1 */}
+          <div>
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-white">
+              Our Community
+            </p>
 
-            <div className="group bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500">
-              <div className="flex items-start space-x-4">
-                <div className="w-16 h-16 bg-linear-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-500">
-                  <Mail className="w-8 h-8" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Email Us</h3>
-                  <p className="text-gray-400 mb-2">We'll respond within 2 hours</p>
-                  <a href="mailto:support@communityfix.com" className="text-emerald-400 text-xl font-bold hover:text-emerald-300 transition-colors">
-                    support@communityfix.com
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <div className="group bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500">
-              <div className="flex items-start space-x-4">
-                <div className="w-16 h-16 bg-linear-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-500">
-                  <MapPin className="w-8 h-8" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Visit Us</h3>
-                  <p className="text-gray-400 mb-2">Monday - Friday, 9AM - 6PM</p>
-                  <div className="text-gray-300">
-                    123 Civic Center Drive<br />
-                    Suite 500<br />
-                    Your City, State 12345
-                  </div>
-                </div>
-              </div>
-            </div>
+            <p className="text-[14px] leading-6 text-zinc-400">
+              Connecting citizens, volunteers, and local authorities to solve
+              everyday community challenges and create positive local impact.
+            </p>
           </div>
 
-          <div className="group bg-linear-to-br from-zinc-800 to-zinc-900 rounded-3xl p-8 border border-zinc-700 hover:border-emerald-500/50 transition-all duration-500">
-            <h3 className="text-2xl font-bold text-white mb-6">Send us a message</h3>
-            <form className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-gray-400 mb-2">First Name</label>
-                  <input 
-                    type="text" 
-                    className="w-full px-6 py-4 bg-zinc-800 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                    placeholder="John"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-400 mb-2">Last Name</label>
-                  <input 
-                    type="text" 
-                    className="w-full px-6 py-4 bg-zinc-800 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                    placeholder="Doe"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-gray-400 mb-2">Email</label>
-                <input 
-                  type="email" 
-                  className="w-full px-6 py-4 bg-zinc-800 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                  placeholder="john@example.com"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 mb-2">Message</label>
-                <textarea 
-                  rows="4"
-                  className="w-full px-6 py-4 bg-zinc-800 border border-zinc-700 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors resize-none"
-                  placeholder="How can we help you improve your community?"
-                />
-              </div>
-              <button 
-                type="submit"
-                className="w-full px-8 py-5 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl font-bold text-lg text-white hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-[1.02]"
-              >
-                Send Message
-              </button>
-            </form>
+          {/* Column 2 */}
+          <div>
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-white">
+              Resources
+            </p>
+
+            <a
+              href="/events"
+              className="inline-flex items-center gap-2 text-[14px] text-emerald-400 transition hover:opacity-80"
+            >
+              Explore Events
+            </a>
+          </div>
+
+          {/* Column 3 */}
+          <div>
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-white">
+              Get in Touch
+            </p>
+
+            <a
+              href="mailto:support@communityfix.com"
+              className="text-[14px] text-emerald-400 transition hover:underline hover:opacity-80"
+            >
+              support@communityfix.com
+            </a>
+
+            <p className="mt-3 text-sm text-zinc-500">
+              We'd love to hear your ideas, feedback, and suggestions to make
+              our communities even better.
+            </p>
           </div>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default Contact;
