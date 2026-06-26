@@ -63,7 +63,7 @@ export default function AdminEventManagePage() {
       setLoading(false);
     }
   };
-  console.log(data)
+  // console.log(data)
 
   useEffect(() => { fetchData(); }, [id]);
 
@@ -688,7 +688,7 @@ function FreeParticipantsTab({ participants, eventId, onRefresh, axiosSecure }) 
                 toast.success(`${name} removed.`);
                 onRefresh();
               } catch (err) {
-                console.log(err)
+                // console.log(err)
                 toast.error(err.response?.data?.message || "Remove failed");
               }
             }}

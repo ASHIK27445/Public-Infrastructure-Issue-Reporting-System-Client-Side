@@ -86,7 +86,6 @@ export default function EventDetailPage() {
         `${import.meta.env.VITE_API_MANUAL}/events/${id}`,
       );
       setData(res.data);
-      console.log(res.data)
     } catch (err) {
       // console.warn("API failed, using demo data:", err.message);
       
@@ -229,7 +228,6 @@ export default function EventDetailPage() {
   );
 
   const { event, donations, comments, userReaction, userRegistration, freeParticipants, waitlistCount } = data;
-  console.log(data)
   const typeMeta  = TYPE_META[event.eventType]   || TYPE_META.meetup;
   const colorCls  = COLOR_MAP[typeMeta.color]    || COLOR_MAP.teal;
   const eventDate = new Date(event.date);

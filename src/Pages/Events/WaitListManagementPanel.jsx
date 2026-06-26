@@ -39,7 +39,6 @@ export default function WaitlistManagementPanel({ eventTitle, maxVolunteers }) {
     }
   };
 
-  console.log(volunteers, waitlist)
 
   useEffect(() => { fetchAll(); }, [eventId]);
 

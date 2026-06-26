@@ -224,7 +224,6 @@ export default function QRCheckinPage() {
       const res = await axiosSecure.post(`/events/${id}/checkin/manual`, {
         email: manualEmail.trim(),
       });
-      console.log(res.data)
       setManualResult({ ...res.data, type: "success" });
       setManualEmail("");
       fetchStats();
@@ -298,7 +297,6 @@ export default function QRCheckinPage() {
   const freeParticipantsPending = statsData?.freeParticipantsPending || [];
   const freeTotal = (statsData?.stats?.freeParticipants || 0) + (statsData?.stats?.freeParticipantsAttended || 0);
 
-// console.log(statsData)
   return (
     <Shell>
       {/* ── Header ── */}

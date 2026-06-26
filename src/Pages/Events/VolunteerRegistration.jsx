@@ -152,7 +152,6 @@ export default function VolunteerRegistration() {
         window.location.href = reg.paymentUrl;
         return;
       }
-      // console.log(res.data, result)
       setResult(reg);
       setSubmitted(true);
       toast.success(res.data?.message || "Registered successfully!");

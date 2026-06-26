@@ -63,7 +63,7 @@ export default function CreateEvent() {
       try {
         const res = await axiosSecure.get('/allissues');
         setIssues(res.data || []);
-        console.log(res.data)
+        // console.log(res.data)
       } catch {
         // silently fail — linking is optional
       }
@@ -161,7 +161,7 @@ export default function CreateEvent() {
         linkedIssueId: form.linkedIssueId || undefined,
       };
 
-      console.log(payload)
+      // console.log(payload)
 
       await axiosSecure.post('/events/create', payload
       );
