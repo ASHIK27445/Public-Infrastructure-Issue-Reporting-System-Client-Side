@@ -36,7 +36,7 @@ const COLOR_MAP = {
 /* ═══════════════════════════════════════
    MAIN PAGE
 ═══════════════════════════════════════ */
-export default function EventDetailPage() {
+export default function EventDetailsPage() {
   const { id }           = useParams();
   const navigate         = useNavigate();
   const [searchParams, setSearchParams]   = useSearchParams();
