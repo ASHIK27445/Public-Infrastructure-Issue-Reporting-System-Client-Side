@@ -123,7 +123,10 @@ export const router = createBrowserRouter([
                 path: '/events/:id', Component: EventDetailPage
             },
             {
-                path: '/test', Component: CertificateVerifyPage
+                path: '/ver', Component: CertificateVerifyPage
+            },
+            { 
+                path: '/ver/:certId', Component: CertificateVerifyPage 
             }
         ]
     },
@@ -211,14 +214,10 @@ export const router = createBrowserRouter([
     {
         path: '*', Component: ErrorPage
     },
-    {
-        path: '/onlytest', element: <h1></h1>
-    },
+    // {
+    //     path: '/onlytest', element: <h1></h1>
+    // },
     {
         path: '/event/:id/qr/checkin', element: <PrivateRouter><QRCheckinPage /></PrivateRouter>
     },
-    {
-        path: '/ver', Component: CertificateVerifyPage
-    },
-    { path: '/ver/:certId', Component: CertificateVerifyPage }
 ])

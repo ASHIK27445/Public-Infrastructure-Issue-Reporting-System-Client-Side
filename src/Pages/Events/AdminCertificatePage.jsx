@@ -510,7 +510,7 @@ function CertRow({ cert, eventId, onResendClick, resending }) {
       <td className="px-4 py-3.5">
         <div className="flex items-center gap-1.5">
           {/* Verify */}
-          <Link to={`/verify/${cert.certId}`}
+          <Link to={`/ver/${cert.certId}`}
             title="Verify certificate"
             className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-800 hover:text-white transition-all">
             <Eye className="w-4 h-4" />
