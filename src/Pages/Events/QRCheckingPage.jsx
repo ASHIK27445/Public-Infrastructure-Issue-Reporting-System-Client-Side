@@ -334,7 +334,7 @@ export default function QRCheckinPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-5 flex gap-6 items-start">
+      <div className="max-w-5xl mx-auto px-4 py-5 flex flex-col-reverse lg:flex-row gap-6 items-start">
         {/* Main Content */}
         <div className="flex-1 min-w-0">
           {/* ── Progress ── */}
@@ -356,7 +356,7 @@ export default function QRCheckinPage() {
           </div>
 
           {/* ── Stats ── */}
-          <div className="grid grid-cols-4 gap-3 mb-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             <StatCard
               icon={CheckCircle}
               label="Attended"
@@ -554,7 +554,7 @@ export default function QRCheckinPage() {
                 {!scanning ? (
                   <button
                     onClick={startScanner}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-amber-50 font-medium text-sm transition-colors"
                   >
                     <Camera className="w-5 h-5" />
                     Start Camera
@@ -789,7 +789,7 @@ export default function QRCheckinPage() {
           )}
         </div>
         {/* Sidebar */}
-        <div className="w-64 shrink-0 sticky top-24 space-y-3">
+        <div className="w-full lg:w-64 shrink-0 lg:sticky lg:top-24 space-y-3">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Breakdown</p>
           <SidebarStatRow label="Volunteers" attended={statsData?.stats?.volunteerAttended || 0} total={statsData?.stats?.volunteerCount || 0} color="blue" />
           <SidebarStatRow label="Guests" attended={statsData?.stats?.guestAttended || 0} total={statsData?.stats?.guestCount || 0} color="violet" />
@@ -899,7 +899,7 @@ function CheckinCard({ volunteer, type, onUndo, onManualCheckin, isFreeParticipa
 ═══════════════════════════════════════ */
 function Shell({ children }) {
   return (
-    <div className="min-h-screen bg-linear-to-br from-zinc-900 to-zinc-800 " style={{ fontFamily: "Inter, sans-serif" }}>
+    <div className="overflow-hidden min-h-screen bg-linear-to-br from-zinc-900 to-zinc-800 " style={{ fontFamily: "Inter, sans-serif" }}>
       <style>
         {`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');`}
       </style>
