@@ -300,7 +300,7 @@ export default function QRCheckinPage() {
   return (
     <Shell>
       {/* ── Header ── */}
-      <div className="sticky top-0 z-20 bg-linear-to-br from-zinc-900 to-zinc-800   backdrop-blur-sm border-b border-gray-100 px-4 py-4">
+      <div className="sticky top-0 z-20 bg-linear-to-br from-zinc-900 to-zinc-800 backdrop-blur-sm border-b border-gray-100 px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
           <button
             onClick={() => {
@@ -334,9 +334,9 @@ export default function QRCheckinPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-5 flex flex-col-reverse lg:flex-row gap-6 items-start">
+      <div className="max-w-5xl mx-auto px-4 py-5 flex flex-col lg:flex-row gap-6 items-start">
         {/* Main Content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 w-full">
           {/* ── Progress ── */}
           <div className="mb-6">
             <div className="flex justify-between text-xs text-gray-500 mb-2">
@@ -356,7 +356,7 @@ export default function QRCheckinPage() {
           </div>
 
           {/* ── Stats ── */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
             <StatCard
               icon={CheckCircle}
               label="Attended"
@@ -383,7 +383,7 @@ export default function QRCheckinPage() {
           </div>
 
           {/* ── Tabs ── */}
-          <div className="flex gap-1 bg-zinc-800 rounded-xl p-1 mb-6">
+          <div className="flex gap-1 bg-zinc-800 rounded-xl p-1 mb-6 overflow-x-auto">
             {[
               { id: "scanner", label: "Scan", icon: Scan },
               { id: "manual", label: "Manual", icon: UserPlus },
@@ -403,7 +403,7 @@ export default function QRCheckinPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                   activeTab === tab.id
                     ? "bg-white text-blue-600 shadow-sm"
                     : "text-gray-500 hover:text-gray-700"
