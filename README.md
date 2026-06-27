@@ -89,7 +89,7 @@ Beyond issue reporting, CommunityFix now features a full **Community Event & Vol
     <br>Cloudinary
   </td>
   <td align="center" width="96">
-    <img src="https://cdn.worldvectorlogo.com/logos/nodemailer.svg" width="48" height="48" alt="Nodemailer" />
+    <img src="https://img.shields.io/badge/Nodemailer-0F9DCE?style=for-the-badge&logo=nodemailer&logoColor=white" alt="Nodemailer" />
     <br>Nodemailer
   </td>
   <td align="center" width="96">
@@ -97,7 +97,7 @@ Beyond issue reporting, CommunityFix now features a full **Community Event & Vol
     <br>Puppeteer
   </td>
   <td align="center" width="96">
-    <img src="https://cdn.worldvectorlogo.com/logos/google-gemini-icon.svg" width="48" height="48" alt="Gemini AI" />
+    <img src="https://img.shields.io/badge/Gemini_AI-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini AI" />
     <br>Gemini AI
   </td>
   <td align="center" width="96">
